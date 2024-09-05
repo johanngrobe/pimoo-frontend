@@ -1,0 +1,152 @@
+[
+  {
+    "text": "Durch regelkonforme Gehwegbreiten wird der Verkehrsfluss gesichert.",
+    "tags": ["1.1", "Fuß", "EFA"],
+    "mainObjective": 1,
+    "subObjective": 1
+  },
+  {
+    "text": "Durch regelkonforme Radverkehrsführung wird der Verkehrsfluss gesichert.",
+    "tags": ["1.2", "Rad", "ERA"],
+    "mainObjective": 1,
+    "subObjective": 2
+  },
+  {
+    "text": "Durch leitstungsfähre LSA wird der Vekehrsfluss für den MIV gesichert.",
+    "tags": ["1.4", "MIV", "RASt"],
+    "mainObjective": 1,
+    "subObjective": 4
+  },
+  {
+    "text": "Durch sichere Führung an Knotenpunkten wird das Fußwegenetz verbessert.",
+    "tags": ["2.1", "EFA", "Fuß"],
+    "mainObjective": 2,
+    "subObjective": 1
+  },
+  {
+    "text": "Durch sichere Führung an Knotenpunkten wird das Radwegenetz verbessert.",
+    "tags": ["2.2", "ERA", "Rad"],
+    "mainObjective": 2,
+    "subObjective": 2
+  },
+  {
+    "text": "Durch regelkonforme Gehwegbreiten wird die Qualität des Netzbestandteiles verbessert.",
+    "tags": ["2.3", "EFA", "Fuß"],
+    "mainObjective": 2,
+    "subObjective": 3
+  },
+  {
+    "text": "Durch eine regelkonforme Radverehrsführung wird die Qualität des Netzbestandteiles verbessert.",
+    "tags": ["2.4", "ERA", "Rad"],
+    "mainObjective": 2,
+    "subObjective": 4
+  },
+  {
+    "text": "Durch zusätzliche Haltepunkte wird die räumliche Erschließung des ÖPNV verbessert.",
+    "tags": ["3.1", "ÖPNV"],
+    "mainObjective": 3,
+    "subObjective": 1
+  },
+  {
+    "text": "Durch neue kürzere Wegeverbindungen zum ÖPNV wird die räumliche Erschließung verbessert.",
+    "tags": ["3.1", "ÖPNV"],
+    "mainObjective": 3,
+    "subObjective": 1
+  },
+  {
+    "text": "Durch eine Erhöhung des Taktes wird die zeitliche Erschließung erhöht.",
+    "tags": ["3.2", "ÖPNV"],
+    "mainObjective": 3,
+    "subObjective": 2
+  },
+  {
+    "text": "Durch zuverlässige Fahrzeiten im ÖPNV wird die Verlässlichkeit verbessert.",
+    "tags": ["3.4", "ÖPNV"],
+    "mainObjective": 3,
+    "subObjective": 4
+  },
+  {
+    "text": "Durch eine umfangreiche Versorgung mit Artikeln des täglichen Bedarfes können Verkehre vermieden werden.",
+    "tags": ["4.1", "MIV"],
+    "mainObjective": 4,
+    "subObjective": 1
+  },
+  {
+    "text": "Durch attraktivere nicht MIV Verbindungen können Verkehre modal verlagert werden.",
+    "tags": ["4.2", "MIV", "Fuß", "Rad"],
+    "mainObjective": 4,
+    "subObjective": 2
+  },
+  {
+    "text": "Durch den kostengünstigen Zugang können Verkehre modal verlagert werden.",
+    "tags": ["4.2", "MIV", "ÖPNV"],
+    "mainObjective": 4,
+    "subObjective": 2
+  },
+  {
+    "text": "Durch den niedrigschwelligen Zugang zum ÖPNV können Verkehre modal verlagert werden.",
+    "tags": ["4.2", "MIV", "ÖPNV"],
+    "mainObjective": 4,
+    "subObjective": 2
+  },
+  {
+    "text": "Durch eine Steigerung des Elektrifizierungsgrades in der Fahrzeugflotte können Verkehre verträglicher abgewickelt werden.",
+    "tags": ["4.3", "MIV"],
+    "mainObjective": 4,
+    "subObjective": 3
+  },
+  {
+    "text": "Durch regelmäßige Kontrollen und Sanktionierungen werden geltende Regeln stärker eingehalten.",
+    "tags": ["5", "Sicherheit"],
+    "mainObjective": null,
+    "subObjective": null
+  },
+  {
+    "text": "Durch eine Verbesserung der Verkehrssicherheit werden die Unfallzahlen reduziert.",
+    "tags": ["5.1", "Sicherheit"],
+    "mainObjective": 5,
+    "subObjective": 1
+  },
+  {
+    "text": "Durch eine Gleichberechtigung der Verkehrsteilnehmenden wird das Miteinander im Verkehr gefördert.",
+    "tags": ["5.2"],
+    "mainObjective": 5,
+    "subObjective": 2
+  },
+  {
+    "text": "Durch die Verbesserung der Radabstellanlagen an ÖPNV-Haltepunkten wird eine multimodale Mobilität gefördert.",
+    "tags": ["6.3", "Modal", "Rad", "ÖPNV"],
+    "mainObjective": 6,
+    "subObjective": 3
+  },
+  {
+    "text": "Durch die Schaffung von Grün im öffentlichen Raum wird die Aufenthaltsqualität gefördert.",
+    "tags": ["7.1", "Aufenthaltsqualität"],
+    "mainObjective": 7,
+    "subObjective": 1
+  },
+  {
+    "text": "Durch die Geschwindigkeitsreduktion wird die Aufenthaltsqualität erhöht.",
+    "tags": ["7.1", "Geschwindigkeit", "Aufenthaltsqualität"],
+    "mainObjective": 7,
+    "subObjective": 1
+  },
+  {
+    "text": "Durch die Verschmälerung der Fahrbahn kann der Flächenverbrauch der Verkehrsanlagen reduziert werden.",
+    "tags": ["7.1", "Flächenverbrauch"],
+    "mainObjective": 7,
+    "subObjective": 1
+  },
+  {
+    "text": "Durch die Unterbindung ordnungswidrigen Parkens wird die Verkehrssicherheit erhöht.",
+    "tags": ["Parken", "Sicherheit"],
+    "mainObjective": null,
+    "subObjective": null
+  },
+  {
+    "text": "Durch die Geschwindigkeitsreduktion wird die Verkehrssicherheit insbesondere für den nicht MIV erhöht.",
+    "tags": ["Geschwindigkeit", "Nahmobilität"],
+    "mainObjective": null,
+    "subObjective": null
+  }
+]
