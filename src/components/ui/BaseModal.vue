@@ -8,7 +8,7 @@
     >
       <div
         ref="modalContent"
-        class="relative p-4 w-full max-w-2xl max-h-full overflow-y-auto"
+        class="relative p-4 w-full max-w-4xl max-h-full overflow-y-auto"
         @touchmove.prevent
       >
         <!-- Modal content -->
@@ -110,10 +110,24 @@ onBeforeUnmount(() => {
   toggleBodyScroll(false)
 })
 
+const getIgnoreElements = () => {
+  let ignoreElements = []
+
+  for (let value = 0; value <= 6; value++) {
+    for (let subvalue = 0; subvalue <= 6; subvalue++) {
+      ignoreElements.push(`#spatial-impact-${value}-${subvalue}_list`)
+      ignoreElements.push(`#indicators-${value}-${subvalue}_list`)
+      ignoreElements.push(`#indicators-${value}-${subvalue}_header`)
+    }
+  }
+  ignoreElements.push(`#administration-date_panel`)
+  return ignoreElements
+}
+
 // Close modal when clicking outside the modal content
 const modalContent = ref(null)
 onClickOutside(modalContent, closeModal, {
-  ignore: ['#administration-date_panel']
+  ignore: getIgnoreElements()
 })
 </script>
 

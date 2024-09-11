@@ -42,6 +42,8 @@
           showIcon
           iconDisplay="input"
           aria-describedby="administration-date-help"
+          class="dont-close-on-select"
+          inputClass="dont-close-on-select"
           :class="{ 'p-invalid': errors.administrationDate }"
         />
         <label for="administration-date" :class="{ 'p-invalid': errors.administrationDate }">
@@ -240,15 +242,25 @@
       </div>
     </div>
     <div v-if="impact" class="text-right mt-7">
-      <BaseButton @click="closeModal" type="submit">{{
-        isEditMode ? 'Aktualisieren' : 'Speichern'
-      }}</BaseButton>
+      <BaseButton @click="closeModal" type="submit">
+        <div v-if="editMode" class="flex">
+          <IconSync class="me-1" height="20" /><span class="text-left w-18">Aktualisieren</span>
+        </div>
+        <div v-else class="flex">
+          <IconSave class="me-1" height="20" /><span class="text-left w-18">Speichern</span>
+        </div>
+      </BaseButton>
+      <BaseButton v-if="editMode" @click="exportSubmission(currentSubmissionId.value)"
+        ><IconDownload class="me-1" height="20" /><span class="text-left w-18"
+          >PDF-Export</span
+        ></BaseButton
+      >
     </div>
   </form>
 </template>
 
 <script setup>
-import { ref, computed, watchEffect, defineEmits, onMounted } from 'vue'
+import { ref, computed, watchEffect, defineEmits, onMounted, defineModel } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
@@ -260,6 +272,9 @@ import RadioButton from 'primevue/radiobutton'
 import HoverInfo from '@/components/ui/HoverInfo.vue'
 import { useToast } from 'primevue/usetoast'
 import apiClient from '@/services/axios'
+import IconDownload from '@/assets/icons/MaterialSymbolsDownload.svg?component'
+import IconSave from '@/assets/icons/MaterialSymbolsSave.svg?component'
+import IconSync from '@/assets/icons/MaterialSymbolsSync.svg?component'
 
 const impactOptions = ref({})
 const impactGhgOptions = ref({})
@@ -376,19 +391,14 @@ const continueForm = computed(() => {
 })
 
 // Props to determine if the form is in edit mode
-const props = defineProps({
-  submissionId: {
-    type: Number,
-    default: null
-  }
-})
+const currentSubmissionId = defineModel({ default: null })
 
-const isEditMode = computed(() => props.submissionId !== null)
+const editMode = computed(() => currentSubmissionId.value !== null)
 
 // Fetch existing data if editing
 const fetchSubmissionData = async () => {
-  if (isEditMode.value) {
-    const response = await apiClient.get(`/submission/climate/${props.submissionId}`)
+  if (editMode.value) {
+    const response = await apiClient.get(`/submission/climate/${currentSubmissionId.value}`)
     const submission = response.data
 
     // Populate form fields with existing submission data
@@ -407,7 +417,7 @@ const fetchSubmissionData = async () => {
 
 // Watch for changes in submissionId and fetch data when necessary
 watchEffect(() => {
-  if (isEditMode.value) {
+  if (editMode.value) {
     fetchSubmissionData()
   }
 })
@@ -416,7 +426,7 @@ watchEffect(() => {
 const emit = defineEmits(['close-modal'])
 
 const closeModal = () => {
-  if (isEditMode.value) {
+  if (editMode.value) {
     emit('close-modal')
   }
 }
@@ -435,10 +445,10 @@ const onSubmit = handleSubmit(async (values) => {
       .split('T')[0]
   }
 
-  if (isEditMode.value) {
+  if (editMode.value) {
     // PUT request to update existing submission
     const response = await apiClient.put(
-      `/submission/climate/${props.submissionId}`,
+      `/submission/climate/${currentSubmissionId.value}`,
       formattedValues
     )
     switch (response.status) {
@@ -459,6 +469,7 @@ const onSubmit = handleSubmit(async (values) => {
     switch (response.status) {
       case 200:
         toast.add({ severity: 'success', summary: 'Klimacheck gespeichert', life: 3000 })
+        currentSubmissionId.value = response.data.id
         break
       default:
         toast.add({
@@ -469,9 +480,26 @@ const onSubmit = handleSubmit(async (values) => {
         })
     }
   }
-
-  console.log('Form submitted:', formattedValues)
 })
+
+const exportSubmission = async (id) => {
+  try {
+    const response = await apiClient.get(`/submission/climate/export/${id}`, {
+      responseType: 'blob'
+    })
+    // Create a download link for the received Blob
+    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
+    const link = document.createElement('a')
+    link.href = url
+    const fileName = `klimacheck_${id}.pdf`
+    link.setAttribute('download', fileName) // The file name
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } catch (error) {
+    console.error('Error downloading the PDF:', error)
+  }
+}
 </script>
 
 <style scoped>

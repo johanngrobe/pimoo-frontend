@@ -1,5 +1,14 @@
 <template>
-  <h1>Neuer Klimacheck</h1>
+  <div class="flex">
+    <h1>Neuer Klimacheck</h1>
+    <div class="text-right ms-auto mt-3">
+      <BaseButton @click="refreshPage()" outline="true"
+        ><IconRefresh class="me-1" height="20" /><span class="text-left w-18"
+          >Zurücksetzen</span
+        ></BaseButton
+      >
+    </div>
+  </div>
   <BaseCard :collapsible="true" :isCollapsed="formInfoCollapsed">
     <template #title>
       <div @click="toggleFormInfo">
@@ -23,6 +32,14 @@
 <script setup>
 import { ref } from 'vue'
 import ClimateForm from '@/components/form/ClimateForm.vue'
+import IconRefresh from '@/assets/icons/MaterialSymbolsRefresh.svg?component'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const refreshPage = () => {
+  router.go() // Reloads the current route
+}
 
 const formInfoCollapsed = ref(true)
 

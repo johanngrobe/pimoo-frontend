@@ -16,8 +16,10 @@
           />
           <label :for="`checkbox-${index}`" class="text-lg ms-3" @click="toggleCheckbox(index)">
             <div class="flex justify-center">
-              <span class="font-bold flex-none my-auto">{{ mainObjective.no }}</span>
-              <span class="text-semibold ms-2 flex-auto my-auto">{{ mainObjective.label }}</span>
+              <span class="font-bold flex-none my-auto">{{ mainObjective.mainObjective.no }}</span>
+              <span class="text-semibold ms-2 flex-auto my-auto">{{
+                mainObjective.mainObjective.label
+              }}</span>
             </div>
           </label>
         </div>

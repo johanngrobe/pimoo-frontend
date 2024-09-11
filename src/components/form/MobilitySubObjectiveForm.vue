@@ -21,9 +21,13 @@
         >
           <div class="flex justify-center">
             <span class="font-bold flex-none my-auto"
-              >{{ subObjective.mainObjectiveId }}.{{ subObjective.no }}</span
+              >{{ subObjective.subObjective.mainObjectiveId }}.{{
+                subObjective.subObjective.no
+              }}</span
             >
-            <span class="text-semibold ms-2 flex-auto my-auto">{{ subObjective.label }}</span>
+            <span class="text-semibold ms-2 flex-auto my-auto">{{
+              subObjective.subObjective.label
+            }}</span>
           </div>
         </label>
       </div>
@@ -36,7 +40,7 @@
             <Slider
               :id="`impact-${mainObjectiveIndex}-${index}`"
               :key="`impact-${mainObjectiveIndex}-${index}`"
-              v-model="subObjective.impact"
+              v-model.number="subObjective.impact"
               :min="-3"
               :max="3"
               :step="1"
@@ -45,7 +49,7 @@
             <div class="flex justify-between mt-2">
               <span v-for="tick in 7" :key="tick" class="relative w-0.5 h-2 bg-gray-800">
                 <span class="absolute top-2 left-1/2 transform -translate-x-1/2 text-xs">
-                  {{ handleTickmarks(tick - 4) }}
+                  {{ tickmarkLabels[tick - 4] }}
                 </span>
               </span>
             </div>
@@ -59,7 +63,7 @@
                 :options="optionsSpatialImpact"
                 optionLabel="label"
                 optionValue="value"
-                class="w-full"
+                class="w-full dont-close-on-select"
               />
               <label :for="`spatial-impact-${mainObjectiveIndex}-${index}`"
                 >Räumliche Auswirkung</label
@@ -90,9 +94,14 @@
             optionLabel="label"
             optionValue="id"
             placeholder="Indikatoren auswählen"
-            class="w-full"
+            class="w-full dont-close-on-select"
             display="chip"
             empty-filter-message="Keine Ergebnisse gefunden"
+            :pt="{
+              header: () => ({
+                id: `indicators-${mainObjectiveIndex}-${index}_header`
+              })
+            }"
           />
         </div>
       </div>
@@ -101,8 +110,9 @@
 </template>
 
 <script setup>
-import { defineProps, onMounted, ref } from 'vue'
+import { defineProps, onMounted, watchEffect } from 'vue'
 import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
+import { useStorage } from '@vueuse/core'
 import Checkbox from 'primevue/checkbox'
 import Dropdown from 'primevue/dropdown'
 import FloatLabel from 'primevue/floatlabel'
@@ -120,56 +130,56 @@ const props = defineProps({
   }
 })
 
-const optionsSpatialImpact = ref([])
+const optionsIndicators = useStorage('cachedIndicators', [])
+const tickmarkLabels = useStorage('cachedTickmarkLabels', {})
+const optionsSpatialImpact = useStorage('cachedSpatialImpactOptions', [])
 
 const fetchSpatialImpactOptions = async () => {
   try {
-    const response = await apiClient.get('/option/mobility/spatial-impact')
-    optionsSpatialImpact.value = response.data
+    if (!optionsSpatialImpact.value.length) {
+      const response = await apiClient.get('/option/mobility/spatial-impact')
+      optionsSpatialImpact.value = response.data
+    }
   } catch (error) {
     console.error(error)
   }
 }
-
-const tickmarkLabels = ref(null)
 
 const fetchTickmarkLabels = async () => {
   try {
-    const response = await apiClient.get('/option/mobility/impact-tickmarks')
-    tickmarkLabels.value = response.data
-    // tickmarkLabels.value = tickmarkLabels.value.reduce((acc, { label, value }) => {
-    //   acc[value] = label
-    //   return acc
-    // }, {})
+    if (Object.keys(tickmarkLabels.value).length === 0) {
+      const response = await apiClient.get('/option/mobility/impact-tickmarks')
+      tickmarkLabels.value = response.data.reduce((acc, { label, value }) => {
+        acc[value] = label
+        return acc
+      }, {})
+    }
   } catch (error) {
     console.error(error)
   }
 }
-const optionsIndicators = ref([])
 
 const fetchIndicators = async () => {
   try {
-    const response = await apiClient.get('/indicator')
-    optionsIndicators.value = response.data
+    if (!optionsIndicators.value.length) {
+      const response = await apiClient.get('/indicator')
+      optionsIndicators.value = response.data
+    }
   } catch (error) {
     console.error(error)
   }
 }
-
-onMounted(async () => {
-  await fetchIndicators()
-  await fetchSpatialImpactOptions()
-  await fetchTickmarkLabels()
+watchEffect(() => {
+  fetchTickmarkLabels()
+  fetchSpatialImpactOptions()
+  fetchIndicators()
 })
 
-const handleTickmarks = (tick) => {
-  const found = tickmarkLabels.value.find((item) => item.value === String(tick))
-  if (found) {
-    return found.label // Return the corresponding label if found
-  } else {
-    return '' // Return an empty string if not found
-  }
-}
+onMounted(async () => {
+  await fetchTickmarkLabels()
+  await fetchSpatialImpactOptions()
+  await fetchIndicators()
+})
 
 const toggleSubCheckbox = (index) => {
   mobilityStore.mobilityObjectiveForm[props.mainObjectiveIndex].subObjectives[index].target =

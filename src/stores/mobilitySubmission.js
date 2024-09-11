@@ -13,10 +13,14 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
 
       // Transform the objectives structure
       mobilityObjectiveForm.value = response.data.map((mainObjective) => ({
-        ...mainObjective,
+        mainObjective: { ...mainObjective },
+        id: null,
+        submissionId: null,
         target: false,
         subObjectives: mainObjective.subObjectives.map((subObjective) => ({
-          ...subObjective,
+          subObjective: { ...subObjective },
+          id: null,
+          mobilityResultId: null,
           target: false,
           impact: null,
           spatialImpact: null,
@@ -56,21 +60,22 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
 
   const toast = useToast()
 
+  const currentSubmissionId = ref(null)
+
   // Function to submit the entire mobility form and its objectives
   // Function to submit the entire mobility form and its objectives
   const submitMobilityForm = async () => {
-    console.log('Submitting mobility form:', mobilityForm.value, mobilityObjectiveForm.value)
     try {
       // 1. Submit the main mobility form
       const mobilityResponse = await apiClient.post('/submission/mobility', mobilityForm.value)
-      const submissionId = mobilityResponse.data.id // Capture the submission ID for linking objectives
+      currentSubmissionId.value = mobilityResponse.data.id // Capture the submission ID for linking objectives
 
       // 2. Loop through main objectives in `objective.value`
       for (const mainObjective of mobilityObjectiveForm.value) {
         // Submit the main objective, regardless of its target value
         const mainObjectiveResponse = await apiClient.post('/mobility-result', {
-          submissionId: submissionId, // Link to the mobility submission (camelCase)
-          mainObjectiveId: mainObjective.id, // ID of the main objective (camelCase)
+          submissionId: currentSubmissionId.value, // Link to the mobility submission (camelCase)
+          mainObjectiveId: mainObjective.mainObjective.id, // ID of the main objective (camelCase)
           target: mainObjective.target // Submit target (true or false)
         })
 
@@ -82,7 +87,7 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
             // Submit sub-objective if both main and sub-objective targets are true
             await apiClient.post('/mobility-result/sub', {
               mobilityResultId: mainObjectiveResultId, // Link to the main objective result (camelCase)
-              subObjectiveId: subObjective.id, // ID of the sub-objective (camelCase)
+              subObjectiveId: subObjective.subObjective.id, // ID of the sub-objective (camelCase)
               target: subObjective.target, // Target is true
               impact: subObjective.impact,
               spatialImpact: subObjective.spatialImpact, // camelCase
@@ -93,18 +98,19 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
             // Submit sub-objective with false target and null values if main or sub-objective target is false
             await apiClient.post('/mobility-result/sub', {
               mobilityResultId: mainObjectiveResultId, // Link to the main objective result (camelCase)
-              subObjectiveId: subObjective.id // ID of the sub-objective (camelCase)
+              subObjectiveId: subObjective.subObjective.id // ID of the sub-objective (camelCase)
             })
           }
         }
       }
-      console.log('Mobility form submitted successfully:')
       // If everything was successful, trigger the toast notification
       toast.add({
         severity: 'success',
         summary: 'Mobilitätscheck erfolgreich gespeichert',
         life: 3000
       })
+      editMode.value = true
+      await fetchMobilitySubmission(currentSubmissionId.value)
     } catch (error) {
       console.error('Error submitting mobility form:', error)
       toast.add({
@@ -116,22 +122,24 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
     }
   }
 
+  const editMode = ref(false)
+
   const fetchMobilitySubmission = async (submissionId) => {
     try {
       const response = await apiClient.get(`/submission/mobility/${submissionId}`)
 
       setMobilityFormValues(response.data)
-      // TODO Fetch objectives and update the form
       mobilityObjectiveForm.value = response.data.objectives
-      console.log('Mobility submission data fetched:', mobilityObjectiveForm.value)
     } catch (error) {
       console.error('Error fetching submission data:', error)
     }
   }
 
-  // TODO Implement the updateMobilitySubmission function
   const updateMobilitySubmission = async (submissionId) => {
     try {
+      // 1. Submit the main mobility form
+      await apiClient.put(`/submission/mobility/${submissionId}`, mobilityForm.value)
+
       // Loop through main objectives in `mobilityObjectiveForm.value`
       for (const mainObjective of mobilityObjectiveForm.value) {
         // Perform the update for the main objective
@@ -155,8 +163,6 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
           })
         }
       }
-
-      console.log('Mobility objectives updated successfully.')
       toast.add({
         severity: 'success',
         summary: 'Mobilitätsziele erfolgreich aktualisiert',
@@ -174,23 +180,32 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
     }
   }
 
-  function $reset() {
-    formValid.value.mobilityForm = false
-    formValid.value.mobilityOjectiveForm = false
-    mobilityForm.value.author = null
-    mobilityForm.value.administrationNo = null
-    mobilityForm.value.administrationDate = null
-    mobilityForm.value.label = null
-    mobilityForm.value.desc = null
-    fetchObjectives()
+  async function $reset() {
+    currentSubmissionId.value = null
+
+    formValid.value = {
+      mobilityForm: false,
+      mobilityOjectiveForm: false
+    }
+    mobilityForm.value = {
+      author: null,
+      administrationNo: null,
+      administrationDate: null,
+      label: null,
+      desc: null
+    }
+    editMode.value = false
+    await fetchObjectives()
   }
 
   return {
     formValid,
+    currentSubmissionId,
     setMobilityFormValues,
     submitMobilityForm,
     fetchMobilitySubmission,
     updateMobilitySubmission,
+    editMode,
     mobilityObjectiveForm,
     mobilityForm,
     fetchObjectives,

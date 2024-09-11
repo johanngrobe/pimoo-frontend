@@ -42,6 +42,7 @@
           showIcon
           iconDisplay="input"
           aria-describedby="administration-date-help"
+          class="dont-close-on-select"
           :class="{ 'p-invalid': errors.administrationDate }"
         />
         <label for="administration-date" :class="{ 'p-invalid': errors.administrationDate }">
@@ -90,7 +91,7 @@
 </template>
 
 <script setup>
-import { computed, defineEmits, defineProps, watchEffect } from 'vue'
+import { computed, defineEmits, watchEffect } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
 import { useForm } from 'vee-validate'
@@ -99,13 +100,6 @@ import InputText from 'primevue/inputtext'
 import Calendar from 'primevue/calendar'
 import Textarea from 'primevue/textarea'
 import FloatLabel from 'primevue/floatlabel'
-
-const props = defineProps({
-  editMode: {
-    type: Boolean,
-    default: false
-  }
-})
 
 // Validation schema
 const schema = yup.object({
@@ -148,7 +142,7 @@ const fetchSubmissionData = async () => {
 
 // Watch for changes in submissionId and fetch data when necessary
 watchEffect(() => {
-  if (props.editMode) {
+  if (mobilityStore.editMode) {
     fetchSubmissionData()
   }
 })
