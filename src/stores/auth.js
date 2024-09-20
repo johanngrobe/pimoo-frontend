@@ -28,7 +28,7 @@ export const useAuthStore = defineStore(
         password,
         options: {
           data: meta,
-          redirectTo: 'http://localhost:5173/'
+          redirectTo: import.meta.env.VITE_SUPABASE_REDIRECT_URL
         }
       })
       loading.value = false
@@ -80,7 +80,7 @@ export const useAuthStore = defineStore(
       try {
         loading.value = true
         let { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: 'http://localhost:5173/reset-password'
+          redirectTo: import.meta.env.VITE_SUPABASE_REDIRECT_URL + '/reset-password'
         })
         console.log(data)
         loading.value = false
