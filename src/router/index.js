@@ -40,6 +40,11 @@ const router = createRouter({
       component: () => import('@/views/auth/ForgotPasswordView.vue')
     },
     {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: () => import('@/views/auth/ResetPasswordView.vue')
+    },
+    {
       path: '/new-mobility-check',
       name: 'new-mobility-check',
       component: () => import('@/views/authRequired/NewMobilityView.vue'),

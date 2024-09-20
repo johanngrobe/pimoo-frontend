@@ -2,7 +2,7 @@
   <div class="flex">
     <h1>Neuer Klimacheck</h1>
     <div class="text-right ms-auto mt-3">
-      <BaseButton @click="refreshPage()" outline="true"
+      <BaseButton @click="refreshPage()" :outline="true"
         ><IconRefresh class="me-1" height="20" /><span class="text-left w-18"
           >Zurücksetzen</span
         ></BaseButton

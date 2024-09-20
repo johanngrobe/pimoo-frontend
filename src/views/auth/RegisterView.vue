@@ -6,23 +6,19 @@ import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import YupPassword from 'yup-password'
 YupPassword(yup) // extend yup
-import FloatLabel from 'primevue/floatlabel'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Dropdown from 'primevue/dropdown'
+import municipalitiesJSON from '@/assests/municipalities.json'
 
 // Sample municipality options
-const municipalities = [
-  { name: 'Oberursel (Taunus)', code: 'oberursel' },
-  { name: 'Bad Homburg', code: 'bad_homburg' },
-  { name: 'Frankfurt am Main', code: 'frankfurt_am_main' }
-]
+const municipalities = municipalitiesJSON
 
 // Validation schema
 const schema = yup.object({
   firstName: yup.string().required('Vorname ist erforderlich').label('Vorname'),
   lastName: yup.string().required('Nachname ist erforderlich').label('Nachname'),
-  municipality: yup.string().required('Gemeinde ist erforderlich').label('Gemeinde'),
+  municipality: yup.number().required('Gemeinde ist erforderlich').label('Gemeinde'),
   email: yup
     .string()
     .required('E-Mail ist erforderlich')
@@ -90,7 +86,8 @@ const onSubmit = handleSubmit(async (values) => {
     <BaseCard class="block mx-auto my-7 max-w-md">
       <h4 class="text-xl font-bold dark:text-white">Registrieren</h4>
       <form @submit.prevent="onSubmit" class="mt-10">
-        <FloatLabel class="w-full">
+        <div class="field">
+          <label for="firstName">Vorname</label>
           <InputText
             id="firstName"
             v-model="firstName"
@@ -98,13 +95,13 @@ const onSubmit = handleSubmit(async (values) => {
             :class="{ 'p-invalid': errors.firstName }"
             aria-describedby="firstName-help"
           />
-          <label for="firstName">Vorname</label>
-        </FloatLabel>
-        <small v-if="errors.firstName" id="firstName-help" class="p-error">{{
-          errors.firstName
-        }}</small>
 
-        <FloatLabel class="w-full mt-7">
+          <small v-if="errors.firstName" id="firstName-help" class="p-error">{{
+            errors.firstName
+          }}</small>
+        </div>
+        <div class="field">
+          <label for="lastName">Nachname</label>
           <InputText
             id="lastName"
             v-model="lastName"
@@ -112,31 +109,29 @@ const onSubmit = handleSubmit(async (values) => {
             :class="{ 'p-invalid': errors.lastName }"
             aria-describedby="lastName-help"
           />
-          <label for="lastName">Nachname</label>
-        </FloatLabel>
-        <small v-if="errors.lastName" id="lastName-help" class="p-error">{{
-          errors.lastName
-        }}</small>
-
-        <FloatLabel class="w-full mt-7">
+          <small v-if="errors.lastName" id="lastName-help" class="p-error">{{
+            errors.lastName
+          }}</small>
+        </div>
+        <div class="field">
+          <label for="municipality">Gemeinde</label>
           <Dropdown
             id="municipality"
             v-model="municipality"
             :options="municipalities"
             optionLabel="name"
-            optionValue="code"
+            optionValue="id"
             class="w-full"
             :class="{ 'p-invalid': errors.municipality }"
             aria-describedby="municipality-help"
             placeholder="Gemeinde auswählen"
           />
-          <label for="municipality">Gemeinde</label>
-        </FloatLabel>
-        <small v-if="errors.municipality" id="municipality-help" class="p-error">{{
-          errors.municipality
-        }}</small>
-
-        <FloatLabel class="w-full mt-7">
+          <small v-if="errors.municipality" id="municipality-help" class="p-error">{{
+            errors.municipality
+          }}</small>
+        </div>
+        <div class="field">
+          <label for="email">E-Mail</label>
           <InputText
             id="email"
             v-model="email"
@@ -144,11 +139,10 @@ const onSubmit = handleSubmit(async (values) => {
             :class="{ 'p-invalid': errors.email }"
             aria-describedby="email-help"
           />
-          <label for="email">E-Mail</label>
-        </FloatLabel>
-        <small v-if="errors.email" id="email-help" class="p-error">{{ errors.email }}</small>
-
-        <FloatLabel class="w-full mt-7">
+          <small v-if="errors.email" id="email-help" class="p-error">{{ errors.email }}</small>
+        </div>
+        <div class="field">
+          <label for="password">Passwort</label>
           <Password
             id="password"
             class="w-full"
@@ -173,13 +167,13 @@ const onSubmit = handleSubmit(async (values) => {
               </ul>
             </template>
           </Password>
-          <label for="password">Passwort</label>
-        </FloatLabel>
-        <small v-if="errors.password" id="password-help" class="p-error">{{
-          errors.password
-        }}</small>
 
-        <FloatLabel class="w-full mt-7">
+          <small v-if="errors.password" id="password-help" class="p-error">{{
+            errors.password
+          }}</small>
+        </div>
+        <div class="field">
+          <label for="confirmPassword">Passwort wiederholen</label>
           <Password
             id="confirmPassword"
             class="w-full"
@@ -190,12 +184,11 @@ const onSubmit = handleSubmit(async (values) => {
             :class="{ 'p-invalid': errors.confirmPassword }"
             aria-describedby="confirmPassword-help"
           />
-          <label for="confirmPassword">Passwort wiederholen</label>
-        </FloatLabel>
-        <small v-if="errors.confirmPassword" id="confirmPassword-help" class="p-error">{{
-          errors.confirmPassword
-        }}</small>
 
+          <small v-if="errors.confirmPassword" id="confirmPassword-help" class="p-error">{{
+            errors.confirmPassword
+          }}</small>
+        </div>
         <div class="flex gap-4 mt-5">
           <BaseButton outline class="w-full" tag="RouterLink" to="/login"> Anmelden </BaseButton>
           <BaseButton type="submit" class="w-full">Registrieren</BaseButton>

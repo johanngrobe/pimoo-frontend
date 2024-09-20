@@ -2,168 +2,388 @@
   <div>
     <PrimeToast position="top-center" />
     <!-- Display list of submissions -->
+    <BaseCard :collapseable="true" :isCollapsed="isCollapsed">
+      <template #title>
+        <h2 class="font-bold text-lg mb-4 flex" @click="expandCollapse">
+          <IconAdd /><span>Neues Unterziel hinzufügen</span>
+        </h2>
+      </template>
+      <form @submit.prevent="onSubmit">
+        <div class="grid grid-cols-5 gap-x-2">
+          <div class="col-span-4">
+            <div class="flex">
+              <Dropdown
+                v-model="newSubObjective.mainObjective"
+                :options="mainObjectives"
+                optionLabel="label"
+                placeholder="Leitziel"
+                class="w-16 me-2"
+                id="mainObjectiveId"
+              >
+                <template #value="slotProps">
+                  <div v-if="slotProps.value" class="flex align-items-center">
+                    <div class="me-2">{{ slotProps.value.no }}</div>
+                  </div>
+                  <span v-else>
+                    {{ slotProps.placeholder }}
+                  </span>
+                </template>
+                <template #option="slotProps">
+                  <div class="flex align-items-center">
+                    <div class="me-2">{{ slotProps.option.no }}</div>
+                    <div>{{ slotProps.option.label }}</div>
+                  </div>
+                </template></Dropdown
+              >
+              <InputNumber
+                v-model="newSubObjective.no"
+                placeholder="#"
+                class="w-16 me-2"
+                inputClass="w-16"
+                locale="de-DE"
+                :min="1"
+                :step="1"
+                required="true"
+              />
+              <InputText
+                v-model="newSubObjective.label"
+                placeholder="Indikator eingeben"
+                class="w-full"
+                required="true"
+              />
+            </div>
+          </div>
+          <BaseButton type="submit" color="green" class="w-36"
+            ><IconSave class="me-1" height="20" />
+            <span class="text-left w-18">Hinzufügen</span></BaseButton
+          >
+        </div>
+      </form>
+    </BaseCard>
+
+    <InputText v-model="searchQuery" placeholder="Nach Leitziel suchen" class="w-full mt-5" />
     <BaseSpinner v-if="isLoading" class="m-10" />
-    <div v-else-if="submissions.length === 0">
-      <p class="font-lg font-bold m-5">Keine Mobilitätschecks gefunden.</p>
+    <div v-else-if="subObjectives.length === 0">
+      <p class="font-lg font-bold m-5">Keine Unterziele vorhanden.</p>
     </div>
     <div v-else>
-      <InputText v-model="searchQuery" placeholder="Nach Maßnahme suchen" class="w-full mt-5" />
-      <BaseCard v-for="(submission, ix) in filteredSubmissions" :key="submission.id">
-        <div class="flex justify-between">
-          <div>
-            <h3 class="font-bold text-lg mb-4">{{ submission.label }}</h3>
-            <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-              <span class="font-semibold">Bearbeiter*in:</span>
-              <span>{{ submission.author }}</span>
-              <span class="font-semibold">Magistratvorlagennummer:</span>
-              <span>{{ submission.administrationNo }}</span>
-              <span class="font-semibold">Datum Magistratssitzung:</span>
-              <span>{{ formatDate(submission.administrationDate) }}</span>
+      <div v-for="(subObjective, ix) in filteredSubObjetives" :key="subObjective.id">
+        <!-- <div v-if="showMainObjective" class="font-bold mt-4">
+          {{ subObjective.mainObjective.no }} {{ subObjective.mainObjective.label }}
+        </div> -->
+        <BaseCard>
+          <div v-if="!itemEditMode[ix]">
+            <div class="grid grid-cols-5 gap-x-2">
+              <div class="col-span-4">
+                <div class="flex">
+                  <div class="w-10 font-bold">
+                    {{ subObjective.mainObjective.no }}.{{ subObjective.no }}
+                  </div>
+                  <div class="me-4 font-bold">{{ subObjective.label }}</div>
+                </div>
+                <div class="mt-5">
+                  <span class="font-bold me-2">Leitziel:</span>
+                  <span class="me-1">{{ subObjective.mainObjective.no }}</span>
+                  {{ subObjective.mainObjective.label }}
+                </div>
+              </div>
+              <div>
+                <BaseButton @click="editSubObjective(subObjective, ix)" class="w-36">
+                  <IconEdit class="me-1" height="20" /><span class="text-left w-18"
+                    >Bearbeiten</span
+                  ></BaseButton
+                >
+                <!-- Edit form (appears when editing) -->
+                <BaseButton
+                  @click="deleteSubObjective(subObjective.id, ix)"
+                  color="red"
+                  class="w-36"
+                  ><IconDelete class="me-1" height="20" />
+                  <span class="text-left w-18">Löschen</span></BaseButton
+                >
+              </div>
             </div>
           </div>
-          <div class="flex space-x-4">
-            <div class="grid grid-cols-1">
-              <BaseButton @click="exportSubmission(submission.id)"
-                ><IconDownload class="me-1" height="20" /><span class="text-left w-18"
-                  >PDF-Export</span
-                ></BaseButton
-              >
-              <BaseButton @click="editSubmission(submission)">
-                <IconEdit class="me-1" height="20" /><span class="text-left w-18"
-                  >Bearbeiten</span
-                ></BaseButton
-              >
-              <!-- Edit form (appears when editing) -->
-              <BaseButton @click="deleteSubmission(submission.id, ix)" color="red"
-                ><IconDelete class="me-1" height="20" />
-                <span class="text-left w-18 me-4">Löschen</span></BaseButton
-              >
-            </div>
+          <div v-else>
+            <form @submit.prevent="onUpdateSUbmit(ix)">
+              <div class="grid grid-cols-5 gap-x-2">
+                <div class="col-span-4">
+                  <div class="flex">
+                    <Dropdown
+                      v-model="currentSubObjective.mainObjective"
+                      :options="mainObjectives"
+                      optionLabel="label"
+                      placeholder="Leitziel"
+                      class="w-16 me-2"
+                      id="mainObjectiveId"
+                    >
+                      <template #value="slotProps">
+                        <div v-if="slotProps.value" class="flex align-items-center">
+                          <div class="me-2">{{ slotProps.value.no }}</div>
+                        </div>
+                        <span v-else>
+                          {{ slotProps.placeholder }}
+                        </span>
+                      </template>
+                      <template #option="slotProps">
+                        <div class="flex align-items-center">
+                          <div class="me-2">{{ slotProps.option.no }}</div>
+                          <div>{{ slotProps.option.label }}</div>
+                        </div>
+                      </template></Dropdown
+                    >
+                    <InputNumber
+                      v-model="currentSubObjective.no"
+                      placeholder="#"
+                      class="w-16"
+                      inputClass="w-16"
+                      locale="de-DE"
+                      :min="1"
+                      :step="1"
+                      required="true"
+                    />
+                    <InputText
+                      v-model="currentSubObjective.label"
+                      placeholder="Name des Leitziels"
+                      class="w-full"
+                      required="true"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <BaseButton @click="cancelEdit()" color="red" class="w-36"
+                    ><IconCancel class="me-1" height="20" />
+                    <span class="text-left w-18">Abbrechen</span></BaseButton
+                  >
+                  <BaseButton type="submit" color="green" class="w-36"
+                    ><IconSave class="me-1" height="20" />
+                    <span class="text-left w-18">Speichern</span></BaseButton
+                  >
+                </div>
+              </div>
+            </form>
           </div>
-        </div>
-      </BaseCard>
+        </BaseCard>
+      </div>
     </div>
-    <BaseModal v-model="mobilityStore.editMode">
-      <template #header>
-        <h2>{{ currentSubmission.label }} bearbeiten</h2>
-      </template>
-      <MobilityForm
-        :submissionId="currentSubmission.id"
-        @close-modal="cancelEdit"
-        @item-updated="handleUpdate"
-      />
-    </BaseModal>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
 import apiClient from '@/services/axios'
-import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
-import MobilityForm from '@/components/form/MobilityForm.vue'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
+import InputNumber from 'primevue/inputnumber'
+import Dropdown from 'primevue/dropdown'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
 import IconDelete from '@/assets/icons/MaterialSymbolsDelete.svg?component'
 import IconEdit from '@/assets/icons/MaterialSymbolsEditSquare.svg?component'
-import IconDownload from '@/assets/icons/MaterialSymbolsDownload.svg?component'
+import IconSave from '@/assets/icons/MaterialSymbolsSave.svg?component'
+import IconCancel from '@/assets/icons/MaterialSymbolsCancel.svg?component'
+import IconAdd from '@/assets/icons/MaterialSymbolsAdd.svg?component'
 
 const toast = useToast()
 const isLoading = ref(false)
-const mobilityStore = useMobilitySubmissionStore()
+const isCollapsed = ref(true)
+const subObjectives = ref([])
+const currentSubObjective = ref({
+  label: '',
+  no: null,
+  ix: null,
+  id: null,
+  mainObjectiveId: null,
+  mainObjective: null
+})
+const newSubObjective = ref({
+  label: '',
+  no: null,
+  mainObjectiveId: null,
+  mainObjective: {}
+})
 
-const submissions = ref([])
-const currentSubmission = ref(null)
+newSubObjective.value.mainObjectiveId = computed(() => {
+  return newSubObjective.value?.mainObjective?.id || null
+})
+
 const searchQuery = ref('')
 
 onMounted(async () => {
-  await fetchSubmissions()
+  await fetchSubObjetives()
+  await fetchMainObjetives()
+  setItemEditArray()
 })
 
-const fetchSubmissions = async () => {
-  try {
-    isLoading.value = true
-    const response = await apiClient.get('/submission/mobility')
-    submissions.value = response.data
-    isLoading.value = false
-  } catch (error) {
-    submissions.value = []
+const expandCollapse = () => {
+  isCollapsed.value = !isCollapsed.value
+}
+
+const setItemEditMode = (ix) => {
+  itemEditMode.value[ix] = !itemEditMode.value[ix]
+}
+
+const itemEditMode = ref([])
+
+const setItemEditArray = () => {
+  itemEditMode.value = Array(subObjectives.value.length).fill(false)
+}
+
+const resetCurrentSubObjective = () => {
+  currentSubObjective.value = {
+    label: '',
+    mainObjectiveId: null,
+    mainObjective: null,
+    no: null,
+    ix: null,
+    id: null
   }
 }
 
-const deleteSubmission = async (id, ix) => {
-  const response = await apiClient.delete(`/submission/mobility/${id}`)
+const resetNewSubObjective = () => {
+  newSubObjective.value = {
+    label: '',
+    no: null,
+    mainObjectiveId: null,
+    mainObjective: null
+  }
+}
+
+const fetchSubObjetives = async () => {
+  try {
+    isLoading.value = true
+    const response = await apiClient.get('/objective/sub')
+    subObjectives.value = response.data
+    isLoading.value = false
+  } catch (error) {
+    subObjectives.value = []
+  }
+}
+
+const mainObjectives = ref([])
+
+const fetchMainObjetives = async () => {
+  try {
+    isLoading.value = true
+    const response = await apiClient.get('/objective/main')
+    mainObjectives.value = response.data.map((mainObjective) => {
+      return {
+        ...mainObjective,
+        labelShown: false
+      }
+    })
+    isLoading.value = false
+  } catch (error) {
+    mainObjectives.value = []
+  }
+}
+
+const deleteSubObjective = async (id, ix) => {
+  const response = await apiClient.delete(`/objective/sub/${id}`)
   switch (response.status) {
     case 204:
       toast.add({
         severity: 'success',
-        summary: 'Mobilitätscheck erfolgreich gelöscht',
+        summary: 'Unterziel erfolgreich gelöscht',
         life: 3000
       })
-      submissions.value.splice(ix, 1)
+      subObjectives.value.splice(ix, 1)
       break
     default:
       toast.add({
         severity: 'error',
-        summary: 'Fehler beim Löschen des Mobilitätschecks',
+        summary: 'Fehler beim Löschen des Unterziel',
         life: 3000
       })
   }
 }
 
 // Computed property to filter submissions by multiple fields
-const filteredSubmissions = computed(() => {
-  return submissions.value.filter((submission) => {
+const filteredSubObjetives = computed(() => {
+  return subObjectives.value.filter((subObjective) => {
     const query = searchQuery.value.toLowerCase()
     isLoading.value = true
-    let results =
-      submission.label.toLowerCase().includes(query) ||
-      submission.author.toLowerCase().includes(query) ||
-      submission.administrationNo.toLowerCase().includes(query) ||
-      submission.administrationDate.includes(query) ||
-      submission.desc.toLowerCase().includes(query) ||
-      submission.createdAt.includes(query) // Date format remains the same, no need to lowercase
+    let results = subObjective.label.toLowerCase().includes(query)
+
     isLoading.value = false
     return results
   })
 })
 
-const editSubmission = (submission) => {
-  currentSubmission.value = { ...submission }
-  mobilityStore.editMode = true
-  mobilityStore.fetchMobilitySubmission(currentSubmission.value.id)
-}
-
-const exportSubmission = async (id) => {
+const onUpdateSUbmit = async (ix) => {
   try {
-    const response = await apiClient.get(`/submission/mobility/export/${id}`, {
-      responseType: 'blob'
-    })
-    // Create a download link for the received Blob
-    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
-    const link = document.createElement('a')
-    link.href = url
-    const fileName = `mobilitätscheck_${id}.pdf`
-    link.setAttribute('download', fileName) // The file name
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    const response = await apiClient.put(
+      `/objective/sub/${currentSubObjective.value.id}`,
+      currentSubObjective.value
+    )
+    switch (response.status) {
+      case 200:
+        toast.add({
+          severity: 'success',
+          summary: 'Unterziel erfolgreich aktualisiert',
+          life: 3000
+        })
+        subObjectives.value.splice(ix, 1, response.data)
+        resetCurrentSubObjective()
+        setItemEditMode(ix)
+        break
+      default:
+        toast.add({
+          severity: 'error',
+          summary: 'Fehler beim Aktualisieren des Unterziels',
+          life: 3000
+        })
+    }
   } catch (error) {
-    console.error('Error downloading the PDF:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Fehler beim Aktualisieren des Unterziels',
+      life: 3000
+    })
   }
 }
 
+const onSubmit = async () => {
+  try {
+    const response = await apiClient.post('/objective/sub', newSubObjective.value)
+    switch (response.status) {
+      case 201:
+        toast.add({
+          severity: 'success',
+          summary: 'Unterziel erfolgreich hinzugefügt',
+          life: 3000
+        })
+        subObjectives.value.unshift(response.data)
+        itemEditMode.value.unshift(false)
+        resetNewSubObjective()
+        break
+      default:
+        toast.add({
+          severity: 'error',
+          summary: 'Fehler beim Hinzufügen des Unterziels',
+          life: 3000
+        })
+    }
+  } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Fehler beim Hinzufügen des Unterziels',
+      life: 3000
+    })
+  }
+}
+
+const editSubObjective = async (subObjective, ix) => {
+  if (currentSubObjective.value.ix !== null) {
+    setItemEditMode(currentSubObjective.value.ix)
+  }
+  currentSubObjective.value = { ...subObjective }
+  currentSubObjective.value.ix = ix
+  setItemEditMode(ix)
+}
+
 const cancelEdit = () => {
-  mobilityStore.editMode = false
-}
-
-const formatDate = (date) => {
-  const options = { year: 'numeric', month: '2-digit', day: '2-digit' }
-  return new Date(date).toLocaleDateString('de-DE', options)
-}
-
-const handleUpdate = () => {
-  fetchSubmissions()
+  setItemEditMode(currentSubObjective.value.ix)
+  resetCurrentSubObjective()
 }
 </script>
 

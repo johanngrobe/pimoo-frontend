@@ -1,6 +1,5 @@
 <template>
   <div>
-    <PrimeToast position="top-center" />
     <!-- Display list of submissions -->
     <BaseSpinner v-if="isLoading" class="m-10" />
     <div v-else-if="submissions.length === 0">

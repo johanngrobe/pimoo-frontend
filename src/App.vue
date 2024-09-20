@@ -1,6 +1,10 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import SidebarMenu from './components/layout/SidebarMenu.vue'
+import { useTitle } from '@vueuse/core'
+import Toast from 'primevue/toast'
+
+useTitle('pimoo Mobilitätscheck')
 </script>
 
 <template>
@@ -11,6 +15,7 @@ import SidebarMenu from './components/layout/SidebarMenu.vue'
     <!-- Main Content Area -->
     <div class="flex-1">
       <div class="max-w-4xl mx-auto p-6">
+        <Toast position="top-center" />
         <RouterView />
       </div>
     </div>

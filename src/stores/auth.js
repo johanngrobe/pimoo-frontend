@@ -27,7 +27,8 @@ export const useAuthStore = defineStore(
         email,
         password,
         options: {
-          data: meta
+          data: meta,
+          redirectTo: 'http://localhost:5173/'
         }
       })
       loading.value = false
@@ -60,6 +61,37 @@ export const useAuthStore = defineStore(
       }
     }
 
+    async function updateUser(data) {
+      try {
+        loading.value = true
+        let { error } = await supabase.auth.updateUser({
+          ...data
+        })
+        loading.value = false
+        if (error) throw error
+      } catch (error) {
+        if (error instanceof Error) {
+          alert(error.message)
+        }
+      }
+    }
+
+    async function resetPassword(email) {
+      try {
+        loading.value = true
+        let { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: 'http://localhost:5173/reset-password'
+        })
+        console.log(data)
+        loading.value = false
+        if (error) throw error
+      } catch (error) {
+        if (error instanceof Error) {
+          alert(error.message)
+        }
+      }
+    }
+
     return {
       user,
       token,
@@ -68,7 +100,9 @@ export const useAuthStore = defineStore(
       isAuthenticated,
       register,
       login,
-      logout
+      logout,
+      updateUser,
+      resetPassword
     }
   }
   // ,

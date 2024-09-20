@@ -11,7 +11,6 @@ import BaseCard from './components/ui/BaseCard.vue'
 import BaseButton from './components/ui/BaseButton.vue'
 import BaseModal from './components/ui/BaseModal.vue'
 import ToastService from 'primevue/toastservice'
-import Toast from 'primevue/toast'
 
 const app = createApp(App)
 
@@ -19,7 +18,6 @@ app.component('BaseAlert', BaseAlert)
 app.component('BaseCard', BaseCard)
 app.component('BaseButton', BaseButton)
 app.component('BaseModal', BaseModal)
-app.component('PrimeToast', Toast)
 
 app.use(ToastService)
 app.use(createPinia())
