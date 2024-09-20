@@ -9,7 +9,7 @@ YupPassword(yup) // extend yup
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Dropdown from 'primevue/dropdown'
-import municipalitiesJSON from '@/assests/municipalities.json'
+import municipalitiesJSON from '@/assets/municipalities.json'
 
 // Sample municipality options
 const municipalities = municipalitiesJSON
