@@ -82,10 +82,10 @@ const fetchSubmissions = async () => {
     isLoading.value = true
     const response = await apiClient.get('/submission/climate')
     submissions.value = response.data
-    isLoading.value = false
   } catch (error) {
     submissions.value = []
   }
+  isLoading.value = false
 }
 
 // Computed property to filter submissions by multiple fields

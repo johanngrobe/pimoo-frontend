@@ -141,10 +141,10 @@ const fetchTags = async () => {
     isLoading.value = true
     const response = await apiClient.get('/tag')
     tags.value = response.data
-    isLoading.value = false
   } catch (error) {
     tags.value = []
   }
+  isLoading.value = false
 }
 
 const deleteTag = async (id, ix) => {

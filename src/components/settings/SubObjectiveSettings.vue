@@ -253,10 +253,10 @@ const fetchSubObjetives = async () => {
     isLoading.value = true
     const response = await apiClient.get('/objective/sub')
     subObjectives.value = response.data
-    isLoading.value = false
   } catch (error) {
     subObjectives.value = []
   }
+  isLoading.value = false
 }
 
 const mainObjectives = ref([])
@@ -271,10 +271,10 @@ const fetchMainObjetives = async () => {
         labelShown: false
       }
     })
-    isLoading.value = false
   } catch (error) {
     mainObjectives.value = []
   }
+  isLoading.value = false
 }
 
 const deleteSubObjective = async (id, ix) => {

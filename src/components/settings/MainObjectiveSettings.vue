@@ -179,10 +179,10 @@ const fetchMainObjetives = async () => {
     isLoading.value = true
     const response = await apiClient.get('/objective/main')
     mainObjectives.value = response.data
-    isLoading.value = false
   } catch (error) {
     mainObjectives.value = []
   }
+  isLoading.value = false
 }
 
 const deleteMainObjective = async (id, ix) => {

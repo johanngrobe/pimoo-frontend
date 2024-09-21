@@ -188,10 +188,10 @@ const fetchIndicators = async () => {
     isLoading.value = true
     const response = await apiClient.get('/indicator')
     indicators.value = response.data
-    isLoading.value = false
   } catch (error) {
     indicators.value = []
   }
+  isLoading.value = false
 }
 
 const fetchTags = async () => {

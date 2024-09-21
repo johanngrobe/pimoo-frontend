@@ -84,10 +84,10 @@ const fetchSubmissions = async () => {
     isLoading.value = true
     const response = await apiClient.get('/submission/mobility')
     submissions.value = response.data
-    isLoading.value = false
   } catch (error) {
     submissions.value = []
   }
+  isLoading.value = false
 }
 
 const deleteSubmission = async (id, ix) => {

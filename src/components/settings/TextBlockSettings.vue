@@ -188,10 +188,10 @@ const fetchTextBlocks = async () => {
     isLoading.value = true
     const response = await apiClient.get('/text-block')
     textBlocks.value = response.data
-    isLoading.value = false
   } catch (error) {
     textBlocks.value = []
   }
+  isLoading.value = false
 }
 
 const fetchTags = async () => {
