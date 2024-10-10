@@ -12,7 +12,7 @@
           <div>
             <h3 class="font-bold text-lg mb-4">{{ submission.label }}</h3>
             <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-              <span class="font-semibold">Bearbeiter*in:</span>
+              <span class="font-semibold">Sachbearbeitung:</span>
               <span>{{ submission.author }}</span>
               <span class="font-semibold">Magistratvorlagennummer:</span>
               <span>{{ submission.administrationNo }}</span>

@@ -6,19 +6,16 @@
       :key="index"
       class="mt-7"
     >
-      <div class="flex items-center">
+      <div class="flex items-center" @click="toggleSubCheckbox(index)">
         <Checkbox
           class="flex-none"
           :id="`sub-checkbox-${mainObjectiveIndex}-${index}`"
           :key="`sub-checkbox-${mainObjectiveIndex}-${index}`"
           v-model="subObjective.target"
           :binary="true"
-        />
-        <label
-          :for="`sub-checkbox-${mainObjectiveIndex}-${index}`"
-          class="text-lg ms-3"
           @click="toggleSubCheckbox(index)"
-        >
+        />
+        <label :for="`sub-checkbox-${mainObjectiveIndex}-${index}`" class="text-lg ms-3">
           <div class="flex justify-center">
             <span class="font-bold flex-none my-auto"
               >{{ subObjective.subObjective.mainObjectiveId }}.{{
@@ -46,8 +43,20 @@
               :step="1"
               class="w-full mt-3"
             />
-            <div class="flex justify-between mt-2">
-              <span v-for="tick in 7" :key="tick" class="relative w-0.5 h-2 bg-gray-800">
+            <div class="relative w-full flex justify-between mt-2">
+              <span
+                v-for="tick in 7"
+                :key="tick"
+                class="relative flex flex-col items-center cursor-pointer"
+                @click="moveSlider(index, tick - 4)"
+              >
+                <!-- Enlarge the clickable area around the tick -->
+                <div
+                  class="h-10 w-10 absolute top-0 left-1/2 transform -translate-x-1/2 bg-transparent"
+                ></div>
+
+                <span class="w-0.5 h-2 bg-gray-800"></span>
+                <!-- Invisible but clickable -->
                 <span class="absolute top-2 left-1/2 transform -translate-x-1/2 text-xs">
                   {{ tickmarkLabels[tick - 4] }}
                 </span>
@@ -55,33 +64,29 @@
             </div>
           </div>
           <div class="ms-5 mt-7 my-auto max-w-md">
-            <FloatLabel>
-              <Dropdown
-                :id="`spatial-impact-${mainObjectiveIndex}-${index}`"
-                :key="`spatial-impact-${mainObjectiveIndex}-${index}`"
-                v-model="subObjective.spatialImpact"
-                :options="optionsSpatialImpact"
-                optionLabel="label"
-                optionValue="value"
-                class="w-full dont-close-on-select"
-              />
-              <label :for="`spatial-impact-${mainObjectiveIndex}-${index}`"
-                >Räumliche Auswirkung</label
-              >
-            </FloatLabel>
+            <label :for="`spatial-impact-${mainObjectiveIndex}-${index}`"
+              >Räumliche Auswirkung</label
+            >
+            <Select
+              :id="`spatial-impact-${mainObjectiveIndex}-${index}`"
+              :key="`spatial-impact-${mainObjectiveIndex}-${index}`"
+              v-model="subObjective.spatialImpact"
+              :options="optionsSpatialImpact"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full dont-close-on-select"
+            />
           </div>
         </div>
         <div class="mt-7 max-w-5xl">
-          <FloatLabel>
-            <Textarea
-              :id="`annotation-${mainObjectiveIndex}-${index}`"
-              :key="`annotation-${mainObjectiveIndex}-${index}`"
-              v-model="subObjective.annotation"
-              rows="5"
-              class="w-full"
-            />
-            <label :for="`explanation-${mainObjectiveIndex}-${index}`">Erläuterung</label>
-          </FloatLabel>
+          <label :for="`explanation-${mainObjectiveIndex}-${index}`">Erläuterung</label>
+          <Textarea
+            :id="`annotation-${mainObjectiveIndex}-${index}`"
+            :key="`annotation-${mainObjectiveIndex}-${index}`"
+            v-model="subObjective.annotation"
+            rows="5"
+            class="w-full"
+          />
         </div>
         <AddTextBlock class="mt-3 w-full" @add-text-block="appendTextBlock($event, index)" />
         <div class="mt-7 max-w-5xl">
@@ -105,6 +110,12 @@
           />
         </div>
       </div>
+      <div
+        v-if="
+          index < mobilityStore.mobilityObjectiveForm[mainObjectiveIndex].subObjectives.length - 1
+        "
+        class="border-b-2 mt-7"
+      ></div>
     </div>
   </form>
 </template>
@@ -114,8 +125,7 @@ import { defineProps, onMounted, watchEffect } from 'vue'
 import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
 import { useStorage } from '@vueuse/core'
 import Checkbox from 'primevue/checkbox'
-import Dropdown from 'primevue/dropdown'
-import FloatLabel from 'primevue/floatlabel'
+import Select from 'primevue/select'
 import MultiSelect from 'primevue/multiselect'
 import Textarea from 'primevue/textarea'
 import Slider from 'primevue/slider'
@@ -184,6 +194,11 @@ onMounted(async () => {
 const toggleSubCheckbox = (index) => {
   mobilityStore.mobilityObjectiveForm[props.mainObjectiveIndex].subObjectives[index].target =
     !mobilityStore.mobilityObjectiveForm[props.mainObjectiveIndex].subObjectives[index].target
+}
+
+const moveSlider = (index, tickValue) => {
+  mobilityStore.mobilityObjectiveForm[props.mainObjectiveIndex].subObjectives[index].impact =
+    tickValue // Update the slider value based on clicked label
 }
 
 const appendTextBlock = (event, index) => {

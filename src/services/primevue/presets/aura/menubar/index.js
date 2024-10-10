@@ -18,7 +18,7 @@ export default {
             'border border-surface-200 dark:border-surface-700'
         ]
     },
-    menu: ({ props }) => ({
+    rootList: ({ props }) => ({
         class: [
             // Flexbox
             'sm:flex',
@@ -51,34 +51,36 @@ export default {
             'outline-none'
         ]
     }),
-    menuitem: {
+    item: {
         class: 'sm:relative sm:w-auto w-full static my-[2px] [&:first-child]:mt-0'
     },
-    content: ({ props, context }) => ({
+    itemContent: ({ context }) => ({
         class: [
             // Shape
             'rounded-[4px]',
 
             // Colors
-            'text-surface-700 dark:text-white/80',
             {
                 'text-surface-500 dark:text-white/70': !context.focused && !context.active,
-                'text-surface-500 dark:text-white/70 bg-surface-200': context.focused && !context.active,
-                'text-primary-highlight-inverse bg-primary-highlight': (context.focused && context.active) || context.active || (!context.focused && context.active)
+                'text-surface-500 dark:text-white/70 bg-surface-200 dark:bg-surface-600/90': context.focused && !context.active,
+                'bg-highlight text-highlight-contrast': (context.focused && context.active) || context.active || (!context.focused && context.active)
             },
 
             // States
             {
                 'hover:bg-surface-100 dark:hover:bg-[rgba(255,255,255,0.03)]': !context.active,
-                'hover:bg-primary-highlight-hover text-primary-highlight-inverse': context.active
+                'hover:bg-highlight-emphasis': context.active
             },
+
+            // Disabled State
+            { 'opacity-60 pointer-events-none cursor-default': context.disabled },
 
             // Transitions
             'transition-all',
             'duration-200'
         ]
     }),
-    action: ({ context }) => ({
+    itemLink: ({ context }) => ({
         class: [
             'relative',
 
@@ -104,10 +106,10 @@ export default {
             'overflow-hidden'
         ]
     }),
-    icon: {
+    itemIcon: {
         class: 'mr-2'
     },
-    submenuicon: ({ props }) => ({
+    submenuIcon: ({ props }) => ({
         class: [
             {
                 'ml-auto sm:ml-2': props.root,
@@ -117,6 +119,7 @@ export default {
     }),
     submenu: ({ props }) => ({
         class: [
+            'flex flex-col',
             // Size
             'rounded-md',
             'min-w-[12.5rem]',
@@ -140,7 +143,7 @@ export default {
         ]
     }),
     separator: {
-        class: 'border-t border-surface-200 dark:border-surface-600 my-[2px]'
+        class: 'border-t border-surface-200 dark:border-surface-600'
     },
     button: {
         class: [

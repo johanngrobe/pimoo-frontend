@@ -53,7 +53,7 @@ const addTextBlock = (block) => {
 
 const fetchTextBlocks = async () => {
   try {
-    const response = await apiClient.get('/text_block')
+    const response = await apiClient.get('/text-block')
     return response.data
   } catch (error) {
     console.error(error)
@@ -67,7 +67,7 @@ const filteredTextBlocks = computed(() => {
     const query = searchQuery.value.toLowerCase()
     filteredTextBlocks = filteredTextBlocks.filter(
       (block) =>
-        block.text.toLowerCase().includes(query) ||
+        block.label.toLowerCase().includes(query) ||
         block.tags.some((tag) => tag.toLowerCase().includes(query))
     )
   }

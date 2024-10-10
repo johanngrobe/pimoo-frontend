@@ -24,6 +24,11 @@ import MobilityForm from '@/components/form/MobilityForm.vue'
 import Toast from 'primevue/toast'
 import IconRefresh from '@/assets/icons/MaterialSymbolsRefresh.svg?component'
 import { useRouter } from 'vue-router'
+import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
+
+const mobilityStore = useMobilitySubmissionStore()
+
+mobilityStore.$reset()
 
 const router = useRouter()
 

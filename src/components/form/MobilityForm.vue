@@ -1,24 +1,24 @@
 <template>
-  <BaseCard :collapsable="true" :isCollapsed="form.mobilityForm">
+  <BaseCard :collapsable="true" :isCollapsed="formState.mobilityForm">
     <template #title>
       <div @click="toggleForm('mobilityForm')">
         <h2 class="text-3xl font-extrabold dark:text-white">Allgemeine Informationen</h2>
       </div>
     </template>
-    <MobilitySubmissionForm @valid-form="toggleFormSubmit" />
+    <MobilitySubmissionForm ref="mobilitySubmissionFormRef" />
   </BaseCard>
-  <BaseCard :collapsable="true" :isCollapsed="form.mobilityObjectiveForm">
+  <BaseCard :collapsable="true" :isCollapsed="formState.mobilityObjectiveForm">
     <template #title>
       <h2
         class="text-3xl font-extrabold dark:text-white"
-        @click="toggleForm('mobililtyObjectiveForm')"
+        @click="toggleForm('mobilityObjectiveForm')"
       >
         Leitziele
       </h2>
     </template>
-    <MobilityMainObjectiveForm @valid-form="toggleFormSubmit" />
+    <MobilityMainObjectiveForm />
   </BaseCard>
-  <div class="text-right mt-7" v-if="mobilityStore.formValid.mobilityForm">
+  <div class="text-right mt-7">
     <BaseButton v-if="mobilityStore.editMode" @click="handleSubmit" type="submit"
       ><IconSync class="me-1" height="20" /><span class="text-left w-18">Aktualisieren</span>
     </BaseButton>
@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, watchEffect } from 'vue'
+import { ref, defineProps, defineEmits, watchEffect, watch } from 'vue'
 import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
 import apiClient from '@/services/axios'
 import MobilitySubmissionForm from '@/components/form/MobilitySubmissionForm.vue'
@@ -47,6 +47,13 @@ const props = defineProps({
   submissionId: {
     type: Number,
     default: null
+  },
+  initialFormState: {
+    type: Object,
+    default: () => ({
+      mobilityForm: false,
+      mobilityObjectiveForm: false
+    })
   }
 })
 
@@ -59,21 +66,32 @@ watchEffect(() => {
   }
 })
 
-const form = ref({
-  mobilityForm: false,
-  mobilityObjectiveForm: true
-})
+// Create a reactive local copy of the form state
+const formState = ref({ ...props.initialFormState })
 
-const toggleFormSubmit = ({ from, to }) => {
-  if (!form[from]) {
-    Object.keys(form.value).forEach((key) => {
-      form.value[key] = key === to ? false : true
-    })
+// Watch for prop changes to update local state if the prop changes dynamically
+watch(
+  () => props.initialFormState,
+  (newVal) => {
+    formState.value = { ...newVal }
   }
-}
+)
+
+// const form = ref({
+//   mobilityForm: false,
+//   mobilityObjectiveForm: true
+// })
+
+// const toggleFormSubmit = ({ from, to }) => {
+//   if (!formState[from]) {
+//     Object.keys(formState.value).forEach((key) => {
+//       formState.value[key] = key === to ? false : true
+//     })
+//   }
+// }
 
 const toggleForm = (formName) => {
-  form.value[formName] = !form.value[formName]
+  formState.value[formName] = !formState.value[formName]
 }
 
 // Emit event to close modal
@@ -86,15 +104,22 @@ const closeModal = () => {
 }
 
 const showExportButton = ref(false)
+const mobilitySubmissionFormRef = ref(null)
 
 const handleSubmit = async () => {
-  if (mobilityStore.editMode) {
-    await mobilityStore.updateMobilitySubmission(props.submissionId)
-    closeModal()
-    emit('item-updated')
-  } else {
-    await mobilityStore.submitMobilityForm()
-    showExportButton.value = true
+  if (mobilitySubmissionFormRef.value) {
+    await mobilitySubmissionFormRef.value.onSubmit()
+  }
+
+  if (mobilityStore.formValid.mobilityForm) {
+    if (mobilityStore.editMode) {
+      await mobilityStore.updateMobilitySubmission(props.submissionId)
+      closeModal()
+      emit('item-updated')
+    } else {
+      await mobilityStore.submitMobilityForm()
+      showExportButton.value = true
+    }
   }
 }
 

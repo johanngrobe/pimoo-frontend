@@ -6,18 +6,19 @@
         :key="index"
         class="mt-7"
       >
-        <div class="flex items-center">
+        <div class="flex items-center border p-2 rounded-lg" @click="toggleCheckbox(index)">
           <Checkbox
             class="flex-none"
             :id="`checkbox-${index}`"
             :key="`checkbox-${index}`"
             v-model="mainObjective.target"
             :binary="true"
+            @click="toggleCheckbox(index)"
           />
-          <label :for="`checkbox-${index}`" class="text-lg ms-3" @click="toggleCheckbox(index)">
+          <label :for="`checkbox-${index}`" class="text-lg ms-3">
             <div class="flex justify-center">
               <span class="font-bold flex-none my-auto">{{ mainObjective.mainObjective.no }}</span>
-              <span class="text-semibold ms-2 flex-auto my-auto">{{
+              <span class="font-bold ms-2 flex-auto my-auto">{{
                 mainObjective.mainObjective.label
               }}</span>
             </div>
@@ -28,7 +29,7 @@
         </div>
         <div
           v-if="index < mobilityStore.mobilityObjectiveForm.length - 1"
-          class="border-b-2 mt-7"
+          class="border-b-4 mt-7"
         ></div>
       </div>
     </form>

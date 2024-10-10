@@ -1,91 +1,81 @@
 <template>
   <form class="my-7" @submit.prevent="onSubmit">
     <div class="form-group field mt-7">
-      <FloatLabel class="w-full">
-        <InputText
-          v-model="author"
-          aria-describedby="author-help"
-          :class="{ 'p-invalid': errors.author }"
-          class="w-full"
-          inputClass="w-full"
-        />
-        <label for="author" :class="{ 'p-invalid': errors.author }">Bearbeiter*in</label>
-      </FloatLabel>
+      <label for="author" :class="{ 'p-invalid': errors.author }">Bearbeiter*in</label>
+      <InputText
+        v-model="author"
+        aria-describedby="author-help"
+        :class="{ 'p-invalid': errors.author }"
+        class="w-full"
+        inputClass="w-full"
+      />
       <small v-if="errors.author" id="author-help" class="p-error">{{ errors.author }}</small>
     </div>
 
     <div class="form-group field mt-7">
-      <FloatLabel class="w-full">
-        <InputText
-          id="administration-no"
-          v-model="administrationNo"
-          aria-describedby="administration-no-help"
-          :class="{ 'p-invalid': errors.administrationNo }"
-          class="w-full"
-          inputClass="w-full"
-        />
-        <label for="administration-no" :class="{ 'p-invalid': errors.administrationNo }"
-          >Magistratvorlagennummer</label
-        >
-      </FloatLabel>
+      <label for="administration-no" :class="{ 'p-invalid': errors.administrationNo }"
+        >Magistratvorlagennummer</label
+      >
+      <InputText
+        id="administration-no"
+        v-model="administrationNo"
+        aria-describedby="administration-no-help"
+        :class="{ 'p-invalid': errors.administrationNo }"
+        class="w-full"
+        inputClass="w-full"
+      />
       <small v-if="errors.administrationNo" id="administration-no-help" class="p-error">
         {{ errors.administrationNo }}
       </small>
     </div>
 
     <div class="form-group field mt-7">
-      <FloatLabel>
-        <Calendar
-          id="administration-date"
-          v-model="administrationDate"
-          dateFormat="dd.mm.yy"
-          showIcon
-          iconDisplay="input"
-          aria-describedby="administration-date-help"
-          class="dont-close-on-select"
-          :class="{ 'p-invalid': errors.administrationDate }"
-        />
-        <label for="administration-date" :class="{ 'p-invalid': errors.administrationDate }">
-          Datum Magistratssitzung
-        </label>
-      </FloatLabel>
+      <label for="administration-date" :class="{ 'p-invalid': errors.administrationDate }">
+        Datum Magistratssitzung </label
+      ><br />
+      <DatePicker
+        id="administration-date"
+        v-model="administrationDate"
+        aria-describedby="administration-date-help"
+        showIcon
+        iconDisplay="input"
+        :class="{ 'p-invalid': errors.administrationDate }"
+        class="w-52"
+        dateFormat="dd.mm.yy"
+      />
       <small v-if="errors.administrationDate" id="administration-date-help" class="p-error">
         {{ errors.administrationDate }}
       </small>
     </div>
 
     <div class="form-group field mt-7">
-      <FloatLabel class="w-full">
-        <InputText
-          id="label"
-          v-model="label"
-          aria-describedby="label-help"
-          :class="{ 'p-invalid': errors.label }"
-          class="w-full"
-          inputClass="w-full"
-        />
-        <label for="label" :class="{ 'p-invalid': errors.label }">Titel der Maßnahme</label>
-      </FloatLabel>
+      <label for="label" :class="{ 'p-invalid': errors.label }">Titel der Maßnahme</label>
+      <InputText
+        id="label"
+        v-model="label"
+        aria-describedby="label-help"
+        :class="{ 'p-invalid': errors.label }"
+        class="w-full"
+        inputClass="w-full"
+      />
+
       <small v-if="errors.label" id="label-help" class="p-error">{{ errors.label }}</small>
     </div>
 
     <div class="form-group field mt-7">
-      <FloatLabel class="w-full">
-        <Textarea
-          id="desc"
-          v-model="desc"
-          rows="5"
-          aria-describedby="descr-help"
-          :class="{ 'p-invalid': errors.desc }"
-          class="w-full"
-          inputClass="w-full"
-        />
-        <label for="desc" :class="{ 'p-invalid': errors.desc }">Beschreibung der Maßnahme</label>
-      </FloatLabel>
+      <label for="desc" :class="{ 'p-invalid': errors.desc }">Beschreibung der Maßnahme</label>
+
+      <Textarea
+        id="desc"
+        v-model="desc"
+        rows="5"
+        aria-describedby="descr-help"
+        :class="{ 'p-invalid': errors.desc }"
+        class="w-full"
+        inputClass="w-full"
+      />
+
       <small v-if="errors.desc" id="desc-help" class="p-error">{{ errors.desc }}</small>
-    </div>
-    <div class="text-right mt-7">
-      <BaseButton type="submit">Weiter</BaseButton>
     </div>
   </form>
 </template>
@@ -97,9 +87,8 @@ import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import InputText from 'primevue/inputtext'
-import Calendar from 'primevue/calendar'
+import DatePicker from 'primevue/datepicker'
 import Textarea from 'primevue/textarea'
-import FloatLabel from 'primevue/floatlabel'
 
 // Validation schema
 const schema = yup.object({
@@ -162,6 +151,10 @@ const onSubmit = handleSubmit((values) => {
   mobilityStore.setMobilityFormValues(formattedValues)
   mobilityStore.formValid.mobilityForm = true
   emit('valid-form', { from: 'mobilityForm', to: 'mobilityObjectiveForm' })
+})
+
+defineExpose({
+  onSubmit
 })
 </script>
 

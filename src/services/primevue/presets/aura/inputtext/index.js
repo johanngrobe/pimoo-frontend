@@ -9,6 +9,9 @@ export default {
 
             // Spacing
             'm-0',
+            { 'w-full': props.fluid },
+
+            // Size
             {
                 'py-3 px-3.5': props.size == 'large',
                 'py-1.5 px-2': props.size == 'small',
@@ -41,7 +44,7 @@ export default {
             },
 
             // Filled State *for FloatLabel
-            { filled: parent.instance?.$name == 'FloatLabel' && context.filled },
+            { filled: (parent.instance?.$name == 'FloatLabel' && context.filled) || (parent.instance?.$parentInstance?.$name == 'FloatLabel' && parent.props.modelValue !== null && parent.props.modelValue?.length !== 0) },
 
             // Misc
             'appearance-none',

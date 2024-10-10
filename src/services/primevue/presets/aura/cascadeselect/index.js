@@ -1,9 +1,13 @@
 export default {
     root: ({ props, state }) => ({
         class: [
-            // Display and Position
-            'inline-flex',
             'relative',
+
+            // Flex
+            {
+                flex: props.fluid,
+                'inline-flex': !props.fluid
+            },
 
             // Shape
             'rounded-md',
@@ -32,26 +36,31 @@ export default {
             { 'bg-surface-200 dark:bg-surface-700 select-none pointer-events-none cursor-default': props.disabled }
         ]
     }),
-    label: ({ props }) => ({
+    label: ({ props, parent }) => ({
         class: [
-            // Font
-            'leading-none',
+            //Font
+            'leading-[normal]',
 
-            // Flex & Alignment
-            'flex flex-auto',
-
-            // Sizing and Spacing
-            'w-[1%]',
-            'py-2 px-3',
-
-            //Shape
-            'rounded-none',
+            // Display
+            'block',
+            'flex-auto',
 
             // Color and Background
             'bg-transparent',
             'border-0',
-            { 'text-surface-800 dark:text-white/80': props.modelValue, 'text-surface-400 dark:text-surface-500': !props.modelValue },
-            'placeholder:text-surface-400 dark:placeholder:text-surface-500',
+            { 'text-surface-800 dark:text-white/80': props.modelValue != undefined, 'text-surface-400 dark:text-surface-500': props.modelValue == undefined },
+            {
+                'placeholder:text-transparent dark:placeholder:text-transparent': parent.instance?.$name == 'FloatLabel',
+                '!text-transparent dark:!text-transparent': (parent.instance?.$name == 'FloatLabel' && props.modelValue == null) || props.modelValue?.length == 0
+            },
+
+            // Sizing and Spacing
+            'w-[1%]',
+            'py-2 px-3',
+            { 'pr-7': props.showClear },
+
+            //Shape
+            'rounded-none',
 
             // Transitions
             'transition',
@@ -59,6 +68,9 @@ export default {
 
             // States
             'focus:outline-none focus:shadow-none',
+
+            // Filled State *for FloatLabel
+            { filled: parent.instance?.$name == 'FloatLabel' && props.modelValue !== null },
 
             // Misc
             'relative',
@@ -68,7 +80,7 @@ export default {
             'appearance-none'
         ]
     }),
-    dropdownbutton: {
+    dropdown: {
         class: [
             // Flexbox
             'flex items-center justify-center',
@@ -85,7 +97,7 @@ export default {
             'rounded-r-md'
         ]
     },
-    panel: {
+    overlay: {
         class: [
             // Colors
             'bg-surface-0 dark:bg-surface-900',
@@ -97,19 +109,10 @@ export default {
             'shadow-md'
         ]
     },
-    wrapper: {
-        class: [
-            // Sizing
-            'max-h-[200px]',
-
-            // Misc
-            'overflow-auto'
-        ]
-    },
     list: {
-        class: 'p-1 list-none m-0'
+        class: 'flex flex-col list-none p-0 m-0 gap-[2px] min-w-full'
     },
-    item: ({ context }) => ({
+    option: ({ context }) => ({
         class: [
             //Shape
             'rounded-[4px]',
@@ -120,8 +123,8 @@ export default {
             // Colors
             {
                 'text-surface-500 dark:text-white/70': !context.focused && !context.active,
-                'text-surface-500 dark:text-white/70 bg-surface-200': context.focused && !context.active,
-                'text-primary-highlight-inverse bg-primary-highlight': (context.focused && context.active) || context.active || (!context.focused && context.active)
+                'text-surface-500 dark:text-white/70 bg-surface-200 dark:bg-surface-600/90': context.focused && !context.active,
+                'bg-highlight text-highlight-contrast': (context.focused && context.active) || context.active || (!context.focused && context.active)
             },
 
             // Transitions
@@ -131,14 +134,14 @@ export default {
             // States
             {
                 'hover:bg-surface-100 dark:hover:bg-[rgba(255,255,255,0.03)]': !context.active,
-                'hover:bg-primary-highlight-hover text-primary-highlight-inverse': context.active
+                'hover:bg-highlight-emphasis': context.active
             },
 
             // Disabled
             { 'opacity-60 pointer-events-none cursor-default': context.disabled }
         ]
     }),
-    content: {
+    optionContent: {
         class: [
             'relative',
             'leading-[normal]',
@@ -151,9 +154,6 @@ export default {
             'py-2',
             'px-3',
 
-            // Color
-            'text-surface-700 dark:text-white/80',
-
             // Misc
             'no-underline',
             'overflow-hidden',
@@ -161,19 +161,20 @@ export default {
             'select-none'
         ]
     },
-    groupicon: {
+    groupIcon: {
         class: [
             // Alignment
             'ml-auto'
         ]
     },
-    sublist: {
+    optionList: {
         class: [
+            'min-w-full',
+
             // Spacing
             'p-1',
             'm-0',
             'list-none',
-            'min-w-[12.5rem]',
 
             // Shape
             'shadow-none sm:shadow-md',
@@ -187,9 +188,6 @@ export default {
             // Color
             'bg-surface-0 dark:bg-surface-900'
         ]
-    },
-    separator: {
-        class: 'border-t border-surface-200 dark:border-surface-600 my-1'
     },
     transition: {
         enterFromClass: 'opacity-0 scale-y-[0.8]',
