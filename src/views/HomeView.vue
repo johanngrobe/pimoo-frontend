@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="title mb-7">
-      <h2>Mobilitäscheck für Magistratsvorlagen</h2>
+      <h2>Mobilitätscheck für Magistratsvorlagen</h2>
     </div>
     <section>
       <p>

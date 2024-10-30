@@ -4,7 +4,7 @@
       <h4 class="text-xl font-bold dark:text-white">Account bestätigen</h4>
       <div class="mt-4">
         <div v-if="route.query.verify === 'check-mail'">
-          <p>Die Regristrierung war erfolgreich.</p>
+          <p>Die Registrierung war erfolgreich.</p>
           <p class="font-semibold">
             Bitte überprüfen Sie ihre E-Mails und bestätigen Sie ihren Account.
           </p>

@@ -15,7 +15,7 @@
 
     <div class="form-group field mt-7">
       <label for="administration-no" :class="{ 'p-invalid': errors.administrationNo }"
-        >Magistratvorlagennummer</label
+        >Magistratsvorlagennummer</label
       >
       <InputText
         id="administration-no"
