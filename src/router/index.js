@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import AboutView from '@/views/AboutView.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,6 +36,14 @@ const router = createRouter({
       }
     },
     {
+      path: '/verify-account',
+      name: 'verify-account',
+      component: () => import('@/views/auth/VerifyAccountView.vue'),
+      meta: {
+        requiresAuth: false
+      }
+    },
+    {
       path: '/forgot-password',
       name: 'forgot-password',
       component: () => import('@/views/auth/ForgotPasswordView.vue')
@@ -61,6 +70,15 @@ const router = createRouter({
       }
     },
     {
+      path: '/my-history',
+      name: 'my-history',
+      component: () => import('@/views/authRequired/MyHistoryView.vue'),
+      meta: {
+        requiresAuth: true,
+        forRoles: ['politician']
+      }
+    },
+    {
       path: '/history',
       name: 'history',
       component: () => import('@/views/authRequired/HistoryView.vue'),
@@ -81,16 +99,30 @@ const router = createRouter({
       name: 'settings',
       component: () => import('@/views/authRequired/SettingsView.vue'),
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
+        requiredUserRole: ['administration']
       }
     }
   ]
 })
 
-router.beforeEach((to, _, next) => {
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  // Check if the route requires authentication
   if (to.meta.requiresAuth) {
-    next()
+    if (!authStore.isLoggedIn) {
+      // Redirect to login if the user is not authenticated
+      next({ name: 'login' })
+    }
+    if (to.meta.requiredUserRole && !to.meta.requiredUserRole.includes(authStore.userRole)) {
+      // Check if user has the required role(s) for this route
+      next({ name: 'not-authorized' }) // or redirect to a 403 page
+    } else {
+      // Allow access if authenticated and has required role(s)
+      next()
+    }
   } else {
+    // Allow access if no authentication is required
     next()
   }
 })

@@ -10,6 +10,7 @@ import BaseAlert from './components/ui/BaseAlert.vue'
 import BaseCard from './components/ui/BaseCard.vue'
 import BaseButton from './components/ui/BaseButton.vue'
 import BaseModal from './components/ui/BaseModal.vue'
+import BaseSpinner from './components/ui/BaseSpinner.vue'
 import ToastService from 'primevue/toastservice'
 
 const app = createApp(App)
@@ -18,9 +19,10 @@ app.component('BaseAlert', BaseAlert)
 app.component('BaseCard', BaseCard)
 app.component('BaseButton', BaseButton)
 app.component('BaseModal', BaseModal)
+app.component('BaseSpinner', BaseSpinner)
 
-app.use(ToastService)
 app.use(createPinia())
+app.use(ToastService)
 app.use(router)
 app.use(PrimeVue, {
   unstyled: true,

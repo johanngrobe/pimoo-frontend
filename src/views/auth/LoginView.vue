@@ -1,11 +1,13 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
+
+const isLoading = ref(false)
 
 // Validation schema
 const schema = yup.object({
@@ -29,24 +31,40 @@ const { defineField, handleSubmit, errors } = useForm({
 const [email] = defineField('email')
 const [password] = defineField('password')
 
-const router = useRouter()
+const route = useRoute()
+
+const sessionExpired = computed(() => {
+  if (route.query.redirect === 'sessionExpired') {
+    return true
+  }
+  return false
+})
+
 const { login } = useAuthStore()
 
 const loginFailed = ref(false)
 
 const onSubmit = handleSubmit(async (values) => {
   try {
+    isLoading.value = true
     await login(values)
     loginFailed.value = false
-    router.replace('/')
+    isLoading.value = false
   } catch (error) {
     loginFailed.value = true
+    isLoading.value = false
   }
 })
 </script>
 
 <template>
   <div>
+    <BaseAlert
+      v-if="sessionExpired"
+      type="warning"
+      title="Sitzung ist abgelaufen!"
+      message="Ihr Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
+    ></BaseAlert>
     <BaseAlert
       v-if="loginFailed"
       type="warning"
@@ -55,33 +73,36 @@ const onSubmit = handleSubmit(async (values) => {
     ></BaseAlert>
     <BaseCard class="block mx-auto my-7 max-w-md">
       <h4 class="text-xl font-bold dark:text-white">Anmelden</h4>
-      <form @submit.prevent="onSubmit" class="mt-10">
-        <label for="email">E-Mail</label>
-        <InputText
-          id="email"
-          v-model="email"
-          class="w-full"
-          :class="{ 'p-invalid': errors.email }"
-          aria-describedby="email-help"
-        />
+      <BaseSpinner v-if="isLoading" />
+      <form v-else @submit.prevent="onSubmit" class="mt-10">
+        <div class="field">
+          <label for="email">E-Mail</label>
+          <InputText
+            id="email"
+            v-model="email"
+            class="w-full"
+            :class="{ 'p-invalid': errors.email }"
+            aria-describedby="email-help"
+          />
 
-        <small v-if="errors.email" id="email-help" class="p-error">{{ errors.email }}</small>
-
-        <label for="password">Passwort</label>
-        <Password
-          id="password"
-          class="w-full"
-          inputClass="w-full"
-          v-model="password"
-          toggleMask
-          :feedback="false"
-          :class="{ 'p-invalid': errors.password }"
-          aria-describedby="password-help"
-        />
-        <small v-if="errors.password" id="password-help" class="p-error">{{
-          errors.password
-        }}</small>
-
+          <small v-if="errors.email" id="email-help" class="p-error">{{ errors.email }}</small>
+        </div>
+        <div class="field mt-4">
+          <label for="password">Passwort</label>
+          <Password
+            id="password"
+            class="w-full"
+            inputClass="w-full"
+            v-model="password"
+            toggleMask
+            :feedback="false"
+            :class="{ 'p-invalid': errors.password }"
+            aria-describedby="password-help"
+          />
+          <small v-if="errors.password" id="password-help" class="p-error">{{
+            errors.password
+          }}</small>
+        </div>
         <div class="flex gap-4 mt-5">
           <BaseButton outline class="w-full" tag="RouterLink" to="/register">
             Registrieren

@@ -12,8 +12,14 @@
           <div>
             <h3 class="font-bold text-lg mb-4">{{ submission.label }}</h3>
             <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-              <span class="font-semibold">Bearbeiter*in:</span>
-              <span>{{ submission.author }}</span>
+              <span class="font-semibold">Sachbearbeitung:</span>
+              <span>{{ submission.author.firstName }} {{ submission.author.lastName }}</span>
+              <span v-if="checkLastEditor(submission)" class="font-semibold"
+                >Letzte Bearbeitung durch:</span
+              >
+              <span v-if="checkLastEditor(submission)"
+                >{{ submission.lastEditor.firstName }} {{ submission.lastEditor.lastName }}</span
+              >
               <span class="font-semibold">Magistratvorlagennummer:</span>
               <span>{{ submission.administrationNo }}</span>
               <span class="font-semibold">Datum Magistratssitzung:</span>
@@ -24,20 +30,40 @@
           </div>
           <div class="flex space-x-4">
             <div class="grid grid-cols-1">
+              <div class="mb-2" v-if="userRoleAccess()">
+                <Checkbox
+                  v-model="submission.isPublished"
+                  :binary="true"
+                  inputId="published"
+                  class="ms-2"
+                  @change="publishSubmission(submission.id, submission.isPublished)"
+                />
+                <label for="published" class="ms-2">Veröffentlicht</label>
+              </div>
               <BaseButton @click="exportSubmission(submission.id)"
                 ><IconDownload class="me-1" height="20" /><span class="text-left w-18"
                   >PDF-Export</span
                 ></BaseButton
               >
-              <BaseButton @click="editSubmission(submission)">
+              <BaseButton v-if="userRoleAccess()" @click="editSubmission(submission)">
                 <IconEdit class="me-1" height="20" /><span class="text-left w-18"
                   >Bearbeiten</span
                 ></BaseButton
               >
               <!-- Edit form (appears when editing) -->
-              <BaseButton @click="deleteSubmission(submission.id)" color="red"
+              <BaseButton
+                v-if="userRoleAccess()"
+                @click="deleteSubmission(submission.id, ix)"
+                color="red"
                 ><IconDelete class="me-1" height="20" />
                 <span class="text-left w-18 me-4">Löschen</span></BaseButton
+              >
+              <BaseButton
+                v-if="userRoleAccess(['politician'])"
+                @click="copySubmission(submission.id, ix)"
+                color="green"
+                ><IconEdit class="me-1" height="20" />
+                <span class="text-left w-18 me-4">In meine Datenbank kopieren</span></BaseButton
               >
             </div>
           </div>
@@ -48,7 +74,8 @@
       <template #header>
         <h2>{{ currentSubmission.label }} bearbeiten</h2>
       </template>
-      <ClimateSubmissionForm v-model="currentSubmissionId" @close-modal="cancelEdit" />
+      <BaseSpinner v-if="isLoading" class="m-10" />
+      <ClimateSubmissionForm v-else v-model="currentSubmissionId" @close-modal="cancelEdit" />
     </BaseModal>
   </div>
 </template>
@@ -57,6 +84,7 @@
 import { computed, ref, onMounted } from 'vue'
 import apiClient from '@/services/axios'
 import ClimateSubmissionForm from '@/components/form/ClimateForm.vue'
+import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
@@ -72,6 +100,8 @@ const isLoading = ref(false)
 const currentSubmission = ref(null)
 const currentSubmissionId = ref(null)
 const searchQuery = ref('')
+
+const authStore = useAuthStore()
 
 onMounted(async () => {
   await fetchSubmissions()
@@ -124,10 +154,76 @@ const deleteSubmission = async (id) => {
   }
 }
 
+const checkLastEditor = (submission) => {
+  let check = false
+  if (submission.lastEditor) {
+    check = submission.lastEditor.id !== submission.author.id
+  }
+  return check
+}
+
 const editSubmission = (submission) => {
   currentSubmission.value = { ...submission }
   currentSubmissionId.value = currentSubmission.value.id
   isEditing.value = true
+}
+
+const userRoleAccess = (forRoles = ['administration']) => {
+  return forRoles.includes(authStore.userRole)
+}
+
+const copySubmission = async (id) => {
+  try {
+    const response = await apiClient.post(`/submission/climate/copy/${id}`)
+
+    if (response.status === 201) {
+      toast.add({
+        severity: 'success',
+        summary: 'Klimacheck erfolgreich kopiert',
+        life: 3000
+      })
+    }
+  } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Fehler beim Kopieren des Klimachecks',
+      life: 3000
+    })
+  }
+}
+
+const publishSubmission = async (id, isPublished) => {
+  try {
+    const response = await apiClient.patch(`/submission/climate/${id}`, {
+      isPublished
+    })
+
+    if (response.status === 200) {
+      console.log(response.data)
+      switch (response.data.isPublished) {
+        case true:
+          toast.add({
+            severity: 'success',
+            summary: 'Klimacheck ist veröffentlicht',
+            life: 3000
+          })
+          break
+        case false:
+          toast.add({
+            severity: 'success',
+            summary: 'Veröffentlichung zurückgezogen',
+            life: 3000
+          })
+          break
+      }
+    }
+  } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Fehler beim Veröffentlichen des Mobilitätschecks',
+      life: 3000
+    })
+  }
 }
 
 const exportSubmission = async (id) => {

@@ -1,8 +1,10 @@
 <template>
-  <h2 class="mb-7">Profil</h2>
+  <div>
+    <h1 class="mb-7">Profil</h1>
 
-  <UserData />
-  <ResetPassword :changePassword="true" />
+    <UserData />
+    <ResetPassword :changePassword="true" />
+  </div>
 </template>
 
 <script setup>

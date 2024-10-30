@@ -1,6 +1,5 @@
 <template>
   <div>
-    <PrimeToast position="top-center" />
     <!-- Display list of submissions -->
 
     <BaseCard :collapseable="true" :isCollapsed="isCollapsed">
@@ -241,7 +240,7 @@ const getTagIds = () => {
 
 const onUpdateSUbmit = async (ix) => {
   try {
-    const response = await apiClient.put(
+    const response = await apiClient.patch(
       `/text-block/${currentTextBlock.value.id}`,
       currentTextBlock.value
     )

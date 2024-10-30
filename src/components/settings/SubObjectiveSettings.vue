@@ -1,6 +1,5 @@
 <template>
   <div>
-    <PrimeToast position="top-center" />
     <!-- Display list of submissions -->
     <BaseCard :collapseable="true" :isCollapsed="isCollapsed">
       <template #title>
@@ -311,7 +310,7 @@ const filteredSubObjetives = computed(() => {
 
 const onUpdateSUbmit = async (ix) => {
   try {
-    const response = await apiClient.put(
+    const response = await apiClient.patch(
       `/objective/sub/${currentSubObjective.value.id}`,
       currentSubObjective.value
     )

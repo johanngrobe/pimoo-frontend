@@ -3,7 +3,9 @@ import ResetPassword from '@/components/auth/ResetPassword.vue'
 </script>
 
 <template>
-  <ResetPassword class="mx-auto" />
+  <div class="mx-auto">
+    <ResetPassword class="mx-auto" />
+  </div>
 </template>
 
 <style scoped></style>

@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useRouter, RouterLink } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import YupPassword from 'yup-password'
@@ -9,16 +9,21 @@ YupPassword(yup) // extend yup
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Dropdown from 'primevue/dropdown'
-import municipalitiesJSON from '@/assets/municipalities.json'
+import apiClient from '@/services/axios'
+import { useToast } from 'primevue/usetoast'
 
-// Sample municipality options
-const municipalities = municipalitiesJSON
+const isLoading = ref(false)
+const municipalityOptions = ref(null)
+const userRoleOptions = ref(null)
+
+const toast = useToast()
 
 // Validation schema
 const schema = yup.object({
   firstName: yup.string().required('Vorname ist erforderlich').label('Vorname'),
   lastName: yup.string().required('Nachname ist erforderlich').label('Nachname'),
-  municipality: yup.number().required('Gemeinde ist erforderlich').label('Gemeinde'),
+  role: yup.string().required('BenutzerRolle ist erforderlich').label('Benutzerrolle'),
+  municipalityId: yup.number().required('Gemeinde ist erforderlich').label('Gemeinde'),
   email: yup
     .string()
     .required('E-Mail ist erforderlich')
@@ -26,7 +31,7 @@ const schema = yup.object({
     .label('E-Mail'),
   password: yup
     .string()
-    .min(12, 'Passwort muss mindestens 12 Zeichen lang sein')
+    .min(8, 'Passwort muss mindestens 8 Zeichen lang sein')
     .minLowercase(1, 'Passwort muss mindestens 1 Kleinbuchstaben enthalten')
     .minUppercase(1, 'Passwort muss mindestens 1 Großbuchstaben enthalten')
     .minNumbers(1, 'Passwort muss mindestens 1 Zahl enthalten')
@@ -47,45 +52,61 @@ const { defineField, handleSubmit, errors } = useForm({
 
 const [firstName] = defineField('firstName')
 const [lastName] = defineField('lastName')
-const [municipality] = defineField('municipality')
+const [role] = defineField('role')
+const [municipalityId] = defineField('municipalityId')
 const [email] = defineField('email')
 const [password] = defineField('password')
 const [confirmPassword] = defineField('confirmPassword')
 
 const router = useRouter()
 const { register } = useAuthStore()
-const registerFailed = ref(false)
+
+const fetchMunicipalityOptions = async () => {
+  try {
+    const response = await apiClient.get('/option/municipality')
+    municipalityOptions.value = response.data
+  } catch (error) {
+    municipalityOptions.value = []
+  }
+}
+
+const fetchUserRoleOptions = async () => {
+  try {
+    const response = await apiClient.get('/option/user-role')
+    userRoleOptions.value = response.data
+  } catch (error) {
+    userRoleOptions.value = []
+  }
+}
+onMounted(() => {
+  fetchMunicipalityOptions()
+  fetchUserRoleOptions()
+})
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    await register({
-      email: values.email,
-      password: values.password,
-      meta: {
-        first_name: values.firstName,
-        last_name: values.lastName,
-        municipality: values.municipality
-      }
-    })
-    registerFailed.value = false
-    router.replace('/')
+    isLoading.value = true
+    await register(values)
+    router.replace({ name: 'verify-account', query: { verify: 'check-mail' } })
   } catch (error) {
-    registerFailed.value = true
+    console.log(error)
+    toast.add({
+      severity: 'error',
+      summary: 'Fehler',
+      detail: 'Registrierung fehlgeschlagen',
+      life: 3000
+    })
   }
+  isLoading.value = false
 })
 </script>
 
 <template>
   <div>
-    <BaseAlert
-      v-if="registerFailed"
-      type="warning"
-      title="Registrierung fehlgeschlagen!"
-      message="Überprüfen Sie Ihre Angaben."
-    ></BaseAlert>
     <BaseCard class="block mx-auto my-7 max-w-md">
       <h4 class="text-xl font-bold dark:text-white">Registrieren</h4>
-      <form @submit.prevent="onSubmit" class="mt-10">
+      <BaseSpinner v-if="isLoading" />
+      <form v-else @submit.prevent="onSubmit" class="mt-10">
         <div class="field">
           <label for="firstName">Vorname</label>
           <InputText
@@ -100,7 +121,7 @@ const onSubmit = handleSubmit(async (values) => {
             errors.firstName
           }}</small>
         </div>
-        <div class="field">
+        <div class="field mt-4">
           <label for="lastName">Nachname</label>
           <InputText
             id="lastName"
@@ -113,24 +134,39 @@ const onSubmit = handleSubmit(async (values) => {
             errors.lastName
           }}</small>
         </div>
-        <div class="field">
+        <div class="field mt-4">
           <label for="municipality">Gemeinde</label>
           <Dropdown
             id="municipality"
-            v-model="municipality"
-            :options="municipalities"
+            v-model="municipalityId"
+            :options="municipalityOptions"
             optionLabel="name"
             optionValue="id"
             class="w-full"
-            :class="{ 'p-invalid': errors.municipality }"
-            aria-describedby="municipality-help"
+            :class="{ 'p-invalid': errors.municipalityId }"
+            aria-describedby="municipalityId-help"
             placeholder="Gemeinde auswählen"
           />
-          <small v-if="errors.municipality" id="municipality-help" class="p-error">{{
-            errors.municipality
+          <small v-if="errors.municipalityId" id="municipalityId-help" class="p-error">{{
+            errors.municipalityId
           }}</small>
         </div>
-        <div class="field">
+        <div class="field mt-4">
+          <label for="role">Benutzerrolle</label>
+          <Dropdown
+            id="role"
+            v-model="role"
+            :options="userRoleOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-full"
+            :class="{ 'p-invalid': errors.role }"
+            aria-describedby="role-help"
+            placeholder="Benutzerrolle auswählen"
+          />
+          <small v-if="errors.role" id="role-help" class="p-error">{{ errors.role }}</small>
+        </div>
+        <div class="field mt-4">
           <label for="email">E-Mail</label>
           <InputText
             id="email"
@@ -141,7 +177,7 @@ const onSubmit = handleSubmit(async (values) => {
           />
           <small v-if="errors.email" id="email-help" class="p-error">{{ errors.email }}</small>
         </div>
-        <div class="field">
+        <div class="field mt-4">
           <label for="password">Passwort</label>
           <Password
             id="password"
@@ -163,7 +199,7 @@ const onSubmit = handleSubmit(async (values) => {
                 <li>Min. ein Großbuchstaben</li>
                 <li>Min eine Zahl</li>
                 <li>Min. ein Sonderzeichen</li>
-                <li>Min. eine Länge von 12 Zeichen</li>
+                <li>Min. eine Länge von 8 Zeichen</li>
               </ul>
             </template>
           </Password>
@@ -172,7 +208,7 @@ const onSubmit = handleSubmit(async (values) => {
             errors.password
           }}</small>
         </div>
-        <div class="field">
+        <div class="field mt-4">
           <label for="confirmPassword">Passwort wiederholen</label>
           <Password
             id="confirmPassword"
@@ -189,12 +225,8 @@ const onSubmit = handleSubmit(async (values) => {
             errors.confirmPassword
           }}</small>
         </div>
-        <div class="flex gap-4 mt-5">
-          <BaseButton outline class="w-full" tag="RouterLink" to="/login"> Anmelden </BaseButton>
-          <BaseButton type="submit" class="w-full">Registrieren</BaseButton>
-        </div>
+        <BaseButton type="submit" class="w-full mt-5">Registrieren</BaseButton>
       </form>
-      <router-link to="/forgot-password">Passwort vergessen?</router-link>
     </BaseCard>
   </div>
 </template>

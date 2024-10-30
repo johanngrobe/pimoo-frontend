@@ -1,35 +1,44 @@
 <template>
   <BaseCard class="block mx-auto my-7 max-w-md">
     <h4 class="text-xl font-bold dark:text-white mb-5">Passwort vergessen?</h4>
-    <form @submit.prevent="onSubmit">
-      <div class="field">
-        <label for="email">E-Mail</label>
-        <InputText
-          id="email"
-          v-model="email"
-          placeholder="vergessen@email.de"
-          class="w-full"
-          :class="{ 'p-invalid': errors.email }"
-          aria-describedby="email-help"
-        />
-        <small v-if="errors.email" class="p-error">{{ errors.email }}</small>
+    <BaseSpinner v-if="isLoading" />
+    <div v-else>
+      <form v-if="!submit" @submit.prevent="onSubmit">
+        <div class="field">
+          <label for="email">E-Mail</label>
+          <InputText
+            id="email"
+            v-model="email"
+            placeholder="vergessen@email.de"
+            class="w-full"
+            :class="{ 'p-invalid': errors.email }"
+            aria-describedby="email-help"
+          />
+          <small v-if="errors.email" class="p-error">{{ errors.email }}</small>
+        </div>
+        <div class="text-right mt-2">
+          <BaseButton type="submit">Passwort zurücksetzen</BaseButton>
+        </div>
+      </form>
+      <div v-else>
+        <p>Prüfen SIe ihre E-Mails und klicken Sie den Link zum Zurücksetzen des Passworts.</p>
       </div>
-      <div class="text-right mt-2">
-        <BaseButton type="submit">Passwort zurücksetzen</BaseButton>
-      </div>
-    </form>
+    </div>
   </BaseCard>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 import InputText from 'primevue/inputtext'
 import { useAuthStore } from '@/stores/auth'
 import * as yup from 'yup'
 import { useForm } from 'vee-validate'
 import { useToast } from 'primevue/usetoast'
 
-const { resetPassword } = useAuthStore()
+const isLoading = ref(false)
+const submit = ref(false)
+
+const { forgotPassword } = useAuthStore()
 
 const schema = yup.object({
   email: yup
@@ -45,20 +54,16 @@ const { defineField, handleSubmit, errors } = useForm({
 
 const [email] = defineField('email')
 
-const router = useRouter()
 const toast = useToast()
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    await resetPassword(values.email)
-    router.replace({ name: 'home' })
-    toast.add({
-      severity: 'success',
-      summary: 'Erfolg',
-      detail: 'E-Mail zum Zurücksetzen des Passworts gesendet'
-    })
+    isLoading.value = true
+    await forgotPassword(values.email)
+    isLoading.value = false
+    submit.value = true
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Fehler', detail: 'E-Mail nicht gefunden' })
+    toast.add({ severity: 'error', summary: 'Fehler', detail: 'E-Mail nicht gefunden', life: 3000 })
   }
 })
 </script>

@@ -54,10 +54,10 @@
           </li>
         </ul>
         <transition>
-          <div v-if="authStore.isAuthenticated">
+          <div v-if="authStore.isLoggedIn">
             <div class="border-t-2 border-gray-200 dark:border-gray-700 my-2"></div>
             <ul class="space-y-2 font-medium">
-              <li v-for="item in authMenuItems" :key="item.name">
+              <li v-for="item in filteredAuthMenuItems" :key="item.name">
                 <RouterLink
                   :to="item.link"
                   class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
@@ -114,7 +114,7 @@ const toggleSidebar = () => {
 }
 
 // Simulate authentication status
-// const isAuthenticated = ref(true)
+// const isLoggedIn = ref(true)
 
 // Define menu items
 const menuItems = ref([
@@ -135,6 +135,12 @@ const menuItems = ref([
     link: '/login',
     icon: 'MaterialSymbolsLogin.svg',
     onlyWhenLoggedOut: true
+  },
+  {
+    name: 'Registrieren',
+    link: '/register',
+    icon: 'MaterialSymbolsAdd.svg',
+    onlyWhenLoggedOut: true
   }
 ])
 
@@ -143,31 +149,43 @@ const authMenuItems = ref([
     name: 'Neuer Mobilitätscheck',
     link: '/new-mobility-check',
     icon: 'MaterialSymbolsAdd.svg',
-    requiresAuth: true
+    requiresAuth: true,
+    forRoles: ['administration', 'politician']
   },
   {
     name: 'Neuer Klimacheck',
     link: '/new-climate-check',
     icon: 'MaterialSymbolsAdd.svg',
-    requiresAuth: true
+    requiresAuth: true,
+    forRoles: ['administration', 'politician']
   },
   {
-    name: 'Verlauf',
+    name: 'Meine Datenbank',
+    link: '/my-history',
+    icon: 'MaterialSymbolsHistory.svg',
+    requiresAuth: true,
+    forRoles: ['politician']
+  },
+  {
+    name: 'Datenbank',
     link: '/history',
     icon: 'MaterialSymbolsHistory.svg',
-    requiresAuth: true
+    requiresAuth: true,
+    forRoles: ['administration', 'politician']
   },
   {
     name: 'Profil',
     link: '/profile',
     icon: 'MaterialSymbolsManageAccounts.svg',
-    requiresAuth: true
+    requiresAuth: true,
+    forRoles: ['administration', 'politician']
   },
   {
     name: 'Einstellungen',
     link: '/settings',
     icon: 'MaterialSymbolsSettings.svg',
-    requiresAuth: true
+    requiresAuth: true,
+    forRoles: ['administration']
   }
 ])
 
@@ -178,10 +196,20 @@ const itemLogout = {
 
 const filteredMenuItems = computed(() => {
   return menuItems.value.filter((item) => {
-    if (authStore.isAuthenticated) {
+    if (authStore.isLoggedIn) {
       return !item.onlyWhenLoggedOut
     } else {
       return item.onlyWhenLoggedOut || !item.onlyWhenLoggedOut
+    }
+  })
+})
+
+const filteredAuthMenuItems = computed(() => {
+  return authMenuItems.value.filter((item) => {
+    if (authStore.isLoggedIn) {
+      return item.requiresAuth && item.forRoles.includes(authStore.userRole)
+    } else {
+      return !item.requiresAuth
     }
   })
 })

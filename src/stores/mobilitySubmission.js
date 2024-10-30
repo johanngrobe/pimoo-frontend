@@ -5,10 +5,12 @@ import { useToast } from 'primevue/usetoast'
 
 export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () => {
   const mobilityObjectiveForm = ref([])
+  const isLoading = ref(false)
 
   // Fetch objectives from the API
   const fetchObjectives = async () => {
     try {
+      isLoading.value = true
       const response = await apiClient.get('/objective/main')
 
       // Transform the objectives structure
@@ -31,6 +33,7 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
     } catch (error) {
       console.error('Error fetching objectives:', error)
     }
+    isLoading.value = false
   }
 
   // Automatically fetch objectives when the store is created
@@ -42,20 +45,26 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
   })
 
   const mobilityForm = ref({
-    author: null,
     administrationNo: null,
     administrationDate: null,
     label: null,
-    desc: null
+    desc: null,
+    createdBy: null,
+    lastEditedBy: null
   })
 
   function setMobilityFormValues(value) {
+    isLoading.value = true
+
     formValid.value.submissionForm = true
-    mobilityForm.value.author = value.author
     mobilityForm.value.administrationNo = value.administrationNo
     mobilityForm.value.administrationDate = value.administrationDate
     mobilityForm.value.label = value.label
     mobilityForm.value.desc = value.desc
+    mobilityForm.value.createdBy = value.createdBy
+    mobilityForm.value.lastEditedBy = value.lastEditedBy
+
+    isLoading.value = false
   }
 
   const toast = useToast()
@@ -66,6 +75,7 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
   // Function to submit the entire mobility form and its objectives
   const submitMobilityForm = async () => {
     try {
+      isLoading.value = true
       // 1. Submit the main mobility form
       const mobilityResponse = await apiClient.post('/submission/mobility', mobilityForm.value)
       currentSubmissionId.value = mobilityResponse.data.id // Capture the submission ID for linking objectives
@@ -120,12 +130,14 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
         life: 3000
       })
     }
+    isLoading.value = false
   }
 
   const editMode = ref(false)
 
   const fetchMobilitySubmission = async (submissionId) => {
     try {
+      isLoading.value = true
       const response = await apiClient.get(`/submission/mobility/${submissionId}`)
 
       setMobilityFormValues(response.data)
@@ -133,33 +145,36 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
     } catch (error) {
       console.error('Error fetching submission data:', error)
     }
+    isLoading.value = false
   }
 
   const updateMobilitySubmission = async (submissionId) => {
     try {
+      isLoading.value = true
       // 1. Submit the main mobility form
-      await apiClient.put(`/submission/mobility/${submissionId}`, mobilityForm.value)
+      await apiClient.patch(`/submission/mobility/${submissionId}`, mobilityForm.value)
 
       // Loop through main objectives in `mobilityObjectiveForm.value`
       for (const mainObjective of mobilityObjectiveForm.value) {
         // Perform the update for the main objective
-        await apiClient.put(`/mobility-result/${mainObjective.id}`, {
-          submissionId: submissionId, // Link to the mobility submission (camelCase)
-          mainObjectiveId: mainObjective.mainObjectiveId, // ID of the main objective (camelCase)
+        await apiClient.patch(`/mobility-result/${mainObjective.id}`, {
           target: mainObjective.target // Submit target (true or false)
         })
 
         // Loop through each sub-objective of the current main objective
         for (const subObjective of mainObjective.subObjectives) {
           // Perform the update for each sub-objective
-          await apiClient.put(`/mobility-result/sub/${subObjective.id}`, {
-            mobilityResultId: mainObjective.id, // Link to the main objective result (camelCase)
-            subObjectiveId: subObjective.subObjectiveId, // ID of the sub-objective (camelCase)
+          let subObjectiveIndicators = null
+          if (subObjective.indicators.length > 0) {
+            subObjectiveIndicators = subObjective.indicators
+          }
+
+          await apiClient.patch(`/mobility-result/sub/${subObjective.id}`, {
             target: subObjective.target, // Target value (true or false)
             impact: subObjective.impact, // Impact (can be null if not applicable)
             spatialImpact: subObjective.spatialImpact, // Spatial impact (can be null)
             annotation: subObjective.annotation, // Annotation or notes (can be null)
-            indicatorIds: subObjective.indicators // List of indicator IDs
+            indicatorIds: subObjectiveIndicators // List of indicator IDs
           })
         }
       }
@@ -178,6 +193,7 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
       })
       throw error // Re-throw the error to handle it in upstream calls
     }
+    isLoading.value = false
   }
 
   async function $reset() {
@@ -188,7 +204,7 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
       mobilityOjectiveForm: false
     }
     mobilityForm.value = {
-      author: null,
+      // author: null,
       administrationNo: null,
       administrationDate: null,
       label: null,
@@ -199,6 +215,7 @@ export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () =
   }
 
   return {
+    isLoading,
     formValid,
     currentSubmissionId,
     setMobilityFormValues,

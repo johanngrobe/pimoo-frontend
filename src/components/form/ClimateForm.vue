@@ -1,72 +1,67 @@
 <template>
   <form class="my-7" @submit.prevent="onSubmit">
     <div class="form-group field mt-7">
-      <FloatLabel class="w-full">
-        <InputText
-          v-model="author"
-          aria-describedby="author-help"
-          :class="{ 'p-invalid': errors.author }"
-          class="w-full"
-          inputClass="w-full"
-        />
-        <label for="author" :class="{ 'p-invalid': errors.author }">Bearbeiter*in</label>
-      </FloatLabel>
+      <label for="author" :class="{ 'p-invalid': errors.author }">Bearbeiter*in</label>
+      <InputText
+        v-model="authorName"
+        aria-describedby="author-help"
+        :class="{ 'p-invalid': errors.author }"
+        class="w-full"
+        inputClass="w-full"
+        disabled
+      />
       <small v-if="errors.author" id="author-help" class="p-error">{{ errors.author }}</small>
     </div>
 
     <div class="form-group field mt-7">
-      <FloatLabel class="w-full">
-        <InputText
-          id="administration-no"
-          v-model="administrationNo"
-          aria-describedby="administration-no-help"
-          :class="{ 'p-invalid': errors.administrationNo }"
-          class="w-full"
-          inputClass="w-full"
-        />
-        <label for="administration-no" :class="{ 'p-invalid': errors.administrationNo }"
-          >Magistratvorlagennummer</label
-        >
-      </FloatLabel>
+      <label for="administration-no" :class="{ 'p-invalid': errors.administrationNo }"
+        >Magistratvorlagennummer</label
+      >
+      <InputText
+        id="administration-no"
+        v-model="administrationNo"
+        aria-describedby="administration-no-help"
+        :class="{ 'p-invalid': errors.administrationNo }"
+        class="w-full"
+        inputClass="w-full"
+      />
       <small v-if="errors.administrationNo" id="administration-no-help" class="p-error">
         {{ errors.administrationNo }}
       </small>
     </div>
 
     <div class="form-group field mt-7">
-      <FloatLabel>
-        <Calendar
-          id="administration-date"
-          v-model="administrationDate"
-          dateFormat="dd.mm.yy"
-          showIcon
-          iconDisplay="input"
-          aria-describedby="administration-date-help"
-          class="dont-close-on-select"
-          inputClass="dont-close-on-select"
-          :class="{ 'p-invalid': errors.administrationDate }"
-        />
-        <label for="administration-date" :class="{ 'p-invalid': errors.administrationDate }">
-          Datum Magistratssitzung
-        </label>
-      </FloatLabel>
+      <label for="administration-date" :class="{ 'p-invalid': errors.administrationDate }">
+        Datum Magistratssitzung </label
+      ><br />
+      <DatePicker
+        id="administration-date"
+        v-model="administrationDate"
+        dateFormat="dd.mm.yy"
+        showIcon
+        iconDisplay="input"
+        aria-describedby="administration-date-help"
+        class="dont-close-on-select"
+        inputClass="dont-close-on-select"
+        :class="{ 'p-invalid': errors.administrationDate }"
+      />
+
       <small v-if="errors.administrationDate" id="administration-date-help" class="p-error">
         {{ errors.administrationDate }}
       </small>
     </div>
 
     <div class="form-group field mt-7">
-      <FloatLabel class="w-full">
-        <InputText
-          id="label"
-          v-model="label"
-          aria-describedby="label-help"
-          :class="{ 'p-invalid': errors.label }"
-          class="w-full"
-          inputClass="w-full"
-        />
-        <label for="label" :class="{ 'p-invalid': errors.label }">Titel der Maßnahme</label>
-      </FloatLabel>
+      <label for="label" :class="{ 'p-invalid': errors.label }">Titel der Maßnahme</label>
+      <InputText
+        id="label"
+        v-model="label"
+        aria-describedby="label-help"
+        :class="{ 'p-invalid': errors.label }"
+        class="w-full"
+        inputClass="w-full"
+      />
+
       <small v-if="errors.label" id="label-help" class="p-error">{{ errors.label }}</small>
     </div>
 
@@ -265,9 +260,8 @@ import { useAuthStore } from '@/stores/auth'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import InputText from 'primevue/inputtext'
-import Calendar from 'primevue/calendar'
+import DatePicker from 'primevue/datepicker'
 import Textarea from 'primevue/textarea'
-import FloatLabel from 'primevue/floatlabel'
 import RadioButton from 'primevue/radiobutton'
 import HoverInfo from '@/components/ui/HoverInfo.vue'
 import { useToast } from 'primevue/usetoast'
@@ -279,11 +273,15 @@ import IconSync from '@/assets/icons/MaterialSymbolsSync.svg?component'
 const impactOptions = ref({})
 const impactGhgOptions = ref({})
 const impactDurationOptions = ref({})
+const user = ref({})
+
+const authStore = useAuthStore()
 
 onMounted(async () => {
   await fetchImpactOptions()
   await fetchImpactGhgOptions()
   await fetchImpactDurationOptions()
+  user.value = await authStore.getUser()
 })
 
 const fetchImpactOptions = async () => {
@@ -307,7 +305,7 @@ const impactDurationEnum = ['short', 'medium', 'long']
 
 // Validation schema
 const schema = yup.object({
-  author: yup.string().required('Angabe ist erforderlich'),
+  // author: yup.string().required('Angabe ist erforderlich'),
   administrationNo: yup.string().required('Angabe ist erforderlich'),
   administrationDate: yup.date().required('Angabe ist erforderlich'),
   label: yup.string().required('Angabe ist erforderlich'),
@@ -362,7 +360,7 @@ const { defineField, handleSubmit, errors, setFieldValue } = useForm({
 })
 
 // Define form state
-const [author] = defineField('author')
+// const [author] = defineField('author')
 const [administrationNo] = defineField('administrationNo')
 const [administrationDate] = defineField('administrationDate')
 const [label] = defineField('label')
@@ -373,12 +371,11 @@ const [impactDesc] = defineField('impactDesc')
 const [impactDuration] = defineField('impactDuration')
 const [alternativeDesc] = defineField('alternativeDesc')
 
-const fullName = computed(() => {
-  const storeAuth = useAuthStore()
-  return storeAuth.user.user_metadata.first_name + ' ' + storeAuth.user.user_metadata.last_name
+const authorName = computed(() => {
+  return `${user.value.firstName} ${user.value.lastName}`
 })
 
-setFieldValue('author', fullName.value)
+// setFieldValue('author', fullName.value)
 
 const continueForm = computed(() => {
   switch (impact.value) {
@@ -402,7 +399,7 @@ const fetchSubmissionData = async () => {
     const submission = response.data
 
     // Populate form fields with existing submission data
-    setFieldValue('author', submission.author)
+    // setFieldValue('author', submission.author)
     setFieldValue('administrationNo', submission.administrationNo)
     setFieldValue('administrationDate', new Date(submission.administrationDate))
     setFieldValue('label', submission.label)
@@ -447,7 +444,7 @@ const onSubmit = handleSubmit(async (values) => {
 
   if (editMode.value) {
     // PUT request to update existing submission
-    const response = await apiClient.put(
+    const response = await apiClient.patch(
       `/submission/climate/${currentSubmissionId.value}`,
       formattedValues
     )

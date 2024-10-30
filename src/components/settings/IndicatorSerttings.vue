@@ -1,6 +1,5 @@
 <template>
   <div>
-    <PrimeToast position="top-center" />
     <!-- Display list of submissions -->
 
     <BaseCard :collapseable="true" :isCollapsed="isCollapsed">
@@ -18,15 +17,23 @@
               class="w-full"
               required="true"
             />
-            <MultiSelect
-              v-model="newIndicator.tagIds"
-              :options="tags"
-              option-label="label"
-              option-value="id"
-              display="chip"
-              placeholder="Tags auswählen"
+            <InputText
+              v-model.trim="newIndicator.sourceUrl"
+              placeholder="Quellen-URL"
               class="w-full mt-2"
             />
+            <div class="flex">
+              <label for="tags" class="content-center ms-1">Tags:</label>
+              <MultiSelect
+                v-model="newIndicator.tagIds"
+                :options="tags"
+                option-label="label"
+                option-value="id"
+                display="chip"
+                placeholder="Tags auswählen"
+                class="w-full mt-2 ms-2"
+              />
+            </div>
           </div>
           <BaseButton type="submit" color="green" class="w-36"
             ><IconSave class="me-1" height="20" />
@@ -46,7 +53,14 @@
         <div v-if="!itemEditMode[ix]">
           <div class="grid grid-cols-5 gap-x-2">
             <div class="col-span-4">
-              <h3 class="mb-2">{{ indicator.label }}</h3>
+              <h3 class="mb-2 me-2">
+                <a v-if="indicator.sourceUrl" :href="indicator.sourceUrl" target="_blank">
+                  <span class="text-blue-900 hover:underline">{{ indicator.label }}</span>
+                  <span class="ms-2">🟩</span></a
+                >
+                <span v-else>{{ indicator.label }}<span class="ms-2">🟥</span></span>
+              </h3>
+
               <div class="flex">
                 <span class="font-semibold me-2">Tags:</span>
                 <div v-if="indicator.tags.length > 0">
@@ -83,20 +97,29 @@
             <div class="grid grid-cols-5 gap-x-2">
               <div class="col-span-4">
                 <InputText
-                  v-model="currentIndicator.label"
+                  v-model.trim="currentIndicator.label"
                   placeholder="indicator-Bezeichnung"
                   class="w-full"
                   required="true"
                 />
-                <MultiSelect
-                  v-model="currentIndicator.tagIds"
-                  :options="tags"
-                  option-label="label"
-                  option-value="id"
-                  display="chip"
-                  placeholder="Tags auswählen"
+                <InputText
+                  v-model.trim="currentIndicator.sourceUrl"
+                  placeholder="Quellen-URL"
                   class="w-full mt-2"
                 />
+                <div class="flex">
+                  <label for="tags" class="content-center ms-1">Tags:</label>
+                  <MultiSelect
+                    v-model="currentIndicator.tagIds"
+                    :options="tags"
+                    option-label="label"
+                    option-value="id"
+                    id="tags"
+                    display="chip"
+                    placeholder="Tags auswählen"
+                    class="w-full mt-2 ms-2"
+                  />
+                </div>
               </div>
               <div>
                 <BaseButton @click="cancelEdit()" color="red" class="w-36"
@@ -138,11 +161,13 @@ const currentIndicator = ref({
   label: '',
   tags: [],
   tagIds: [],
-  id: null
+  id: null,
+  sourceUrl: null
 })
 const newIndicator = ref({
   label: '',
-  tagIds: []
+  tagIds: [],
+  sourceUrl: null
 })
 const searchQuery = ref('')
 
@@ -172,7 +197,8 @@ const resetCurrentIndicator = () => {
     tags: [],
     tagIds: [],
     ix: null,
-    id: null
+    id: null,
+    sourceUrl: null
   }
 }
 
@@ -241,7 +267,7 @@ const getTagIds = () => {
 
 const onUpdateSUbmit = async (ix) => {
   try {
-    const response = await apiClient.put(
+    const response = await apiClient.patch(
       `/indicator/${currentIndicator.value.id}`,
       currentIndicator.value
     )

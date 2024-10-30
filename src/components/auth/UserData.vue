@@ -1,6 +1,7 @@
 <template>
-  <BaseCard class="block my-5 max-w-md">
-    <form @submit.prevent="onSubmit" class="">
+  <BaseCard class="block my-5 mx-auto max-w-md">
+    <BaseSpinner v-if="isLoading" />
+    <form v-else @submit.prevent="onSubmit" class="">
       <div class="field">
         <label for="firstName">Vorname</label>
         <InputText
@@ -32,18 +33,35 @@
         <label for="municipality">Gemeinde</label>
         <Dropdown
           id="municipality"
-          v-model="municipality"
-          :options="municipalities"
+          v-model="municipalityId"
+          :options="municipalityOptions"
           optionLabel="name"
           optionValue="id"
           class="w-full"
           :class="{ 'p-invalid': errors.municipality }"
           aria-describedby="municipality-help"
           placeholder="Gemeinde auswählen"
+          disabled
         />
         <small v-if="errors.municipality" id="municipality-help" class="p-error">{{
           errors.municipality
         }}</small>
+      </div>
+      <div class="field mt-4">
+        <label for="role">Benutzerrolle</label>
+        <Dropdown
+          id="role"
+          v-model="role"
+          :options="userRoleOptions"
+          optionLabel="label"
+          optionValue="value"
+          class="w-full"
+          :class="{ 'p-invalid': errors.role }"
+          aria-describedby="role-help"
+          placeholder="Benutzerrolle auswählen"
+          disabled
+        />
+        <small v-if="errors.role" id="role-help" class="p-error">{{ errors.role }}</small>
       </div>
       <div class="field mt-4">
         <label for="email">E-Mail</label>
@@ -64,15 +82,18 @@
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import * as yup from 'yup'
 import { useForm } from 'vee-validate'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
 import Dropdown from 'primevue/dropdown'
-import municipalitiesJSON from '@/assets/municipalities.json'
+import apiClient from '@/services/axios'
+import BaseSpinner from '../ui/BaseSpinner.vue'
 
-const municipalities = municipalitiesJSON
+const municipalityOptions = ref(null)
+const userRoleOptions = ref(null)
 
 const schema = yup.object({
   email: yup
@@ -82,7 +103,8 @@ const schema = yup.object({
     .label('E-Mail'),
   firstName: yup.string().required('Vorname ist erforderlich').label('Vorname'),
   lastName: yup.string().required('Nachname ist erforderlich').label('Nachname'),
-  municipality: yup.string().required('Gemeinde ist erforderlich').label('Gemeinde')
+  municipalityId: yup.number().required('Gemeinde ist erforderlich').label('Gemeinde'),
+  role: yup.string().required('Rolle ist erforderlich').label('Rolle')
 })
 
 const { defineField, handleSubmit, errors, setFieldValue } = useForm({
@@ -92,27 +114,50 @@ const { defineField, handleSubmit, errors, setFieldValue } = useForm({
 const [email] = defineField('email')
 const [firstName] = defineField('firstName')
 const [lastName] = defineField('lastName')
-const [municipality] = defineField('municipality')
+const [municipalityId] = defineField('municipalityId')
+const [role] = defineField('role')
 
 const authStore = useAuthStore()
 
-setFieldValue('email', authStore.user.email)
-setFieldValue('firstName', authStore.user.user_metadata.first_name)
-setFieldValue('lastName', authStore.user.user_metadata.last_name)
-setFieldValue('municipality', authStore.user.user_metadata.municipality)
+const setUserValues = async () => {
+  const user = await authStore.getUser()
+  console.log(user)
+
+  setFieldValue('email', user.email)
+  setFieldValue('firstName', user.firstName)
+  setFieldValue('lastName', user.lastName)
+  setFieldValue('municipalityId', user.municipalityId)
+  setFieldValue('role', user.role)
+}
+
+const fetchMunicipalityOptions = async () => {
+  try {
+    const response = await apiClient.get('/option/municipality')
+    municipalityOptions.value = response.data
+  } catch (error) {
+    municipalityOptions.value = []
+  }
+}
+
+const fetchUserRoleOptions = async () => {
+  try {
+    const response = await apiClient.get('/option/user-role')
+    userRoleOptions.value = response.data
+  } catch (error) {
+    userRoleOptions.value = []
+  }
+}
+onMounted(() => {
+  fetchMunicipalityOptions()
+  fetchUserRoleOptions()
+  setUserValues()
+})
 
 const toast = useToast()
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    await authStore.updateUser({
-      email: values.email,
-      data: {
-        first_name: values.firstName,
-        last_name: values.lastName,
-        municipality: values.municipality
-      }
-    })
+    await authStore.updateUser(values)
     toast.add({
       severity: 'success',
       summary: 'Profil erfolgreich aktualisiert',

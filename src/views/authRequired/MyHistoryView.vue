@@ -1,14 +1,14 @@
 <template>
   <div>
-    <h1>Datenbank</h1>
+    <h1>Meine Datenbank</h1>
 
     <BaseTabs :tabs="tabs">
       <template #mobility-check>
-        <MobilitySubmissionHistory />
+        <MyMobilitySubmissionHistory />
       </template>
 
       <template #climate-check>
-        <ClimateSubmissionHistory />
+        <MyClimateSubmissionHistory />
       </template>
     </BaseTabs>
   </div>
@@ -16,8 +16,8 @@
 
 <script setup>
 import BaseTabs from '@/components/ui/BaseTabs.vue'
-import MobilitySubmissionHistory from '@/components/history/MobilitySubmissionHistory.vue'
-import ClimateSubmissionHistory from '@/components/history/ClimateSubmissionHistory.vue'
+import MyMobilitySubmissionHistory from '@/components/history/MyMobilitySubmissionHistory.vue'
+import MyClimateSubmissionHistory from '@/components/history/MyClimateSubmissionHistory.vue'
 
 const tabs = [
   { name: 'mobility-check', label: 'Mobilitätscheck', disabled: false },

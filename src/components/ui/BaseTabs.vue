@@ -10,7 +10,7 @@
             :class="tab.name === selectedTab.name ? 'active-tab' : 'inactive-tab'"
             :aria-current="tab.name === selectedTab.name ? 'page' : undefined"
           >
-            {{ tab.name }}
+            {{ tab.label }}
           </a>
         </li>
       </ul>
@@ -22,7 +22,8 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue'
+import { defineProps, watchEffect, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps({
   tabs: {
@@ -35,13 +36,36 @@ const props = defineProps({
   }
 })
 
-const selectedTab = ref(props.defaultTab || props.tabs[0])
+const route = useRoute()
+const router = useRouter()
 
+// Computed property to initialize or update `selectedTab`
+const selectedTab = computed({
+  get() {
+    const tabParam = route.query.tab
+    return props.tabs.find((tab) => tab.name === tabParam) || props.defaultTab || props.tabs[0]
+  },
+  set(newTab) {
+    if (newTab) {
+      router.push({ query: { ...route.query, tab: newTab.name } })
+    }
+  }
+})
+
+// Function to select tab when a button is clicked
 const selectTab = (tab) => {
   if (!tab.disabled) {
     selectedTab.value = tab
   }
 }
+
+// Sync the URL query parameter when `selectedTab` changes
+watchEffect(() => {
+  const currentTab = selectedTab.value
+  if (currentTab && route.query.tab !== currentTab.name) {
+    router.replace({ query: { ...route.query, tab: currentTab.name } })
+  }
+})
 </script>
 
 <style scoped>

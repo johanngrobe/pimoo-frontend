@@ -1,13 +1,14 @@
 <template>
   <form class="my-7" @submit.prevent="onSubmit">
     <div class="form-group field mt-7">
-      <label for="author" :class="{ 'p-invalid': errors.author }">Bearbeiter*in</label>
+      <label for="author" :class="{ 'p-invalid': errors.author }">Sachbearbeitung</label>
       <InputText
-        v-model="author"
+        v-model="authorName"
         aria-describedby="author-help"
         :class="{ 'p-invalid': errors.author }"
         class="w-full"
         inputClass="w-full"
+        disabled
       />
       <small v-if="errors.author" id="author-help" class="p-error">{{ errors.author }}</small>
     </div>
@@ -81,7 +82,7 @@
 </template>
 
 <script setup>
-import { computed, defineEmits, watchEffect } from 'vue'
+import { computed, defineEmits, watchEffect, onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
 import { useForm } from 'vee-validate'
@@ -92,7 +93,7 @@ import Textarea from 'primevue/textarea'
 
 // Validation schema
 const schema = yup.object({
-  author: yup.string().required('Angabe ist erforderlich'),
+  // author: yup.string().required('Angabe ist erforderlich'),
   administrationNo: yup.string().required('Angabe ist erforderlich'),
   administrationDate: yup.date().required('Angabe ist erforderlich'),
   label: yup.string().required('Angabe ist erforderlich'),
@@ -104,7 +105,7 @@ const { defineField, handleSubmit, errors, setFieldValue } = useForm({
 })
 
 // Define form state
-const [author] = defineField('author')
+// const [author] = defineField('author')
 const [administrationNo] = defineField('administrationNo')
 const [administrationDate] = defineField('administrationDate')
 const [label] = defineField('label')
@@ -112,17 +113,23 @@ const [desc] = defineField('desc')
 
 const authStore = useAuthStore()
 
-const fullName = computed(() => {
-  return authStore.user.user_metadata.first_name + ' ' + authStore.user.user_metadata.last_name
+const user = ref({})
+
+onMounted(async () => {
+  user.value = await authStore.getUser()
 })
 
-setFieldValue('author', fullName.value)
+const authorName = computed(() => {
+  return `${user.value.firstName} ${user.value.lastName}`
+})
+
+// setFieldValue('author', fullName.value)
 
 const mobilityStore = useMobilitySubmissionStore()
 
 const fetchSubmissionData = async () => {
   // Populate form fields with existing submission data
-  setFieldValue('author', mobilityStore.mobilityForm.author)
+  // setFieldValue('author', mobilityStore.mobilityForm.author)
   setFieldValue('administrationNo', mobilityStore.mobilityForm.administrationNo)
   setFieldValue('administrationDate', new Date(mobilityStore.mobilityForm.administrationDate))
   setFieldValue('label', mobilityStore.mobilityForm.label)

@@ -31,16 +31,6 @@
           </div>
           <div class="flex space-x-4">
             <div class="grid grid-cols-1">
-              <div class="mb-2" v-if="userRoleAccess()">
-                <Checkbox
-                  v-model="submission.isPublished"
-                  :binary="true"
-                  inputId="published"
-                  class="ms-2"
-                  @change="publishSubmission(submission.id, submission.isPublished)"
-                />
-                <label for="published" class="ms-2">Veröffentlicht</label>
-              </div>
               <BaseButton @click="exportSubmission(submission.id)"
                 ><IconDownload class="me-1" height="20" /><span class="text-left w-18"
                   >PDF-Export</span
@@ -58,13 +48,6 @@
                 color="red"
                 ><IconDelete class="me-1" height="20" />
                 <span class="text-left w-18 me-4">Löschen</span></BaseButton
-              >
-              <BaseButton
-                v-if="userRoleAccess(['politician'])"
-                @click="copySubmission(submission.id, ix)"
-                color="green"
-                ><IconEdit class="me-1" height="20" />
-                <span class="text-left w-18 me-4">In meine Datenbank kopieren</span></BaseButton
               >
             </div>
           </div>
@@ -94,7 +77,6 @@ import { useAuthStore } from '@/stores/auth'
 import MobilityForm from '@/components/form/MobilityForm.vue'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
-import Checkbox from 'primevue/checkbox'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
 import IconDelete from '@/assets/icons/MaterialSymbolsDelete.svg?component'
 import IconEdit from '@/assets/icons/MaterialSymbolsEditSquare.svg?component'
@@ -126,7 +108,7 @@ const fetchSubmissions = async () => {
         break
       case 'politician':
         filter = {
-          isPublished: true
+          byUserId: true
         }
         break
     }
@@ -184,7 +166,7 @@ const checkLastEditor = (submission) => {
   return check
 }
 
-const userRoleAccess = (forRoles = ['administration']) => {
+const userRoleAccess = (forRoles = ['politician']) => {
   return forRoles.includes(authStore.userRole)
 }
 
@@ -192,60 +174,6 @@ const editSubmission = (submission) => {
   currentSubmission.value = { ...submission }
   mobilityStore.editMode = true
   mobilityStore.fetchMobilitySubmission(currentSubmission.value.id)
-}
-
-const publishSubmission = async (id, isPublished) => {
-  try {
-    const response = await apiClient.patch(`/submission/mobility/${id}`, {
-      isPublished
-    })
-
-    if (response.status === 200) {
-      console.log(response.data)
-      switch (response.data.isPublished) {
-        case true:
-          toast.add({
-            severity: 'success',
-            summary: 'Mobilitätscheck ist veröffentlicht',
-            life: 3000
-          })
-          break
-        case false:
-          toast.add({
-            severity: 'success',
-            summary: 'Veröffentlichung zurückgezogen',
-            life: 3000
-          })
-          break
-      }
-    }
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Fehler beim Veröffentlichen des Mobilitätschecks',
-      life: 3000
-    })
-  }
-}
-
-const copySubmission = async (id) => {
-  try {
-    const response = await apiClient.post(`/submission/mobility/copy/${id}`)
-
-    if (response.status === 201) {
-      toast.add({
-        severity: 'success',
-        summary: 'Mobilitätscheck erfolgreich kopiert',
-        life: 3000
-      })
-    }
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Fehler beim Kopieren des Mobilitätschecks',
-      life: 3000
-    })
-  }
 }
 
 const exportSubmission = async (id) => {

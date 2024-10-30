@@ -1,6 +1,5 @@
 <template>
   <div>
-    <PrimeToast position="top-center" />
     <!-- Display list of submissions -->
 
     <BaseCard :collapseable="true" :isCollapsed="isCollapsed">
@@ -181,7 +180,7 @@ const filteredTags = computed(() => {
 
 const onUpdateSUbmit = async (ix) => {
   try {
-    const response = await apiClient.put(`/tag/${currentTag.value.id}`, currentTag.value)
+    const response = await apiClient.patch(`/tag/${currentTag.value.id}`, currentTag.value)
     switch (response.status) {
       case 200:
         toast.add({
