@@ -1,80 +1,90 @@
 <template>
   <BaseCard class="block my-5 mx-auto max-w-md">
+    <h4 class="text-xl font-bold dark:text-white mb-4">Benutzerangaben</h4>
     <BaseSpinner v-if="isLoading" />
-    <form v-else @submit.prevent="onSubmit" class="">
+    <form v-else @submit.prevent="onSubmit" class="grid grid-cols-1 gap-y-4">
       <div class="field">
-        <label for="firstName">Vorname</label>
-        <InputText
-          id="firstName"
-          v-model="firstName"
-          class="w-full"
-          :class="{ 'p-invalid': errors.firstName }"
-          aria-describedby="firstName-help"
-        />
-
-        <small v-if="errors.firstName" id="firstName-help" class="p-error">{{
+        <FloatLabel variant="on">
+          <InputText
+            id="firstName"
+            v-model="firstName"
+            class="w-full"
+            :invalid="!!errors.firstName"
+            aria-describedby="firstName-help"
+          />
+          <label for="firstName">Vorname</label>
+        </FloatLabel>
+        <small v-if="errors.firstName" id="firstName-help" class="p-error block">{{
           errors.firstName
         }}</small>
       </div>
-      <div class="field mt-4">
-        <label for="lastName">Nachname</label>
-        <InputText
-          id="lastName"
-          v-model="lastName"
-          class="w-full"
-          :class="{ 'p-invalid': errors.lastName }"
-          aria-describedby="lastName-help"
-        />
-        <small v-if="errors.lastName" id="lastName-help" class="p-error">{{
+      <div class="field">
+        <FloatLabel variant="on">
+          <InputText
+            id="lastName"
+            v-model="lastName"
+            class="w-full"
+            :invalid="!!errors.lastName"
+            aria-describedby="lastName-help"
+          />
+          <label for="lastName">Nachname</label>
+        </FloatLabel>
+        <small v-if="errors.lastName" id="lastName-help" class="p-error block">{{
           errors.lastName
         }}</small>
       </div>
-      <div class="field mt-4">
-        <label for="municipality">Gemeinde</label>
-        <Dropdown
-          id="municipality"
-          v-model="municipalityId"
-          :options="municipalityOptions"
-          optionLabel="name"
-          optionValue="id"
-          class="w-full"
-          :class="{ 'p-invalid': errors.municipality }"
-          aria-describedby="municipality-help"
-          placeholder="Gemeinde auswählen"
-          disabled
-        />
-        <small v-if="errors.municipality" id="municipality-help" class="p-error">{{
+      <div class="field">
+        <FloatLabel variant="on">
+          <Dropdown
+            id="municipality"
+            v-model="municipalityId"
+            :options="municipalityOptions"
+            optionLabel="name"
+            optionValue="id"
+            class="w-full"
+            :invalid="!!errors.municipality"
+            aria-describedby="municipality-help"
+            placeholder="Gemeinde auswählen"
+            disabled
+          />
+          <label for="municipality">Gemeinde</label>
+        </FloatLabel>
+        <small v-if="errors.municipality" id="municipality-help" class="p-error block">{{
           errors.municipality
         }}</small>
       </div>
-      <div class="field mt-4">
-        <label for="role">Benutzerrolle</label>
-        <Dropdown
-          id="role"
-          v-model="role"
-          :options="userRoleOptions"
-          optionLabel="label"
-          optionValue="value"
-          class="w-full"
-          :class="{ 'p-invalid': errors.role }"
-          aria-describedby="role-help"
-          placeholder="Benutzerrolle auswählen"
-          disabled
-        />
-        <small v-if="errors.role" id="role-help" class="p-error">{{ errors.role }}</small>
+      <div class="field">
+        <FloatLabel variant="on">
+          <Dropdown
+            id="role"
+            v-model="role"
+            :options="userRoleOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-full"
+            :invalid="!!errors.role"
+            aria-describedby="role-help"
+            placeholder="Benutzerrolle auswählen"
+            disabled
+          />
+          <label for="role">Benutzerrolle</label>
+        </FloatLabel>
+        <small v-if="errors.role" id="role-help" class="p-error block">{{ errors.role }}</small>
       </div>
-      <div class="field mt-4">
-        <label for="email">E-Mail</label>
-        <InputText
-          id="email"
-          v-model="email"
-          class="w-full"
-          :class="{ 'p-invalid': errors.email }"
-          aria-describedby="email-help"
-        />
-        <small v-if="errors.email" id="email-help" class="p-error">{{ errors.email }}</small>
+      <div class="field">
+        <FloatLabel variant="on">
+          <InputText
+            id="email"
+            v-model="email"
+            class="w-full"
+            :invalid="!!errors.email"
+            aria-describedby="email-help"
+          />
+          <label for="email">E-Mail</label>
+        </FloatLabel>
+        <small v-if="errors.email" id="email-help" class="p-error block">{{ errors.email }}</small>
       </div>
-      <div class="flex gap-4 mt-5">
+      <div class="flex gap-4">
         <BaseButton type="submit" class="w-full">Speichern</BaseButton>
       </div>
     </form>
@@ -87,6 +97,7 @@ import { useAuthStore } from '@/stores/auth'
 import * as yup from 'yup'
 import { useForm } from 'vee-validate'
 import { useToast } from 'primevue/usetoast'
+import FloatLabel from 'primevue/floatlabel'
 import InputText from 'primevue/inputtext'
 import Dropdown from 'primevue/dropdown'
 import apiClient from '@/services/axios'

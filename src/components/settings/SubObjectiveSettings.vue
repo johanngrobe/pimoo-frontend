@@ -52,10 +52,7 @@
               />
             </div>
           </div>
-          <BaseButton type="submit" color="green" class="w-36"
-            ><IconSave class="me-1" height="20" />
-            <span class="text-left w-18">Hinzufügen</span></BaseButton
-          >
+          <ButtonSave type="submit" color="green" class="w-36" />
         </div>
       </form>
     </BaseCard>
@@ -87,19 +84,8 @@
                 </div>
               </div>
               <div>
-                <BaseButton @click="editSubObjective(subObjective, ix)" class="w-36">
-                  <IconEdit class="me-1" height="20" /><span class="text-left w-18"
-                    >Bearbeiten</span
-                  ></BaseButton
-                >
-                <!-- Edit form (appears when editing) -->
-                <BaseButton
-                  @click="deleteSubObjective(subObjective.id, ix)"
-                  color="red"
-                  class="w-36"
-                  ><IconDelete class="me-1" height="20" />
-                  <span class="text-left w-18">Löschen</span></BaseButton
-                >
+                <ButtonBearbeiten @click="editSubObjective(subObjective, ix)" class="w-36" />
+                <ButtonLoeschen @click="deleteSubObjective(subObjective.id, ix)" class="w-36" />
               </div>
             </div>
           </div>
@@ -150,14 +136,8 @@
                   </div>
                 </div>
                 <div>
-                  <BaseButton @click="cancelEdit()" color="red" class="w-36"
-                    ><IconCancel class="me-1" height="20" />
-                    <span class="text-left w-18">Abbrechen</span></BaseButton
-                  >
-                  <BaseButton type="submit" color="green" class="w-36"
-                    ><IconSave class="me-1" height="20" />
-                    <span class="text-left w-18">Speichern</span></BaseButton
-                  >
+                  <ButtonAbbrechen @click="cancelEdit()" class="w-36" />
+                  <ButtonSave type="submit" color="green" class="w-36" />
                 </div>
               </div>
             </form>
@@ -176,10 +156,10 @@ import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
-import IconDelete from '@/assets/icons/MaterialSymbolsDelete.svg?component'
-import IconEdit from '@/assets/icons/MaterialSymbolsEditSquare.svg?component'
-import IconSave from '@/assets/icons/MaterialSymbolsSave.svg?component'
-import IconCancel from '@/assets/icons/MaterialSymbolsCancel.svg?component'
+import ButtonLoeschen from '@/components/ui/ButtonLoeschen.vue'
+import ButtonBearbeiten from '@/components/ui/ButtonBearbeiten.vue'
+import ButtonSave from '@/components/ui/ButtonSave.vue'
+import ButtonAbbrechen from '@/components/ui/ButtonAbbrechen.vue'
 import IconAdd from '@/assets/icons/MaterialSymbolsAdd.svg?component'
 
 const toast = useToast()

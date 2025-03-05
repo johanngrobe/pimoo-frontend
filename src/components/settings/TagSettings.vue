@@ -18,10 +18,7 @@
               required="true"
             />
           </div>
-          <BaseButton type="submit" color="green" class="w-36"
-            ><IconSave class="me-1" height="20" />
-            <span class="text-left w-18">Hinzufügen</span></BaseButton
-          >
+          <ButtonSave type="submit" color="green" class="w-36" />
         </div>
       </form>
     </BaseCard>
@@ -38,16 +35,8 @@
             <div class="col-span-3">
               <h3 class="mb-2">{{ tag.label }}</h3>
             </div>
-            <BaseButton @click="editTag(tag, ix)" class="w-36">
-              <IconEdit class="me-1" height="20" /><span class="text-left w-18"
-                >Bearbeiten</span
-              ></BaseButton
-            >
-            <!-- Edit form (appears when editing) -->
-            <BaseButton @click="deleteTag(tag.id, ix)" color="red" class="w-36"
-              ><IconDelete class="me-1" height="20" />
-              <span class="text-left w-18">Löschen</span></BaseButton
-            >
+            <ButtonBearbeiten @click="editTag(tag, ix)" class="w-36" />
+            <ButtonLoeschen @click="deleteTag(tag.id, ix)" class="w-36" />
           </div>
         </div>
         <div v-else>
@@ -61,14 +50,8 @@
                   required="true"
                 />
               </div>
-              <BaseButton @click="cancelEdit()" color="red" class="w-36"
-                ><IconCancel class="me-1" height="20" />
-                <span class="text-left w-18">Abbrechen</span></BaseButton
-              >
-              <BaseButton type="submit" color="green" class="w-36"
-                ><IconSave class="me-1" height="20" />
-                <span class="text-left w-18">Speichern</span></BaseButton
-              >
+              <ButtonAbbrechen @click="cancelEdit()" color="red" class="w-36" />
+              <ButtonSave type="submit" color="green" class="w-36" />
             </div>
           </form>
         </div>
@@ -83,10 +66,10 @@ import apiClient from '@/services/axios'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
-import IconDelete from '@/assets/icons/MaterialSymbolsDelete.svg?component'
-import IconEdit from '@/assets/icons/MaterialSymbolsEditSquare.svg?component'
-import IconSave from '@/assets/icons/MaterialSymbolsSave.svg?component'
-import IconCancel from '@/assets/icons/MaterialSymbolsCancel.svg?component'
+import ButtonLoeschen from '@/components/ui/ButtonLoeschen.vue'
+import ButtonBearbeiten from '@/components/ui/ButtonBearbeiten.vue'
+import ButtonSave from '@/components/ui/ButtonSave.vue'
+import ButtonAbbrechen from '@/components/ui/ButtonAbbrechen.vue'
 import IconAdd from '@/assets/icons/MaterialSymbolsAdd.svg?component'
 
 const toast = useToast()

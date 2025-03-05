@@ -64,50 +64,56 @@
             </div>
           </div>
           <div class="ms-5 mt-7 my-auto max-w-md">
-            <label :for="`spatial-impact-${mainObjectiveIndex}-${index}`"
-              >Räumliche Auswirkung</label
-            >
-            <Select
-              :id="`spatial-impact-${mainObjectiveIndex}-${index}`"
-              :key="`spatial-impact-${mainObjectiveIndex}-${index}`"
-              v-model="subObjective.spatialImpact"
-              :options="optionsSpatialImpact"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full dont-close-on-select"
-            />
+            <FloatLabel variant="on">
+              <Select
+                :id="`spatial-impact-${mainObjectiveIndex}-${index}`"
+                :key="`spatial-impact-${mainObjectiveIndex}-${index}`"
+                v-model="subObjective.spatialImpact"
+                :options="optionsSpatialImpact"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full dont-close-on-select"
+              />
+              <label :for="`spatial-impact-${mainObjectiveIndex}-${index}`"
+                >Räumliche Auswirkung</label
+              >
+            </FloatLabel>
           </div>
         </div>
         <div class="mt-7 max-w-5xl">
-          <label :for="`explanation-${mainObjectiveIndex}-${index}`">Erläuterung</label>
-          <Textarea
-            :id="`annotation-${mainObjectiveIndex}-${index}`"
-            :key="`annotation-${mainObjectiveIndex}-${index}`"
-            v-model="subObjective.annotation"
-            rows="5"
-            class="w-full"
-          />
+          <FloatLabel variant="on">
+            <Textarea
+              :id="`annotation-${mainObjectiveIndex}-${index}`"
+              :key="`annotation-${mainObjectiveIndex}-${index}`"
+              v-model="subObjective.annotation"
+              rows="5"
+              class="w-full"
+            />
+            <label :for="`explanation-${mainObjectiveIndex}-${index}`">Erläuterung</label>
+          </FloatLabel>
         </div>
         <AddTextBlock class="mt-3 w-full" @add-text-block="appendTextBlock($event, index)" />
         <div class="mt-7 max-w-5xl">
-          <MultiSelect
-            :id="`indicators-${mainObjectiveIndex}-${index}`"
-            :key="`indicators-${mainObjectiveIndex}-${index}`"
-            v-model="subObjective.indicators"
-            :options="optionsIndicators"
-            filter
-            optionLabel="label"
-            optionValue="id"
-            placeholder="Indikatoren auswählen"
-            class="w-full dont-close-on-select"
-            display="chip"
-            empty-filter-message="Keine Ergebnisse gefunden"
-            :pt="{
-              header: () => ({
-                id: `indicators-${mainObjectiveIndex}-${index}_header`
-              })
-            }"
-          />
+          <FloatLabel variant="on">
+            <MultiSelect
+              :id="`indicators-${mainObjectiveIndex}-${index}`"
+              :key="`indicators-${mainObjectiveIndex}-${index}`"
+              v-model="subObjective.indicators"
+              :options="optionsIndicators"
+              filter
+              optionLabel="label"
+              optionValue="id"
+              class="w-full dont-close-on-select"
+              display="chip"
+              empty-filter-message="Keine Ergebnisse gefunden"
+              :pt="{
+                header: () => ({
+                  id: `indicators-${mainObjectiveIndex}-${index}_header`
+                })
+              }"
+            />
+            <label :for="`indicators-${mainObjectiveIndex}-${index}`">Indikatoren auswählen</label>
+          </FloatLabel>
         </div>
       </div>
       <div
@@ -121,7 +127,7 @@
 </template>
 
 <script setup>
-import { defineProps, onMounted, watchEffect } from 'vue'
+import { onMounted, watchEffect } from 'vue'
 import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
 import { useStorage } from '@vueuse/core'
 import Checkbox from 'primevue/checkbox'
@@ -131,6 +137,7 @@ import Textarea from 'primevue/textarea'
 import Slider from 'primevue/slider'
 import AddTextBlock from '@/components/layout/AddTextBlock.vue'
 import apiClient from '@/services/axios'
+import FloatLabel from 'primevue/floatlabel'
 
 const mobilityStore = useMobilitySubmissionStore()
 

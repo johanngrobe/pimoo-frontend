@@ -1,71 +1,72 @@
 <template>
-  <form class="my-7" @submit.prevent="onSubmit">
-    <div class="form-group field mt-7">
-      <label for="author" :class="{ 'p-invalid': errors.author }">Bearbeiter*in</label>
-      <InputText
-        v-model="authorName"
-        aria-describedby="author-help"
-        :class="{ 'p-invalid': errors.author }"
-        class="w-full"
-        inputClass="w-full"
-        disabled
-      />
-      <small v-if="errors.author" id="author-help" class="p-error">{{ errors.author }}</small>
+  <form @submit.prevent="onSubmit" class="grid grid-cols-1 gap-y-4 my-7">
+    <div class="form-group field">
+      <FloatLabel variant="on">
+        <InputText
+          v-model="authorName"
+          aria-describedby="author-help"
+          :invalid="!!errors.author"
+          class="w-full"
+          inputClass="w-full"
+          disabled
+        />
+        <label for="author">Bearbeiter*in</label>
+      </FloatLabel>
+      <small v-if="errors.author" id="author-help" class="p-error block">{{ errors.author }}</small>
     </div>
 
-    <div class="form-group field mt-7">
-      <label for="administration-no" :class="{ 'p-invalid': errors.administrationNo }"
-        >Magistratsvorlagennummer</label
-      >
-      <InputText
-        id="administration-no"
-        v-model="administrationNo"
-        aria-describedby="administration-no-help"
-        :class="{ 'p-invalid': errors.administrationNo }"
-        class="w-full"
-        inputClass="w-full"
-      />
-      <small v-if="errors.administrationNo" id="administration-no-help" class="p-error">
+    <div class="form-group field">
+      <FloatLabel variant="on">
+        <InputText
+          id="administration-no"
+          v-model="administrationNo"
+          aria-describedby="administration-no-help"
+          :invalid="!!errors.administrationNo"
+          class="w-full"
+          inputClass="w-full"
+        />
+        <label for="administration-no">Magistratsvorlagennummer</label>
+      </FloatLabel>
+      <small v-if="errors.administrationNo" id="administration-no-help" class="p-error block">
         {{ errors.administrationNo }}
       </small>
     </div>
 
-    <div class="form-group field mt-7">
-      <label for="administration-date" :class="{ 'p-invalid': errors.administrationDate }">
-        Datum Magistratssitzung </label
-      ><br />
-      <DatePicker
-        id="administration-date"
-        v-model="administrationDate"
-        dateFormat="dd.mm.yy"
-        showIcon
-        iconDisplay="input"
-        aria-describedby="administration-date-help"
-        class="dont-close-on-select"
-        inputClass="dont-close-on-select"
-        :class="{ 'p-invalid': errors.administrationDate }"
-      />
-
+    <div class="form-group field">
+      <FloatLabel variant="on">
+        <DatePicker
+          id="administration-date"
+          v-model="administrationDate"
+          showIcon
+          iconDisplay="input"
+          aria-describedby="administration-date-help"
+          class="dont-close-on-select"
+          inputClass="dont-close-on-select"
+          :invalid="!!errors.administrationDate"
+        />
+        <label for="administration-date"> Datum Magistratssitzung </label>
+      </FloatLabel>
       <small v-if="errors.administrationDate" id="administration-date-help" class="p-error">
         {{ errors.administrationDate }}
       </small>
     </div>
 
-    <div class="form-group field mt-7">
-      <label for="label" :class="{ 'p-invalid': errors.label }">Titel der Maßnahme</label>
-      <InputText
-        id="label"
-        v-model="label"
-        aria-describedby="label-help"
-        :class="{ 'p-invalid': errors.label }"
-        class="w-full"
-        inputClass="w-full"
-      />
-
-      <small v-if="errors.label" id="label-help" class="p-error">{{ errors.label }}</small>
+    <div class="form-group field">
+      <FloatLabel variant="on">
+        <InputText
+          id="label"
+          v-model="label"
+          aria-describedby="label-help"
+          :invalid="!!errors.label"
+          class="w-full"
+          inputClass="w-full"
+        />
+        <label for="label">Titel der Maßnahme</label>
+      </FloatLabel>
+      <small v-if="errors.label" id="label-help" class="p-error block">{{ errors.label }}</small>
     </div>
 
-    <div class="form-group field mt-7">
+    <div class="form-group field">
       <label for="impact" class="font-bold text-lg" :class="{ 'p-invalid': errors.impact }">
         Einschätzung der Klimarelevanz
       </label>
@@ -78,7 +79,7 @@
             v-model="impact"
             :value="option.value"
             name="impact"
-            :class="{ 'p-invalid': errors.impact }"
+            :invalid="!!errors.impact"
           />
           <label :for="`impact-${option.value}`" class="ml-2">
             {{ option.label }}
@@ -161,28 +162,24 @@
         </div>
 
         <div class="form-group field mt-7">
-          <label
-            for="impact-desc"
-            class="font-bold text-lg"
-            :class="{ 'p-invalid': errors.impactDesc }"
-            >Kurzbeschreibung der Auswirkungen</label
-          >
-          <Textarea
-            id="impact-desc"
-            v-model="impactDesc"
-            rows="5"
-            aria-describedby="impact-desc-help"
-            :class="{ 'p-invalid': errors.impactDesc }"
-            class="w-full"
-            inputClass="w-full"
-          />
-
-          <small v-if="errors.impactDesc" id="impact-desc-help" class="p-error">{{
+          <FloatLabel variant="on">
+            <label for="impact-desc">Kurzbeschreibung der Auswirkungen</label>
+            <Textarea
+              id="impact-desc"
+              v-model="impactDesc"
+              rows="5"
+              aria-describedby="impact-desc-help"
+              :invalid="!!errors.impactDesc"
+              class="w-full"
+              inputClass="w-full"
+            />
+          </FloatLabel>
+          <small v-if="errors.impactDesc" id="impact-desc-help" class="p-error block">{{
             errors.impactDesc
           }}</small>
         </div>
 
-        <div class="form-group field mt-7">
+        <div class="form-group field">
           <label for="impact" class="font-bold text-lg" :class="{ 'p-invalid': errors.impact }">
             Dauer der Auswirkungen
           </label>
@@ -214,61 +211,54 @@
         </div>
 
         <div class="form-group field mt-7">
-          <label for="alternative-desc" :class="{ 'p-invalid': errors.alternativeDesc }"
-            ><div class="font-bold text-lg">Klimafreundliche Alternativen zu der Maßnahme</div>
-            <div class="text-sm">
-              Falls nicht vorhanden: Begründung der Alternativlosigkeit
-            </div></label
-          >
-          <Textarea
-            id="alternative-desc"
-            v-model="alternativeDesc"
-            rows="5"
-            aria-describedby="alternative-desc-help"
-            :class="{ 'p-invalid': errors.alternativeDesc }"
-            class="w-full"
-            inputClass="w-full"
-          />
+          <FloatLabel variant="on">
+            <label for="alternative-desc"> Klimafreundliche Alternativen zu der Maßnahme </label>
+            <Textarea
+              id="alternative-desc"
+              v-model="alternativeDesc"
+              rows="5"
+              aria-describedby="alternative-desc-help"
+              :invalid="!!errors.alternativeDesc"
+              class="w-full"
+              inputClass="w-full"
+            />
+          </FloatLabel>
+          <small>* Falls nicht vorhanden: Begründung der Alternativlosigkeit </small>
 
-          <small v-if="errors.alternativeDesc" id="alternative-desc-help" class="p-error">{{
+          <small v-if="errors.alternativeDesc" id="alternative-desc-help" class="p-error block">{{
             errors.alternativeDesc
           }}</small>
         </div>
       </div>
     </div>
-    <div v-if="impact" class="text-right mt-7">
-      <BaseButton @click="closeModal" type="submit">
-        <div v-if="editMode" class="flex">
-          <IconSync class="me-1" height="20" /><span class="text-left w-18">Aktualisieren</span>
-        </div>
-        <div v-else class="flex">
-          <IconSave class="me-1" height="20" /><span class="text-left w-18">Speichern</span>
-        </div>
-      </BaseButton>
-      <BaseButton v-if="editMode" @click="exportSubmission(currentSubmissionId.value)"
-        ><IconDownload class="me-1" height="20" /><span class="text-left w-18"
-          >PDF-Export</span
-        ></BaseButton
-      >
+    <div v-if="impact" class="flex w-full justify-end">
+      <ButtonSync v-if="editMode" @click="closeModal" type="submit" />
+      <ButtonSave v-else @click="closeModal" type="submit" />
+      <ButtonDownload
+        v-if="editMode"
+        @click="exportSubmission(currentSubmissionId.value)"
+      ></ButtonDownload>
     </div>
   </form>
 </template>
 
 <script setup>
-import { ref, computed, watchEffect, defineEmits, onMounted, defineModel } from 'vue'
+import { ref, computed, watchEffect, onMounted, defineModel } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useForm } from 'vee-validate'
-import * as yup from 'yup'
+import { schema } from '@/utils/schemas/climateForm'
+import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
 import DatePicker from 'primevue/datepicker'
 import Textarea from 'primevue/textarea'
 import RadioButton from 'primevue/radiobutton'
 import HoverInfo from '@/components/ui/HoverInfo.vue'
-import { useToast } from 'primevue/usetoast'
+
 import apiClient from '@/services/axios'
-import IconDownload from '@/assets/icons/MaterialSymbolsDownload.svg?component'
-import IconSave from '@/assets/icons/MaterialSymbolsSave.svg?component'
-import IconSync from '@/assets/icons/MaterialSymbolsSync.svg?component'
+import ButtonDownload from '@/components/ui/ButtonDownload.vue'
+import ButtonSave from '@/components/ui/ButtonSave.vue'
+import ButtonSync from '@/components/ui/ButtonSync.vue'
+import FloatLabel from 'primevue/floatlabel'
 
 const impactOptions = ref({})
 const impactGhgOptions = ref({})
@@ -298,62 +288,6 @@ const fetchImpactDurationOptions = async () => {
   const response = await apiClient.get('/option/climate/impact-duration')
   impactDurationOptions.value = response.data
 }
-
-// Define your enums
-const impactEnum = ['positive', 'negative', 'no_effect']
-const impactDurationEnum = ['short', 'medium', 'long']
-
-// Validation schema
-const schema = yup.object({
-  // author: yup.string().required('Angabe ist erforderlich'),
-  administrationNo: yup.string().required('Angabe ist erforderlich'),
-  administrationDate: yup.date().required('Angabe ist erforderlich'),
-  label: yup.string().required('Angabe ist erforderlich'),
-  impact: yup
-    .string()
-    .oneOf(impactEnum, 'Ungültiger Wert für Impact')
-    .required('Angabe ist erforderlich'),
-  impactGhg: yup.number().when('impact', {
-    is: (impact) => impact !== 'no_effect',
-    then: (schema) =>
-      schema
-        .integer('ImpactGhg muss eine ganze Zahl sein')
-        .notOneOf([0], 'ImpactGhg darf nicht 0 sein')
-        .min(-2, 'ImpactGhg muss zwischen -2 und 2 liegen')
-        .max(2, 'ImpactGhg muss zwischen -2 und 2 liegen')
-        .required('Bitte ausfüllen, wenn Impact nicht "no_effect" ist'),
-    otherwise: (schema) => schema.optional().nullable(true).oneOf([null, ''])
-  }),
-  impactAdaption: yup.number().when('impact', {
-    is: (impact) => impact !== 'no_effect',
-    then: (schema) =>
-      schema
-        .integer('ImpactAdaption muss eine ganze Zahl sein')
-        .notOneOf([0], 'ImpactAdaption darf nicht 0 sein')
-        .min(-2, 'ImpactAdaption muss zwischen -2 und 2 liegen')
-        .max(2, 'ImpactAdaption muss zwischen -2 und 2 liegen')
-        .required('Bitte ausfüllen, wenn Impact nicht "no_effect" ist'),
-    otherwise: (schema) => schema.optional().nullable(true).oneOf([null, ''])
-  }),
-  impactDesc: yup.string().when('impact', {
-    is: (impact) => impact !== 'no_effect',
-    then: (schema) => schema.required('Bitte ausfüllen, wenn Impact nicht "no_effect" ist'),
-    otherwise: (schema) => schema.optional().nullable(true).oneOf([null, ''])
-  }),
-  impactDuration: yup.string().when('impact', {
-    is: (impact) => impact !== 'no_effect',
-    then: (schema) =>
-      schema
-        .oneOf(impactDurationEnum, 'Ungültiger Wert für Impact Duration')
-        .required('Bitte ausfüllen, wenn Impact nicht "no_effect" ist'),
-    otherwise: (schema) => schema.optional().nullable(true).oneOf([null, ''])
-  }),
-  alternativeDesc: yup.string().when('impact', {
-    is: (impact) => impact !== 'no_effect',
-    then: (schema) => schema.required('Bitte ausfüllen, wenn Impact nicht "no_effect" ist'),
-    otherwise: (schema) => schema.optional().nullable(true).oneOf([null, ''])
-  })
-})
 
 const { defineField, handleSubmit, errors, setFieldValue } = useForm({
   validationSchema: schema

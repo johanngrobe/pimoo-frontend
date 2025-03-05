@@ -2,10 +2,11 @@ import '@/assets/main.css'
 // import 'primeicons/primeicons.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { localeDe } from './utils/translation'
 import App from './App.vue'
 import router from './router'
 import PrimeVue from 'primevue/config'
-import Lara from '@/services/primevue/presets/lara' //import preset
+import Aura from '@primeuix/themes/aura'
 import BaseAlert from './components/ui/BaseAlert.vue'
 import BaseCard from './components/ui/BaseCard.vue'
 import BaseButton from './components/ui/BaseButton.vue'
@@ -25,8 +26,13 @@ app.use(createPinia())
 app.use(ToastService)
 app.use(router)
 app.use(PrimeVue, {
-  unstyled: true,
-  pt: Lara //apply preset
+  theme: {
+    preset: Aura,
+    options: {
+      darkModeSelector: false || 'none'
+    }
+  },
+  locale: localeDe
 })
 
 app.mount('#app')

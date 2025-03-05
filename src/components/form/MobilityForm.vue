@@ -18,30 +18,25 @@
     </template>
     <MobilityMainObjectiveForm />
   </BaseCard>
-  <div class="text-right mt-7">
-    <BaseButton v-if="mobilityStore.editMode" @click="handleSubmit" type="submit"
-      ><IconSync class="me-1" height="20" /><span class="text-left w-18">Aktualisieren</span>
-    </BaseButton>
-    <BaseButton v-else @click="handleSubmit" type="submit"
-      ><IconSave class="me-1" height="20" /><span class="text-left w-18">Speichern</span>
-    </BaseButton>
-    <BaseButton v-if="showExportButton" @click="exportSubmission(mobilityStore.currentSubmissionId)"
-      ><IconDownload class="me-1" height="20" /><span class="text-left w-18"
-        >PDF-Export</span
-      ></BaseButton
-    >
+  <div class="flex w-full justify-end mt-7">
+    <ButtonSync v-if="mobilityStore.editMode" @click="handleSubmit" type="submit"></ButtonSync>
+    <ButtonSave v-else @click="handleSubmit" type="submit"></ButtonSave>
+    <ButtonDownload
+      v-if="showExportButton"
+      @click="exportSubmission(mobilityStore.currentSubmissionId)"
+    ></ButtonDownload>
   </div>
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, watchEffect, watch } from 'vue'
+import { ref, watchEffect, watch } from 'vue'
 import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
 import apiClient from '@/services/axios'
 import MobilitySubmissionForm from '@/components/form/MobilitySubmissionForm.vue'
 import MobilityMainObjectiveForm from '@/components/form/MobilityMainObjectiveForm.vue'
-import IconDownload from '@/assets/icons/MaterialSymbolsDownload.svg?component'
-import IconSave from '@/assets/icons/MaterialSymbolsSave.svg?component'
-import IconSync from '@/assets/icons/MaterialSymbolsSync.svg?component'
+import ButtonDownload from '@/components/ui/ButtonDownload.vue'
+import ButtonSync from '@/components/ui/ButtonSync.vue'
+import ButtonSave from '@/components/ui/ButtonSave.vue'
 
 const props = defineProps({
   submissionId: {
