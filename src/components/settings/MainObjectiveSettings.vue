@@ -8,34 +8,7 @@
           <IconAdd /><span>Neues Leitziel hinzufügen</span>
         </h2>
       </template>
-      <form @submit.prevent="onSubmit">
-        <div class="grid grid-cols-5 gap-x-2">
-          <div class="col-span-4">
-            <div class="flex">
-              <InputNumber
-                v-model="newMainObjective.no"
-                placeholder="#"
-                class="w-16 me-2"
-                inputClass="w-16"
-                locale="de-DE"
-                :min="1"
-                :step="1"
-                required="true"
-              />
-              <InputText
-                v-model="newMainObjective.label"
-                placeholder="Indikator eingeben"
-                class="w-full"
-                required="true"
-              />
-            </div>
-          </div>
-          <BaseButton type="submit" color="green" class="w-36"
-            ><IconSave class="me-1" height="20" />
-            <span class="text-left w-18">Hinzufügen</span></BaseButton
-          >
-        </div>
-      </form>
+      <MainObjectiveForm @add-item="onSubmit" />
     </BaseCard>
 
     <InputText v-model="searchQuery" placeholder="Nach Leitziel suchen" class="w-full mt-5" />
@@ -51,9 +24,9 @@
               <div class="w-10">{{ mainObjective.no }}</div>
               <div class="me-4">{{ mainObjective.label }}</div>
             </div>
-            <div>
-              <ButtonBearbeiten @click="editMainObjective(mainObjective, ix)" class="w-36" />
-              <ButtonLoeschen @click="deleteMainObjective(mainObjective.id, ix)" class="w-36" />
+            <div class="flex gap-1">
+              <ButtonBearbeiten @click="editMainObjective(mainObjective, ix)" />
+              <ButtonLoeschen @click="deleteMainObjective(mainObjective.id, ix)" />
             </div>
           </div>
         </div>
@@ -80,9 +53,9 @@
                   />
                 </div>
               </div>
-              <div>
-                <ButtonAbbrechen @click="cancelEdit()" class="w-36" />
-                <ButtonSave type="submit" color="green" class="w-36" />
+              <div class="flex gap-1">
+                <ButtonAbbrechen @click="cancelEdit()" />
+                <ButtonSave type="submit" color="green" />
               </div>
             </div>
           </form>
@@ -99,6 +72,7 @@ import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
+import MainObjectiveForm from './MainObjectiveForm.vue'
 import ButtonLoeschen from '@/components/ui/ButtonLoeschen.vue'
 import ButtonBearbeiten from '@/components/ui/ButtonBearbeiten.vue'
 import ButtonSave from '@/components/ui/ButtonSave.vue'
@@ -115,10 +89,7 @@ const currentMainObjective = ref({
   ix: null,
   id: null
 })
-const newMainObjective = ref({
-  label: '',
-  no: null
-})
+
 const searchQuery = ref('')
 
 onMounted(async () => {
@@ -146,13 +117,6 @@ const resetCurrentMainObjective = () => {
     no: null,
     ix: null,
     id: null
-  }
-}
-
-const resetNewMainObjective = () => {
-  newMainObjective.value = {
-    label: '',
-    no: null
   }
 }
 
@@ -232,9 +196,9 @@ const onUpdateSUbmit = async (ix) => {
   }
 }
 
-const onSubmit = async () => {
+const onSubmit = async (newMainObjective) => {
   try {
-    const response = await apiClient.post('/objective/main', newMainObjective.value)
+    const response = await apiClient.post('/objective/main', newMainObjective)
     switch (response.status) {
       case 201:
         toast.add({
@@ -244,7 +208,6 @@ const onSubmit = async () => {
         })
         mainObjectives.value.unshift(response.data)
         itemEditMode.value.unshift(false)
-        resetNewMainObjective()
         break
       default:
         toast.add({

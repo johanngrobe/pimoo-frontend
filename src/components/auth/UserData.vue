@@ -35,7 +35,7 @@
       </div>
       <div class="field">
         <FloatLabel variant="on">
-          <Dropdown
+          <Select
             id="municipality"
             v-model="municipalityId"
             :options="municipalityOptions"
@@ -55,7 +55,7 @@
       </div>
       <div class="field">
         <FloatLabel variant="on">
-          <Dropdown
+          <Select
             id="role"
             v-model="role"
             :options="userRoleOptions"
@@ -99,7 +99,7 @@ import { useForm } from 'vee-validate'
 import { useToast } from 'primevue/usetoast'
 import FloatLabel from 'primevue/floatlabel'
 import InputText from 'primevue/inputtext'
-import Dropdown from 'primevue/dropdown'
+import Select from 'primevue/select'
 import apiClient from '@/services/axios'
 import BaseSpinner from '../ui/BaseSpinner.vue'
 

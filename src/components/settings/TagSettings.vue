@@ -8,19 +8,7 @@
           <IconAdd /><span>Neuen Tag hinzufügen</span>
         </h2>
       </template>
-      <form @submit.prevent="onSubmit">
-        <div class="grid grid-cols-5 gap-x-2">
-          <div class="col-span-4">
-            <InputText
-              v-model="newTag.label"
-              placeholder="Tag eingeben"
-              class="w-full"
-              required="true"
-            />
-          </div>
-          <ButtonSave type="submit" color="green" class="w-36" />
-        </div>
-      </form>
+      <TagForm @add-item="onSubmit" />
     </BaseCard>
 
     <InputText v-model="searchQuery" placeholder="Nach Tag suchen" class="w-full mt-5" />
@@ -31,12 +19,14 @@
     <div v-else>
       <BaseCard v-for="(tag, ix) in filteredTags" :key="tag.id">
         <div v-if="!itemEditMode[ix]">
-          <div class="grid grid-cols-5 gap-x-2">
-            <div class="col-span-3">
+          <div class="grid grid-cols-12 gap-x-2">
+            <div class="col-span-10">
               <h3 class="mb-2">{{ tag.label }}</h3>
             </div>
-            <ButtonBearbeiten @click="editTag(tag, ix)" class="w-36" />
-            <ButtonLoeschen @click="deleteTag(tag.id, ix)" class="w-36" />
+            <div class="col-span-2 flex gap-1">
+              <ButtonBearbeiten @click="editTag(tag, ix)" />
+              <ButtonLoeschen @click="deleteTag(tag.id, ix)" />
+            </div>
           </div>
         </div>
         <div v-else>
@@ -50,8 +40,8 @@
                   required="true"
                 />
               </div>
-              <ButtonAbbrechen @click="cancelEdit()" color="red" class="w-36" />
-              <ButtonSave type="submit" color="green" class="w-36" />
+              <ButtonAbbrechen @click="cancelEdit()" color="red" />
+              <ButtonSave type="submit" color="green" />
             </div>
           </form>
         </div>
@@ -65,6 +55,7 @@ import { computed, ref, onMounted } from 'vue'
 import apiClient from '@/services/axios'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
+import TagForm from '@/components/settings/TagForm.vue'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
 import ButtonLoeschen from '@/components/ui/ButtonLoeschen.vue'
 import ButtonBearbeiten from '@/components/ui/ButtonBearbeiten.vue'
@@ -81,9 +72,7 @@ const currentTag = ref({
   id: null,
   ix: null
 })
-const newTag = ref({
-  label: ''
-})
+
 const searchQuery = ref('')
 
 onMounted(async () => {
@@ -112,10 +101,6 @@ const resetCurrentTag = () => {
     ix: null,
     id: null
   }
-}
-
-const resetNewTag = () => {
-  newTag.value.label = ''
 }
 
 const fetchTags = async () => {
@@ -191,9 +176,9 @@ const onUpdateSUbmit = async (ix) => {
   }
 }
 
-const onSubmit = async () => {
+const onSubmit = async (newTag) => {
   try {
-    const response = await apiClient.post('/tag', newTag.value)
+    const response = await apiClient.post('/tag', newTag)
     switch (response.status) {
       case 201:
         toast.add({
@@ -203,7 +188,6 @@ const onSubmit = async () => {
         })
         tags.value.unshift(response.data)
         itemEditMode.value.unshift(false)
-        resetNewTag()
         break
       default:
         toast.add({

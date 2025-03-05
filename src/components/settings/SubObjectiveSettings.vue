@@ -7,54 +7,7 @@
           <IconAdd /><span>Neues Unterziel hinzufügen</span>
         </h2>
       </template>
-      <form @submit.prevent="onSubmit">
-        <div class="grid grid-cols-5 gap-x-2">
-          <div class="col-span-4">
-            <div class="flex">
-              <Dropdown
-                v-model="newSubObjective.mainObjective"
-                :options="mainObjectives"
-                optionLabel="label"
-                placeholder="Leitziel"
-                class="w-16 me-2"
-                id="mainObjectiveId"
-              >
-                <template #value="slotProps">
-                  <div v-if="slotProps.value" class="flex align-items-center">
-                    <div class="me-2">{{ slotProps.value.no }}</div>
-                  </div>
-                  <span v-else>
-                    {{ slotProps.placeholder }}
-                  </span>
-                </template>
-                <template #option="slotProps">
-                  <div class="flex align-items-center">
-                    <div class="me-2">{{ slotProps.option.no }}</div>
-                    <div>{{ slotProps.option.label }}</div>
-                  </div>
-                </template></Dropdown
-              >
-              <InputNumber
-                v-model="newSubObjective.no"
-                placeholder="#"
-                class="w-16 me-2"
-                inputClass="w-16"
-                locale="de-DE"
-                :min="1"
-                :step="1"
-                required="true"
-              />
-              <InputText
-                v-model="newSubObjective.label"
-                placeholder="Indikator eingeben"
-                class="w-full"
-                required="true"
-              />
-            </div>
-          </div>
-          <ButtonSave type="submit" color="green" class="w-36" />
-        </div>
-      </form>
+      <SubObjectiveForm :mainObjecives="mainObjectives" @add-item="onSubmit" />
     </BaseCard>
 
     <InputText v-model="searchQuery" placeholder="Nach Leitziel suchen" class="w-full mt-5" />
@@ -84,8 +37,8 @@
                 </div>
               </div>
               <div>
-                <ButtonBearbeiten @click="editSubObjective(subObjective, ix)" class="w-36" />
-                <ButtonLoeschen @click="deleteSubObjective(subObjective.id, ix)" class="w-36" />
+                <ButtonBearbeiten @click="editSubObjective(subObjective, ix)" />
+                <ButtonLoeschen @click="deleteSubObjective(subObjective.id, ix)" />
               </div>
             </div>
           </div>
@@ -94,7 +47,7 @@
               <div class="grid grid-cols-5 gap-x-2">
                 <div class="col-span-4">
                   <div class="flex">
-                    <Dropdown
+                    <Select
                       v-model="currentSubObjective.mainObjective"
                       :options="mainObjectives"
                       optionLabel="label"
@@ -115,8 +68,8 @@
                           <div class="me-2">{{ slotProps.option.no }}</div>
                           <div>{{ slotProps.option.label }}</div>
                         </div>
-                      </template></Dropdown
-                    >
+                      </template>
+                    </Select>
                     <InputNumber
                       v-model="currentSubObjective.no"
                       placeholder="#"
@@ -136,8 +89,8 @@
                   </div>
                 </div>
                 <div>
-                  <ButtonAbbrechen @click="cancelEdit()" class="w-36" />
-                  <ButtonSave type="submit" color="green" class="w-36" />
+                  <ButtonAbbrechen @click="cancelEdit()" />
+                  <ButtonSave type="submit" color="green" />
                 </div>
               </div>
             </form>
@@ -154,8 +107,9 @@ import apiClient from '@/services/axios'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
-import Dropdown from 'primevue/dropdown'
+import Select from 'primevue/select'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
+import SubObjectiveForm from './SubObjectiveForm.vue'
 import ButtonLoeschen from '@/components/ui/ButtonLoeschen.vue'
 import ButtonBearbeiten from '@/components/ui/ButtonBearbeiten.vue'
 import ButtonSave from '@/components/ui/ButtonSave.vue'
@@ -173,16 +127,6 @@ const currentSubObjective = ref({
   id: null,
   mainObjectiveId: null,
   mainObjective: null
-})
-const newSubObjective = ref({
-  label: '',
-  no: null,
-  mainObjectiveId: null,
-  mainObjective: {}
-})
-
-newSubObjective.value.mainObjectiveId = computed(() => {
-  return newSubObjective.value?.mainObjective?.id || null
 })
 
 const searchQuery = ref('')
@@ -215,15 +159,6 @@ const resetCurrentSubObjective = () => {
     no: null,
     ix: null,
     id: null
-  }
-}
-
-const resetNewSubObjective = () => {
-  newSubObjective.value = {
-    label: '',
-    no: null,
-    mainObjectiveId: null,
-    mainObjective: null
   }
 }
 
@@ -321,9 +256,9 @@ const onUpdateSUbmit = async (ix) => {
   }
 }
 
-const onSubmit = async () => {
+const onSubmit = async (newSubObjective) => {
   try {
-    const response = await apiClient.post('/objective/sub', newSubObjective.value)
+    const response = await apiClient.post('/objective/sub', newSubObjective)
     switch (response.status) {
       case 201:
         toast.add({
@@ -333,7 +268,6 @@ const onSubmit = async () => {
         })
         subObjectives.value.unshift(response.data)
         itemEditMode.value.unshift(false)
-        resetNewSubObjective()
         break
       default:
         toast.add({

@@ -13,6 +13,7 @@ import BaseButton from './components/ui/BaseButton.vue'
 import BaseModal from './components/ui/BaseModal.vue'
 import BaseSpinner from './components/ui/BaseSpinner.vue'
 import ToastService from 'primevue/toastservice'
+import Tooltip from 'primevue/tooltip'
 
 const app = createApp(App)
 
@@ -34,5 +35,5 @@ app.use(PrimeVue, {
   },
   locale: localeDe
 })
-
+app.directive('tooltip', Tooltip)
 app.mount('#app')

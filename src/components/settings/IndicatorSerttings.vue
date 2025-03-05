@@ -7,37 +7,8 @@
         <h2 class="font-bold text-lg mb-4 flex" @click="expandCollapse">
           <IconAdd /><span>Neuen Inidikator hinzufügen</span>
         </h2>
+        <IndicatorForm :tags="tags" @add-item="onSubmit" />
       </template>
-      <form @submit.prevent="onSubmit">
-        <div class="grid grid-cols-5 gap-x-2">
-          <div class="col-span-4">
-            <InputText
-              v-model="newIndicator.label"
-              placeholder="Indikator eingeben"
-              class="w-full"
-              required="true"
-            />
-            <InputText
-              v-model.trim="newIndicator.sourceUrl"
-              placeholder="Quellen-URL"
-              class="w-full mt-2"
-            />
-            <div class="flex">
-              <label for="tags" class="content-center ms-1">Tags:</label>
-              <MultiSelect
-                v-model="newIndicator.tagIds"
-                :options="tags"
-                option-label="label"
-                option-value="id"
-                display="chip"
-                placeholder="Tags auswählen"
-                class="w-full mt-2 ms-2"
-              />
-            </div>
-          </div>
-          <ButtonSave type="submit" color="green" class="w-36" />
-        </div>
-      </form>
     </BaseCard>
 
     <InputText v-model="searchQuery" placeholder="Nach Indikator suchen" class="w-full mt-5" />
@@ -76,8 +47,8 @@
               </div>
             </div>
             <div>
-              <ButtonBearbeiten @click="editindicator(indicator, ix)" class="w-36" />
-              <ButtonLoeschen @click="deleteindicator(indicator.id, ix)" color="red" class="w-36" />
+              <ButtonBearbeiten @click="editindicator(indicator, ix)" />
+              <ButtonLoeschen @click="deleteindicator(indicator.id, ix)" color="red" />
             </div>
           </div>
         </div>
@@ -85,34 +56,41 @@
           <form @submit.prevent="onUpdateSUbmit(ix)">
             <div class="grid grid-cols-5 gap-x-2">
               <div class="col-span-4">
-                <InputText
-                  v-model.trim="currentIndicator.label"
-                  placeholder="indicator-Bezeichnung"
-                  class="w-full"
-                  required="true"
-                />
-                <InputText
-                  v-model.trim="currentIndicator.sourceUrl"
-                  placeholder="Quellen-URL"
-                  class="w-full mt-2"
-                />
-                <div class="flex">
-                  <label for="tags" class="content-center ms-1">Tags:</label>
-                  <MultiSelect
-                    v-model="currentIndicator.tagIds"
-                    :options="tags"
-                    option-label="label"
-                    option-value="id"
-                    id="tags"
-                    display="chip"
-                    placeholder="Tags auswählen"
-                    class="w-full mt-2 ms-2"
+                <FloatLabel variant="on">
+                  <InputText
+                    id="label"
+                    v-model.trim="currentIndicator.label"
+                    class="w-full"
+                    required="true"
                   />
+                  <label for="label">Indikator-Bezeichnung</label>
+                </FloatLabel>
+                <FloatLabel varion="on">
+                  <InputText
+                    id="sourceUrl"
+                    v-model.trim="currentIndicator.sourceUrl"
+                    class="w-full mt-2"
+                  />
+                  <label for="sourceUrl">Quellen-URL</label>
+                </FloatLabel>
+                <div class="flex">
+                  <FloatLabel variant="on">
+                    <MultiSelect
+                      v-model="currentIndicator.tagIds"
+                      :options="tags"
+                      option-label="label"
+                      option-value="id"
+                      id="tags"
+                      display="chip"
+                      class="w-full mt-2 ms-2"
+                    />
+                    <label for="tags">Tags</label>
+                  </FloatLabel>
                 </div>
               </div>
               <div>
-                <ButtonAbbrechen @click="cancelEdit()" color="red" class="w-36" />
-                <ButtonSave type="submit" color="green" class="w-36" />
+                <ButtonAbbrechen @click="cancelEdit()" color="red" />
+                <ButtonSave type="submit" color="green" />
               </div>
             </div>
           </form>
@@ -128,11 +106,13 @@ import apiClient from '@/services/axios'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
 import MultiSelect from 'primevue/multiselect'
+import FloatLabel from 'primevue/floatlabel'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
 import ButtonLoeschen from '@/components/ui/ButtonLoeschen.vue'
 import ButtonBearbeiten from '@/components/ui/ButtonBearbeiten.vue'
 import ButtonSave from '@/components/ui/ButtonSave.vue'
 import ButtonAbbrechen from '@/components/ui/ButtonAbbrechen.vue'
+import IndicatorForm from '@/components/settings/IndicatorForm.vue'
 import IconAdd from '@/assets/icons/MaterialSymbolsAdd.svg?component'
 
 const toast = useToast()
@@ -145,11 +125,6 @@ const currentIndicator = ref({
   tags: [],
   tagIds: [],
   id: null,
-  sourceUrl: null
-})
-const newIndicator = ref({
-  label: '',
-  tagIds: [],
   sourceUrl: null
 })
 const searchQuery = ref('')
@@ -182,13 +157,6 @@ const resetCurrentIndicator = () => {
     ix: null,
     id: null,
     sourceUrl: null
-  }
-}
-
-const resetnewIndicator = () => {
-  newIndicator.value = {
-    label: '',
-    tagIds: []
   }
 }
 
@@ -281,9 +249,9 @@ const onUpdateSUbmit = async (ix) => {
   }
 }
 
-const onSubmit = async () => {
+const onSubmit = async (newIndicator) => {
   try {
-    const response = await apiClient.post('/indicator', newIndicator.value)
+    const response = await apiClient.post('/indicator', newIndicator)
     switch (response.status) {
       case 201:
         toast.add({
@@ -293,7 +261,6 @@ const onSubmit = async () => {
         })
         indicators.value.unshift(response.data)
         itemEditMode.value.unshift(false)
-        resetnewIndicator()
         break
       default:
         toast.add({

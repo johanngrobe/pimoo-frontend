@@ -38,7 +38,7 @@
 
         <div class="field">
           <FloatLabel variant="on">
-            <Dropdown
+            <Select
               id="municipality"
               v-model="municipalityId"
               :options="municipalityOptions"
@@ -57,7 +57,7 @@
 
         <div class="field">
           <FloatLabel variant="on">
-            <Dropdown
+            <Select
               id="role"
               v-model="role"
               :options="userRoleOptions"
@@ -156,7 +156,7 @@ import { schema } from '@/utils/schemas/register'
 import InputText from 'primevue/inputtext'
 import FloatLabel from 'primevue/floatlabel'
 import Password from 'primevue/password'
-import Dropdown from 'primevue/dropdown'
+import Select from 'primevue/select'
 import apiClient from '@/services/axios'
 import { useToast } from 'primevue/usetoast'
 

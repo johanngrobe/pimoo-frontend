@@ -8,28 +8,7 @@
           <IconAdd /><span>Neuen Textblock hinzufügen</span>
         </h2>
       </template>
-      <form @submit.prevent="onSubmit">
-        <div class="grid grid-cols-5 gap-x-2">
-          <div class="col-span-4">
-            <InputText
-              v-model="newTextBlock.label"
-              placeholder="Textblock eingeben"
-              class="w-full"
-              required="true"
-            />
-            <MultiSelect
-              v-model="newTextBlock.tagIds"
-              :options="tags"
-              option-label="label"
-              option-value="id"
-              display="chip"
-              placeholder="Tags auswählen"
-              class="w-full mt-2"
-            />
-          </div>
-          <ButtonSave type="submit" color="green" class="w-36" />
-        </div>
-      </form>
+      <TextBlockForm :tags="tags" @add-item="onSubmit" />
     </BaseCard>
 
     <InputText v-model="searchQuery" placeholder="Nach Maßnahme suchen" class="w-full mt-5" />
@@ -60,9 +39,9 @@
                 </div>
               </div>
             </div>
-            <div>
-              <ButtonBearbeiten @click="editTextBlock(textBlock, ix)" class="w-36" />
-              <ButtonLoeschen @click="deleteTextBlock(textBlock.id, ix)" color="red" class="w-36" />
+            <div class="flex gap-1">
+              <ButtonBearbeiten @click="editTextBlock(textBlock, ix)" />
+              <ButtonLoeschen @click="deleteTextBlock(textBlock.id, ix)" color="red" />
             </div>
           </div>
         </div>
@@ -86,9 +65,9 @@
                   class="w-full mt-2"
                 />
               </div>
-              <div>
-                <ButtonAbbrechen @click="cancelEdit()" color="red" class="w-36" />
-                <ButtonSave type="submit" color="green" class="w-36" />
+              <div class="flex gap-1">
+                <ButtonAbbrechen @click="cancelEdit()" color="red" />
+                <ButtonSave type="submit" color="green" />
               </div>
             </div>
           </form>
@@ -103,6 +82,7 @@ import { computed, ref, onMounted } from 'vue'
 import apiClient from '@/services/axios'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
+import TextBlockForm from '@/components/settings/TextBlockForm.vue'
 import MultiSelect from 'primevue/multiselect'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
 import ButtonLoeschen from '@/components/ui/ButtonLoeschen.vue'
@@ -122,10 +102,7 @@ const currentTextBlock = ref({
   tagIds: [],
   id: null
 })
-const newTextBlock = ref({
-  label: '',
-  tagIds: []
-})
+
 const searchQuery = ref('')
 
 onMounted(async () => {
@@ -155,13 +132,6 @@ const resetCurrentTextBlock = () => {
     tagIds: [],
     ix: null,
     id: null
-  }
-}
-
-const resetNewTextBlock = () => {
-  newTextBlock.value = {
-    label: '',
-    tagIds: []
   }
 }
 
@@ -254,9 +224,9 @@ const onUpdateSUbmit = async (ix) => {
   }
 }
 
-const onSubmit = async () => {
+const onSubmit = async (newTextBlock) => {
   try {
-    const response = await apiClient.post('/text-block', newTextBlock.value)
+    const response = await apiClient.post('/text-block', newTextBlock)
     switch (response.status) {
       case 201:
         toast.add({
@@ -266,7 +236,6 @@ const onSubmit = async () => {
         })
         textBlocks.value.unshift(response.data)
         itemEditMode.value.unshift(false)
-        resetNewTextBlock()
         break
       default:
         toast.add({
