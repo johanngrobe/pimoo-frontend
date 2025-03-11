@@ -2,152 +2,75 @@
   <div>
     <!-- Display list of submissions -->
 
-    <BaseCard :collapseable="true" :isCollapsed="isCollapsed">
-      <template #title>
-        <h2 class="font-bold text-lg mb-4 flex" @click="expandCollapse">
-          <IconAdd /><span>Neues Leitziel hinzufügen</span>
-        </h2>
+    <BaseModal v-model="isModalOpen" @close="toggleModal">
+      <template #header>
+        <h2>Leitziel hinzufügen</h2>
       </template>
-      <MainObjectiveForm @add-item="onSubmit" />
-    </BaseCard>
-
-    <InputText v-model="searchQuery" placeholder="Nach Leitziel suchen" class="w-full mt-5" />
+      <MainObjectiveForm :editMode="false" :nextNo="nextNo" @add-item="onSubmit" />
+    </BaseModal>
+    <ButtonAdd @click="toggleModal" class="my-5">Leitziel hinzufügen</ButtonAdd>
+    <FloatLabel variant="on">
+      <InputText id="searchQuery" v-model="searchQuery" class="w-full" />
+      <label for="searchQuery">Nach Leitziel suchen</label>
+    </FloatLabel>
     <BaseSpinner v-if="isLoading" class="m-10" />
     <div v-else-if="mainObjectives.length === 0">
       <p class="font-lg font-bold m-5">Keine Leitziele vorhanden.</p>
     </div>
     <div v-else>
-      <BaseCard v-for="(mainObjective, ix) in filteredMainObjetives" :key="mainObjective.id">
-        <div v-if="!itemEditMode[ix]">
-          <div class="grid grid-cols-5 gap-x-2">
-            <div class="col-span-4 flex">
-              <div class="w-10">{{ mainObjective.no }}</div>
-              <div class="me-4">{{ mainObjective.label }}</div>
-            </div>
-            <div class="flex gap-1">
-              <ButtonBearbeiten @click="editMainObjective(mainObjective, ix)" />
-              <ButtonLoeschen @click="deleteMainObjective(mainObjective.id, ix)" />
-            </div>
-          </div>
-        </div>
-        <div v-else>
-          <form @submit.prevent="onUpdateSUbmit(ix)">
-            <div class="grid grid-cols-5 gap-x-2">
-              <div class="col-span-4">
-                <div class="flex">
-                  <InputNumber
-                    v-model="currentMainObjective.no"
-                    placeholder="#"
-                    class="w-16"
-                    inputClass="w-16"
-                    locale="de-DE"
-                    :min="1"
-                    :step="1"
-                    required="true"
-                  />
-                  <InputText
-                    v-model="currentMainObjective.label"
-                    placeholder="Name des Leitziels"
-                    class="w-full"
-                    required="true"
-                  />
-                </div>
-              </div>
-              <div class="flex gap-1">
-                <ButtonAbbrechen @click="cancelEdit()" />
-                <ButtonSave type="submit" color="green" />
-              </div>
-            </div>
-          </form>
-        </div>
-      </BaseCard>
+      <div v-for="mainObjective in filteredMainObjetives" :key="mainObjective.id">
+        <MainObjectiveSettingsItem
+          :item="mainObjective"
+          @delete-item="onDelete"
+          @update-item="onUpdate"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import apiClient from '@/services/axios'
-import { useToast } from 'primevue/usetoast'
+import { createItem, fetchItems, updateItem, deleteItem } from '@/composables/crud'
 import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
+import FloatLabel from 'primevue/floatlabel'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
 import MainObjectiveForm from './MainObjectiveForm.vue'
-import ButtonLoeschen from '@/components/ui/ButtonLoeschen.vue'
-import ButtonBearbeiten from '@/components/ui/ButtonBearbeiten.vue'
-import ButtonSave from '@/components/ui/ButtonSave.vue'
-import ButtonAbbrechen from '@/components/ui/ButtonAbbrechen.vue'
-import IconAdd from '@/assets/icons/MaterialSymbolsAdd.svg?component'
+import MainObjectiveSettingsItem from './MainObjectiveSettingsItem.vue'
+import ButtonAdd from '@/components/ui/ButtonAdd.vue'
 
-const toast = useToast()
 const isLoading = ref(false)
-const isCollapsed = ref(true)
+const isModalOpen = ref(false)
 const mainObjectives = ref([])
-const currentMainObjective = ref({
-  label: '',
-  no: null,
-  ix: null,
-  id: null
-})
 
 const searchQuery = ref('')
 
 onMounted(async () => {
   await fetchMainObjetives()
-  setItemEditArray()
 })
 
-const expandCollapse = () => {
-  isCollapsed.value = !isCollapsed.value
-}
-
-const setItemEditMode = (ix) => {
-  itemEditMode.value[ix] = !itemEditMode.value[ix]
-}
-
-const itemEditMode = ref([])
-
-const setItemEditArray = () => {
-  itemEditMode.value = Array(mainObjectives.value.length).fill(false)
-}
-
-const resetCurrentMainObjective = () => {
-  currentMainObjective.value = {
-    label: '',
-    no: null,
-    ix: null,
-    id: null
-  }
+const toggleModal = () => {
+  isModalOpen.value = !isModalOpen.value
 }
 
 const fetchMainObjetives = async () => {
-  try {
-    isLoading.value = true
-    const response = await apiClient.get('/objective/main')
-    mainObjectives.value = response.data
-  } catch (error) {
-    mainObjectives.value = []
-  }
+  isLoading.value = true
+  mainObjectives.value = await fetchItems('/objective/main')
   isLoading.value = false
 }
 
-const deleteMainObjective = async (id, ix) => {
-  const response = await apiClient.delete(`/objective/main/${id}`)
-  switch (response.status) {
-    case 204:
-      toast.add({
-        severity: 'success',
-        summary: 'Leitziel erfolgreich gelöscht',
-        life: 3000
-      })
-      mainObjectives.value.splice(ix, 1)
-      break
-    default:
-      toast.add({
-        severity: 'error',
-        summary: 'Fehler beim Löschen des Leitziels',
-        life: 3000
-      })
+const onDelete = async (id) => {
+  await deleteItem({
+    model: 'objective/main',
+    modelId: id,
+    detail: {
+      success: 'Leitziel erfolgreich gelöscht',
+      error: 'Fehler beim Löschen des Leitziels'
+    }
+  })
+  const ix = mainObjectives.value.findIndex((objective) => objective.id === id)
+  if (ix !== -1) {
+    mainObjectives.value.splice(ix, 1)
   }
 }
 
@@ -163,80 +86,36 @@ const filteredMainObjetives = computed(() => {
   })
 })
 
-const onUpdateSUbmit = async (ix) => {
-  try {
-    const response = await apiClient.patch(
-      `/objective/main/${currentMainObjective.value.id}`,
-      currentMainObjective.value
-    )
-    switch (response.status) {
-      case 200:
-        toast.add({
-          severity: 'success',
-          summary: 'Leitziel erfolgreich aktualisiert',
-          life: 3000
-        })
-        mainObjectives.value.splice(ix, 1, response.data)
-        resetCurrentMainObjective()
-        setItemEditMode(ix)
-        break
-      default:
-        toast.add({
-          severity: 'error',
-          summary: 'Fehler beim Aktualisieren des Leitziels',
-          life: 3000
-        })
+const nextNo = computed(() => {
+  return mainObjectives.value.length + 1
+})
+
+const onUpdate = async ({ modelId, values }) => {
+  const response = await updateItem({
+    model: 'objective/main',
+    modelId,
+    values,
+    detail: {
+      success: 'Leitziel erfolgreich aktualisiert',
+      error: 'Fehler beim Aktualisieren des Leitziels'
     }
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Fehler beim Aktualisieren des indicators',
-      life: 3000
-    })
+  })
+  const ix = mainObjectives.value.findIndex((objective) => objective.id === response.id)
+  if (ix !== -1) {
+    mainObjectives.value.splice(ix, 1, response)
   }
 }
 
-const onSubmit = async (newMainObjective) => {
-  try {
-    const response = await apiClient.post('/objective/main', newMainObjective)
-    switch (response.status) {
-      case 201:
-        toast.add({
-          severity: 'success',
-          summary: 'Leitziel erfolgreich hinzugefügt',
-          life: 3000
-        })
-        mainObjectives.value.unshift(response.data)
-        itemEditMode.value.unshift(false)
-        break
-      default:
-        toast.add({
-          severity: 'error',
-          summary: 'Fehler beim Hinzufügen des Leitziels',
-          life: 3000
-        })
+const onSubmit = async (values) => {
+  const response = await createItem({
+    model: 'objective/main',
+    values: values,
+    detail: {
+      success: 'Leitziel erfolgreich hinzugefügt',
+      error: 'Fehler beim Hinzufügen des Leitziels'
     }
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Fehler beim Hinzufügen des Leitziels',
-      life: 3000
-    })
-  }
-}
-
-const editMainObjective = async (mainObjective, ix) => {
-  if (currentMainObjective.value.ix !== null) {
-    setItemEditMode(currentMainObjective.value.ix)
-  }
-  currentMainObjective.value = { ...mainObjective }
-  currentMainObjective.value.ix = ix
-  setItemEditMode(ix)
-}
-
-const cancelEdit = () => {
-  setItemEditMode(currentMainObjective.value.ix)
-  resetCurrentMainObjective()
+  })
+  mainObjectives.value.unshift(response)
 }
 </script>
 

@@ -2,136 +2,56 @@
   <div>
     <!-- Display list of submissions -->
 
-    <BaseCard :collapseable="true" :isCollapsed="isCollapsed">
-      <template #title>
-        <h2 class="font-bold text-lg mb-4 flex" @click="expandCollapse">
-          <IconAdd /><span>Neuen Tag hinzufügen</span>
-        </h2>
+    <BaseModal v-model="isModalOpen" @close="toggleModal">
+      <template #header>
+        <h2>Tag hinzufügen</h2>
       </template>
-      <TagForm @add-item="onSubmit" />
-    </BaseCard>
-
-    <InputText v-model="searchQuery" placeholder="Nach Tag suchen" class="w-full mt-5" />
+      <TagForm :editMode="false" @add-item="onSubmit" />
+    </BaseModal>
+    <ButtonAdd @click="toggleModal" class="my-5">Tag hinzufügen</ButtonAdd>
+    <FloatLabel variant="on">
+      <InputText id="searchQuery" v-model="searchQuery" class="w-full" />
+      <label for="searchQuery">Nach Tag suchen</label>
+    </FloatLabel>
     <BaseSpinner v-if="isLoading" class="m-10" />
     <div v-else-if="tags.length === 0">
       <p class="font-lg font-bold m-5">Keine Indikatoren vorhanden.</p>
     </div>
     <div v-else>
-      <BaseCard v-for="(tag, ix) in filteredTags" :key="tag.id">
-        <div v-if="!itemEditMode[ix]">
-          <div class="grid grid-cols-12 gap-x-2">
-            <div class="col-span-10">
-              <h3 class="mb-2">{{ tag.label }}</h3>
-            </div>
-            <div class="col-span-2 flex gap-1">
-              <ButtonBearbeiten @click="editTag(tag, ix)" />
-              <ButtonLoeschen @click="deleteTag(tag.id, ix)" />
-            </div>
-          </div>
-        </div>
-        <div v-else>
-          <form @submit.prevent="onUpdateSUbmit(ix)">
-            <div class="grid grid-cols-5 gap-x-2">
-              <div class="col-span-3">
-                <InputText
-                  v-model="currentTag.label"
-                  placeholder="Tag eingeben"
-                  class="w-full"
-                  required="true"
-                />
-              </div>
-              <ButtonAbbrechen @click="cancelEdit()" color="red" />
-              <ButtonSave type="submit" color="green" />
-            </div>
-          </form>
-        </div>
-      </BaseCard>
+      <div v-for="tag in filteredTags" :key="tag.id">
+        <TagSettingsItem :item="tag" @delete-item="onDelete" @update-item="onUpdate" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import apiClient from '@/services/axios'
-import { useToast } from 'primevue/usetoast'
+import { fetchItems, deleteItem, createItem, updateItem } from '@/composables/crud'
 import InputText from 'primevue/inputtext'
+import FloatLabel from 'primevue/floatlabel'
 import TagForm from '@/components/settings/TagForm.vue'
+import TagSettingsItem from '@/components/settings/TagSettingsItem.vue'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
-import ButtonLoeschen from '@/components/ui/ButtonLoeschen.vue'
-import ButtonBearbeiten from '@/components/ui/ButtonBearbeiten.vue'
-import ButtonSave from '@/components/ui/ButtonSave.vue'
-import ButtonAbbrechen from '@/components/ui/ButtonAbbrechen.vue'
-import IconAdd from '@/assets/icons/MaterialSymbolsAdd.svg?component'
+import ButtonAdd from '@/components/ui/ButtonAdd.vue'
 
-const toast = useToast()
 const isLoading = ref(false)
-const isCollapsed = ref(true)
+const isModalOpen = ref(false)
 const tags = ref([])
-const currentTag = ref({
-  label: '',
-  id: null,
-  ix: null
-})
-
 const searchQuery = ref('')
 
 onMounted(async () => {
   await fetchTags()
-  await fetchTags()
-  setItemEditArray()
 })
 
-const expandCollapse = () => {
-  isCollapsed.value = !isCollapsed.value
-}
-
-const setItemEditMode = (ix) => {
-  itemEditMode.value[ix] = !itemEditMode.value[ix]
-}
-
-const itemEditMode = ref([])
-
-const setItemEditArray = () => {
-  itemEditMode.value = Array(tags.value.length).fill(false)
-}
-
-const resetCurrentTag = () => {
-  currentTag.value = {
-    label: '',
-    ix: null,
-    id: null
-  }
+const toggleModal = () => {
+  isModalOpen.value = !isModalOpen.value
 }
 
 const fetchTags = async () => {
-  try {
-    isLoading.value = true
-    const response = await apiClient.get('/tag')
-    tags.value = response.data
-  } catch (error) {
-    tags.value = []
-  }
+  isLoading.value = true
+  tags.value = await fetchItems('/tag')
   isLoading.value = false
-}
-
-const deleteTag = async (id, ix) => {
-  const response = await apiClient.delete(`/tag/${id}`)
-  switch (response.status) {
-    case 204:
-      toast.add({
-        severity: 'success',
-        summary: 'Tag erfolgreich gelöscht',
-        life: 3000
-      })
-      tags.value.splice(ix, 1)
-      break
-    default:
-      toast.add({
-        severity: 'error',
-        summary: 'Fehler beim Löschen des Tags',
-        life: 3000
-      })
-  }
 }
 
 // Computed property to filter submissions by multiple fields
@@ -146,77 +66,48 @@ const filteredTags = computed(() => {
   })
 })
 
-const onUpdateSUbmit = async (ix) => {
-  try {
-    const response = await apiClient.patch(`/tag/${currentTag.value.id}`, currentTag.value)
-    switch (response.status) {
-      case 200:
-        toast.add({
-          severity: 'success',
-          summary: 'Tag erfolgreich aktualisiert',
-          life: 3000
-        })
-        tags.value.splice(ix, 1, response.data)
-        resetCurrentTag()
-        setItemEditMode(ix)
-        break
-      default:
-        toast.add({
-          severity: 'error',
-          summary: 'Fehler beim Aktualisieren des Tags',
-          life: 3000
-        })
+const onDelete = async (modelId) => {
+  await deleteItem({
+    model: 'tag',
+    modelId,
+    detail: {
+      success: 'Tag erfolgreich gelöscht',
+      error: 'Fehler beim Löschen des Tags'
     }
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Fehler beim Aktualisieren des Tags',
-      life: 3000
-    })
+  })
+  const ix = tags.value.findIndex((tag) => tag.id === modelId)
+  if (ix !== -1) {
+    tags.value.splice(ix, 1)
   }
 }
 
-const onSubmit = async (newTag) => {
-  try {
-    const response = await apiClient.post('/tag', newTag)
-    switch (response.status) {
-      case 201:
-        toast.add({
-          severity: 'success',
-          summary: 'Tag erfolgreich hinzugefügt',
-          life: 3000
-        })
-        tags.value.unshift(response.data)
-        itemEditMode.value.unshift(false)
-        break
-      default:
-        toast.add({
-          severity: 'error',
-          summary: 'Fehler beim Hinzufügen des Tags',
-          life: 3000
-        })
+const onUpdate = async ({ modelId, values }) => {
+  const response = await updateItem({
+    model: 'tag',
+    modelId,
+    values,
+    detail: {
+      success: 'Tag erfolgreich aktualisiert',
+      error: 'Fehler beim Aktualisieren des Tags'
     }
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Fehler beim Hinzufügen des Tags',
-      life: 3000
-    })
+  })
+  const ix = tags.value.findIndex((tag) => tag.id === modelId)
+  if (ix !== -1) {
+    tags.value[ix] = response
   }
 }
 
-const editTag = async (tag, ix) => {
-  if (currentTag.value.ix !== null) {
-    setItemEditMode(currentTag.value.ix)
-  }
-  currentTag.value = { ...tag }
-  currentTag.value.ix = ix
-  setItemEditMode(ix)
-}
-
-const cancelEdit = () => {
-  setItemEditMode(currentTag.value.ix)
-  resetCurrentTag()
+const onSubmit = async (values) => {
+  const response = await createItem({
+    model: 'tag',
+    values,
+    detail: {
+      success: 'Tag erfolgreich hinzugefügt',
+      error: 'Fehler beim Hinzufügen des Tags'
+    }
+  })
+  tags.value.unshift(response)
+  toggleModal()
 }
 </script>
 

@@ -136,7 +136,7 @@ import MultiSelect from 'primevue/multiselect'
 import Textarea from 'primevue/textarea'
 import Slider from 'primevue/slider'
 import AddTextBlock from '@/components/layout/AddTextBlock.vue'
-import apiClient from '@/services/axios'
+import { apiClient } from '@/services/axios'
 import FloatLabel from 'primevue/floatlabel'
 
 const mobilityStore = useMobilitySubmissionStore()

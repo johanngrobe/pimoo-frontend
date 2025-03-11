@@ -2,177 +2,68 @@
   <div>
     <!-- Display list of submissions -->
 
-    <BaseCard :collapseable="true" :isCollapsed="isCollapsed">
-      <template #title>
-        <h2 class="font-bold text-lg mb-4 flex" @click="expandCollapse">
-          <IconAdd /><span>Neuen Textblock hinzufügen</span>
-        </h2>
+    <BaseModal v-model="isModalOpen" @close="toggleModal">
+      <template #header>
+        <h2>Textblock hinzufügen</h2>
       </template>
-      <TextBlockForm :tags="tags" @add-item="onSubmit" />
-    </BaseCard>
-
-    <InputText v-model="searchQuery" placeholder="Nach Maßnahme suchen" class="w-full mt-5" />
+      <TextBlockForm :editMode="false" :tags="tags" @add-item="onSubmit" />
+    </BaseModal>
+    <ButtonAdd @click="toggleModal" class="my-5">Textblock hinzufügen</ButtonAdd>
+    <FloatLabel variant="on">
+      <InputText id="searchQuery" v-model="searchQuery" class="w-full" />
+      <label for="searchQuery">Nach Textblock suchen</label>
+    </FloatLabel>
     <BaseSpinner v-if="isLoading" class="m-10" />
     <div v-else-if="textBlocks.length === 0">
       <p class="font-lg font-bold m-5">Keine Textblöcke vorhanden.</p>
     </div>
     <div v-else>
-      <BaseCard v-for="(textBlock, ix) in filteredTextBlocks" :key="textBlock.id">
-        <div v-if="!itemEditMode[ix]">
-          <div class="grid grid-cols-5 gap-x-2">
-            <div class="col-span-4">
-              <h3 class="mb-2">{{ textBlock.label }}</h3>
-              <div class="flex">
-                <span class="font-semibold me-2">Tags:</span>
-                <div v-if="textBlock.tags.length > 0">
-                  <span
-                    v-for="tag in textBlock.tags"
-                    :key="tag.id"
-                    class="px-2 py-1 mx-1 rounded-2xl bg-gray-200"
-                    >{{ tag.label }}</span
-                  >
-                </div>
-                <div v-else>
-                  <span class="bg-red-600 text-white rounded-2xl px-2 py-1"
-                    >Keine Tags vergeben</span
-                  >
-                </div>
-              </div>
-            </div>
-            <div class="flex gap-1">
-              <ButtonBearbeiten @click="editTextBlock(textBlock, ix)" />
-              <ButtonLoeschen @click="deleteTextBlock(textBlock.id, ix)" color="red" />
-            </div>
-          </div>
-        </div>
-        <div v-else>
-          <form @submit.prevent="onUpdateSUbmit(ix)">
-            <div class="grid grid-cols-5 gap-x-2">
-              <div class="col-span-4">
-                <InputText
-                  v-model="currentTextBlock.label"
-                  placeholder="Textblock-Bezeichnung"
-                  class="w-full"
-                  required="true"
-                />
-                <MultiSelect
-                  v-model="currentTextBlock.tagIds"
-                  :options="tags"
-                  option-label="label"
-                  option-value="id"
-                  display="chip"
-                  placeholder="Tags auswählen"
-                  class="w-full mt-2"
-                />
-              </div>
-              <div class="flex gap-1">
-                <ButtonAbbrechen @click="cancelEdit()" color="red" />
-                <ButtonSave type="submit" color="green" />
-              </div>
-            </div>
-          </form>
-        </div>
-      </BaseCard>
+      <div v-for="textBlock in filteredTextBlocks" :key="textBlock.id">
+        <TextBlockSettingsItem
+          :item="textBlock"
+          :tags="tags"
+          @delete-item="onDelete"
+          @update-item="onUpdate"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import apiClient from '@/services/axios'
-import { useToast } from 'primevue/usetoast'
-import InputText from 'primevue/inputtext'
+import { fetchItems, deleteItem, createItem, updateItem } from '@/composables/crud'
 import TextBlockForm from '@/components/settings/TextBlockForm.vue'
-import MultiSelect from 'primevue/multiselect'
+import TextBlockSettingsItem from '@/components/settings/TextBlockSettingsItem.vue'
 import BaseSpinner from '@/components/ui/BaseSpinner.vue'
-import ButtonLoeschen from '@/components/ui/ButtonLoeschen.vue'
-import ButtonBearbeiten from '@/components/ui/ButtonBearbeiten.vue'
-import ButtonSave from '@/components/ui/ButtonSave.vue'
-import ButtonAbbrechen from '@/components/ui/ButtonAbbrechen.vue'
-import IconAdd from '@/assets/icons/MaterialSymbolsAdd.svg?component'
+import ButtonAdd from '@/components/ui/ButtonAdd.vue'
+import InputText from 'primevue/inputtext'
+import FloatLabel from 'primevue/floatlabel'
 
-const toast = useToast()
 const isLoading = ref(false)
-const isCollapsed = ref(true)
+const isModalOpen = ref(false)
 const textBlocks = ref([])
 const tags = ref([])
-const currentTextBlock = ref({
-  label: '',
-  tags: [],
-  tagIds: [],
-  id: null
-})
 
 const searchQuery = ref('')
 
 onMounted(async () => {
   await fetchTextBlocks()
   await fetchTags()
-  setItemEditArray()
 })
 
-const expandCollapse = () => {
-  isCollapsed.value = !isCollapsed.value
-}
-
-const setItemEditMode = (ix) => {
-  itemEditMode.value[ix] = !itemEditMode.value[ix]
-}
-
-const itemEditMode = ref([])
-
-const setItemEditArray = () => {
-  itemEditMode.value = Array(textBlocks.value.length).fill(false)
-}
-
-const resetCurrentTextBlock = () => {
-  currentTextBlock.value = {
-    label: '',
-    tags: [],
-    tagIds: [],
-    ix: null,
-    id: null
-  }
+const toggleModal = () => {
+  isModalOpen.value = !isModalOpen.value
 }
 
 const fetchTextBlocks = async () => {
-  try {
-    isLoading.value = true
-    const response = await apiClient.get('/text-block')
-    textBlocks.value = response.data
-  } catch (error) {
-    textBlocks.value = []
-  }
+  isLoading.value = true
+  textBlocks.value = await fetchItems('/text-block')
   isLoading.value = false
 }
 
 const fetchTags = async () => {
-  try {
-    const response = await apiClient.get('/tag')
-    tags.value = response.data
-  } catch (error) {
-    tags.value = []
-  }
-}
-
-const deleteTextBlock = async (id, ix) => {
-  const response = await apiClient.delete(`/text-block/${id}`)
-  switch (response.status) {
-    case 204:
-      toast.add({
-        severity: 'success',
-        summary: 'Textblock erfolgreich gelöscht',
-        life: 3000
-      })
-      textBlocks.value.splice(ix, 1)
-      break
-    default:
-      toast.add({
-        severity: 'error',
-        summary: 'Fehler beim Löschen des Textblocks',
-        life: 3000
-      })
-  }
+  tags.value = await fetchItems('/tag')
 }
 
 // Computed property to filter submissions by multiple fields
@@ -187,86 +78,47 @@ const filteredTextBlocks = computed(() => {
   })
 })
 
-const getTagIds = () => {
-  currentTextBlock.value.tagIds = currentTextBlock.value.tags.map((tag) => tag.id)
-}
-
-const onUpdateSUbmit = async (ix) => {
-  try {
-    const response = await apiClient.patch(
-      `/text-block/${currentTextBlock.value.id}`,
-      currentTextBlock.value
-    )
-    switch (response.status) {
-      case 200:
-        toast.add({
-          severity: 'success',
-          summary: 'Textblock erfolgreich aktualisiert',
-          life: 3000
-        })
-        textBlocks.value.splice(ix, 1, response.data)
-        resetCurrentTextBlock()
-        setItemEditMode(ix)
-        break
-      default:
-        toast.add({
-          severity: 'error',
-          summary: 'Fehler beim Aktualisieren des Textblocks',
-          life: 3000
-        })
+const onDelete = async (modelId) => {
+  await deleteItem({
+    model: 'text-block',
+    modelId,
+    detail: {
+      success: 'Textblock erfolgreich gelöscht',
+      error: 'Fehler beim Löschen des Textblocks'
     }
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Fehler beim Aktualisieren des Textblocks',
-      life: 3000
-    })
+  })
+  const ix = textBlocks.value.findIndex((item) => item.id === modelId)
+  if (ix !== -1) {
+    textBlocks.value.splice(ix, 1)
   }
 }
 
-const onSubmit = async (newTextBlock) => {
-  try {
-    const response = await apiClient.post('/text-block', newTextBlock)
-    switch (response.status) {
-      case 201:
-        toast.add({
-          severity: 'success',
-          summary: 'Textblock erfolgreich hinzugefügt',
-          life: 3000
-        })
-        textBlocks.value.unshift(response.data)
-        itemEditMode.value.unshift(false)
-        break
-      default:
-        toast.add({
-          severity: 'error',
-          summary: 'Fehler beim Hinzufügen des Textblocks',
-          life: 3000
-        })
+const onUpdate = async ({ modelId, values }) => {
+  const response = await updateItem({
+    model: 'text-block',
+    modelId,
+    values,
+    detail: {
+      success: 'Textblock erfolgreich aktualisiert',
+      error: 'Fehler beim Aktualisieren des Textblock'
     }
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Fehler beim Hinzufügen des Textblocks',
-      life: 3000
-    })
+  })
+  const ix = textBlocks.value.findIndex((item) => item.id === response.id)
+  if (ix !== -1) {
+    textBlocks.value.splice(ix, 1, response)
   }
 }
 
-const editTextBlock = async (textBlock, ix) => {
-  if (currentTextBlock.value.ix !== null) {
-    setItemEditMode(currentTextBlock.value.ix)
-  }
-  currentTextBlock.value = { ...textBlock }
-  currentTextBlock.value.ix = ix
-  getTagIds()
-  setItemEditMode(ix)
-  await fetchTags()
-}
-
-const cancelEdit = () => {
-  setItemEditMode(currentTextBlock.value.ix)
-  resetCurrentTextBlock()
+const onSubmit = async (values) => {
+  const response = await createItem({
+    model: 'text-block',
+    values,
+    detail: {
+      success: 'Textblock erfolgreich hinzugefügt',
+      error: 'Fehler beim Hinzufügen des Textblock'
+    }
+  })
+  textBlocks.value.unshift(response)
 }
 </script>
 

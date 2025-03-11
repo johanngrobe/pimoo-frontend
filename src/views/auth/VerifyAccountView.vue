@@ -25,7 +25,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import apiClient from '@/services/axios'
+import { apiClient } from '@/services/axios'
 
 const route = useRoute()
 const router = useRouter()

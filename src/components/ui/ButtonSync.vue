@@ -1,6 +1,6 @@
 <template>
   <BaseButton class="flex gap-2 px-2 py-1">
-    <IconSync class="h-4 w-4" /><span>Aktualisieren</span>
+    <IconSync class="h-4 w-4" /><span><slot></slot></span>
   </BaseButton>
 </template>
 

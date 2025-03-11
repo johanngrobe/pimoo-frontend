@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
-import apiClient from '@/services/axios'
+import { apiClient } from '@/services/axios'
 import { useRouter } from 'vue-router'
 // import { useCookies } from '@vueuse/integrations/useCookies'
 

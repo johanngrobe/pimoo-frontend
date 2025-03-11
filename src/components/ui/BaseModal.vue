@@ -3,7 +3,6 @@
     <div
       v-if="isVisible"
       tabindex="-1"
-      aria-hidden="true"
       class="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black bg-opacity-50 backdrop-blur-md"
     >
       <div
@@ -66,32 +65,39 @@
 </template>
 
 <script setup>
-import { ref, watch, onBeforeUnmount } from 'vue'
-import { onClickOutside } from '@vueuse/core'
+import { ref, onBeforeUnmount, watch } from 'vue'
+import { onClickOutside, useMagicKeys } from '@vueuse/core'
 
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    required: true
-  }
-})
+const keys = useMagicKeys()
+const escape = keys['Escape']
 
-const emit = defineEmits(['update:modelValue'])
+const isVisible = defineModel()
 
-const isVisible = ref(props.modelValue)
+// const props = defineProps({
+//   modelValue: {
+//     type: Boolean,
+//     required: true
+//   }
+// })
+
+// const emit = defineEmits(['update:modelValue'])
+
+// const isVisible = ref(props.modelValue)
 
 // Watch for changes in the `modelValue` prop from the parent to toggle visibility
-watch(
-  () => props.modelValue,
-  (newVal) => {
-    isVisible.value = newVal
-    toggleBodyScroll(newVal)
-  }
-)
+// watch(
+//   () => props.modelValue,
+//   (newVal) => {
+//     isVisible.value = newVal
+//     toggleBodyScroll(newVal)
+//   }
+// )
 
 // Function to close the modal
 const closeModal = () => {
-  emit('update:modelValue', false)
+  isVisible.value = false
+  // emit('update:modelValue', false)
+  toggleBodyScroll(false)
 }
 
 // Disable body scroll when modal is open
@@ -111,18 +117,13 @@ onBeforeUnmount(() => {
 })
 
 const getIgnoreElements = () => {
-  let ignoreElements = []
-
-  for (let value = 0; value <= 6; value++) {
-    for (let subvalue = 0; subvalue <= 6; subvalue++) {
-      ignoreElements.push(`#spatial-impact-${value}-${subvalue}_list`)
-      ignoreElements.push(`#indicators-${value}-${subvalue}_list`)
-      ignoreElements.push(`#indicators-${value}-${subvalue}_header`)
-    }
-  }
-  ignoreElements.push(`#administration-date_panel`)
+  let ignoreElements = [`[role=listbox]`, '[data-pc-section="overlay"]']
   return ignoreElements
 }
+
+watch(escape, (v) => {
+  if (v) closeModal()
+})
 
 // Close modal when clicking outside the modal content
 const modalContent = ref(null)

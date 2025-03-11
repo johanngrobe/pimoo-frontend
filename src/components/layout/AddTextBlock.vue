@@ -29,7 +29,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import InputText from 'primevue/inputtext'
-import apiClient from '@/services/axios'
+import { apiClient } from '@/services/axios'
 
 const textBlocks = ref([])
 

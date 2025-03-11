@@ -1,22 +1,38 @@
 <template>
-  <BaseButton v-tooltip.top="'Löschen'" color="red" class="flex gap-2 px-2 py-1"
-    ><IconDelete class="h-4 w-4" /> <span v-if="props.showLabel">{{ props.label }}</span>
+  <BaseModal v-model="isModalOpen">
+    <template #header>
+      <BaseSubheading>Möchtest du den Eintrag wirklich löschen?</BaseSubheading>
+    </template>
+    <slot></slot>
+    <template #footer>
+      <div class="flex items-center justify-end gap-4 w-full">
+        <BaseButton color="red" @click="handleDelete" class="flex items-center gap-1"
+          ><IconDelete class="w-4 h-4" /><span>Löschen</span></BaseButton
+        >
+        <BaseButton @click="toggleModal">Abbrechen</BaseButton>
+      </div>
+    </template>
+  </BaseModal>
+  <BaseButton v-tooltip.top="'löschen'" @click="toggleModal" color="red"
+    ><IconDelete class="h-4 w-4" />
   </BaseButton>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import BaseModal from './BaseModal.vue'
 import IconDelete from '@/assets/icons/MaterialSymbolsDelete.svg?component'
 
-const props = defineProps({
-  showLabel: {
-    type: Boolean,
-    default: false
-  },
-  label: {
-    type: String,
-    default: 'Löschen'
-  }
-})
-</script>
+const isModalOpen = ref(false)
 
-<style></style>
+const toggleModal = () => {
+  isModalOpen.value = !isModalOpen.value
+}
+
+const emit = defineEmits(['delete-confirmed'])
+
+const handleDelete = () => {
+  emit('delete-confirmed')
+  toggleModal()
+}
+</script>

@@ -85,6 +85,6 @@ const handleClick = (event) => {
 <style scoped>
 /* Base button class */
 .btn {
-  @apply inline-flex items-center justify-center cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none;
+  @apply inline-flex items-center justify-center cursor-pointer font-medium rounded-lg text-sm px-2 py-1 focus:outline-none;
 }
 </style>

@@ -31,7 +31,7 @@
 <script setup>
 import { ref, watchEffect, watch } from 'vue'
 import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
-import apiClient from '@/services/axios'
+import { apiClient } from '@/services/axios'
 import MobilitySubmissionForm from '@/components/form/MobilitySubmissionForm.vue'
 import MobilityMainObjectiveForm from '@/components/form/MobilityMainObjectiveForm.vue'
 import ButtonDownload from '@/components/ui/ButtonDownload.vue'

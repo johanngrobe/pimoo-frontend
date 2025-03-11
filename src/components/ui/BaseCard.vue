@@ -1,67 +1,90 @@
 <template>
-  <div
-    class="mt-5 max-w p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
-  >
-    <div @click="toggleCollapse" class="cursor-pointer">
-      <slot name="title"></slot>
-    </div>
-    <transition name="collapse-transition">
-      <div v-show="!isCollapsed">
-        <slot></slot>
+  <Transition name="fade" mode="out-in">
+    <div
+      v-if="visible"
+      class="relative max-w p-4 m-3 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 items-center content-center"
+    >
+      <!-- Close button, shown only if the closeable prop is true -->
+      <button
+        v-if="closeable"
+        @click="closeCard"
+        class="absolute top-5 right-5 p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+      >
+        <img src="../assets/icons/MaterialSymbolsCancel.svg" alt="Close" class="w-6 h-6" />
+      </button>
+      <div class="gap-2">
+        <div @click="toggleCollapse" class="cursor-pointer items-center">
+          <slot name="header"></slot>
+        </div>
+
+        <Transition name="collapse">
+          <div v-if="!isCollapsed">
+            <slot></slot>
+          </div>
+        </Transition>
       </div>
-    </transition>
-  </div>
+    </div>
+  </Transition>
 </template>
 
 <script setup>
-import { toRefs } from 'vue'
+import { ref } from 'vue'
 
+// Props to control collapsible behavior, initial visibility, and close button visibility
 const props = defineProps({
   collapsible: {
     type: Boolean,
     default: false
   },
-  isCollapsed: {
+  initiallyCollapsed: {
     type: Boolean,
     default: false
+  },
+  closeable: {
+    type: Boolean,
+    default: false
+  },
+  visible: {
+    type: Boolean,
+    default: true
   }
 })
 
-const { collapsible, isCollapsed } = toRefs(props)
+const isCollapsed = ref(props.initiallyCollapsed)
+const visible = ref(props.visible)
 
-const toggleCollapse = () => {
-  if (collapsible.value) {
+// Method to toggle collapse
+function toggleCollapse() {
+  if (props.collapsible) {
     isCollapsed.value = !isCollapsed.value
   }
+}
+
+// Method to close the card
+function closeCard() {
+  visible.value = false
 }
 </script>
 
 <style scoped>
-.cursor-pointer {
-  cursor: pointer;
+/* Fade transition for showing and hiding the card */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
 }
-
-.collapse-transition {
-  transition:
-    max-height 0.3s ease,
-    opacity 0.3s ease,
-    padding 0.3s ease;
-  overflow: hidden;
-  max-height: 500px; /* A reasonable max height for expanded content */
-}
-
-.collapse-transition-enter-active,
-.collapse-transition-leave-active {
-  transition:
-    max-height 0.3s ease,
-    opacity 0.3s ease,
-    padding 0.3s ease;
-}
-
-.collapse-transition-enter,
-.collapse-transition-leave-to /* .collapse-transition-leave-active in <2.1.8 */ {
-  max-height: 0;
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
-  padding: 0;
+}
+
+/* Collapse transition for showing and hiding content */
+.collapse-enter-active,
+.collapse-leave-active {
+  transition: max-height 0.3s ease;
+}
+.collapse-enter-from,
+.collapse-leave-to {
+  max-height: 0;
+  overflow: hidden;
 }
 </style>

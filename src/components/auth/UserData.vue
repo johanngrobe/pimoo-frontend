@@ -85,7 +85,7 @@
         <small v-if="errors.email" id="email-help" class="p-error block">{{ errors.email }}</small>
       </div>
       <div class="flex gap-4">
-        <BaseButton type="submit" class="w-full">Speichern</BaseButton>
+        <ButtonSave type="submit" class="w-full">Speichern</ButtonSave>
       </div>
     </form>
   </BaseCard>
@@ -94,29 +94,18 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import * as yup from 'yup'
+import { schema } from '@/utils/schemas/userData'
 import { useForm } from 'vee-validate'
 import { useToast } from 'primevue/usetoast'
 import FloatLabel from 'primevue/floatlabel'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
-import apiClient from '@/services/axios'
+import { apiClient } from '@/services/axios'
 import BaseSpinner from '../ui/BaseSpinner.vue'
+import ButtonSave from '../ui/ButtonSave.vue'
 
 const municipalityOptions = ref(null)
 const userRoleOptions = ref(null)
-
-const schema = yup.object({
-  email: yup
-    .string()
-    .required('E-Mail ist erforderlich')
-    .email('Ungültige E-Mail-Adresse')
-    .label('E-Mail'),
-  firstName: yup.string().required('Vorname ist erforderlich').label('Vorname'),
-  lastName: yup.string().required('Nachname ist erforderlich').label('Nachname'),
-  municipalityId: yup.number().required('Gemeinde ist erforderlich').label('Gemeinde'),
-  role: yup.string().required('Rolle ist erforderlich').label('Rolle')
-})
 
 const { defineField, handleSubmit, errors, setFieldValue } = useForm({
   validationSchema: schema
@@ -132,7 +121,6 @@ const authStore = useAuthStore()
 
 const setUserValues = async () => {
   const user = await authStore.getUser()
-  console.log(user)
 
   setFieldValue('email', user.email)
   setFieldValue('firstName', user.firstName)

@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import apiClient from '@/services/axios'
+import { apiClient } from '@/services/axios'
 import { useToast } from 'primevue/usetoast'
 
 export const useMobilitySubmissionStore = defineStore('mobilitySubmission', () => {

@@ -1,42 +1,30 @@
 <template>
-  <span class="badge" :class="type">
-    {{ text }}
+  <span
+    class="flex item-center justify-center px-2 py-1 rounded-2xl"
+    :class="bgColorPresets[props.color]"
+  >
+    <slot></slot>
   </span>
 </template>
 
-<script>
-export default {
-  props: ['type', 'title'],
-  computed: {
-    text() {
-      return this.title.toUpperCase();
-    }
+<script setup>
+const props = defineProps({
+  color: {
+    type: String,
+    default: 'blue'
   }
+})
+
+const bgColorPresets = {
+  gray: 'bg-gray-400',
+  red: 'bg-red-600 text-white',
+  yellow: 'bg-yellow-200',
+  green: 'bg-green-200',
+  blue: 'bg-blue-600 text-white',
+  indigo: 'bg-indigo-200',
+  purple: 'bg-purple-200 text-white',
+  pink: 'bg-pink-200'
 }
 </script>
 
-<style scoped>
-.badge {
-  background-color: #ccc;
-  color: #252525;
-  border-radius: 30px;
-  padding: 0.5rem 1.5rem;
-  display: inline-block;
-  margin-right: 0.5rem;
-}
-
-.frontend {
-  background-color: #3d008d;
-  color: white;
-}
-
-.backend {
-  background-color: #71008d;
-  color: white;
-}
-
-.career {
-  background-color: #8d006e;
-  color: white;
-}
-</style>
+<style scoped></style>

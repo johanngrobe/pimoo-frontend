@@ -62,7 +62,7 @@
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import apiClient from '@/services/axios'
+import { apiClient } from '@/services/axios'
 import ClimateSubmissionForm from '@/components/form/ClimateForm.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'primevue/usetoast'

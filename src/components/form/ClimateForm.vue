@@ -254,7 +254,7 @@ import Textarea from 'primevue/textarea'
 import RadioButton from 'primevue/radiobutton'
 import HoverInfo from '@/components/ui/HoverInfo.vue'
 
-import apiClient from '@/services/axios'
+import { apiClient } from '@/services/axios'
 import ButtonDownload from '@/components/ui/ButtonDownload.vue'
 import ButtonSave from '@/components/ui/ButtonSave.vue'
 import ButtonSync from '@/components/ui/ButtonSync.vue'

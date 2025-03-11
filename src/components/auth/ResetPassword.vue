@@ -54,7 +54,7 @@
           }}</small>
         </div>
         <div class="flex gap-4">
-          <BaseButton type="submit" class="w-full">{{ label }}</BaseButton>
+          <ButtonSave type="submit" class="w-full">{{ label }}</ButtonSave>
         </div>
       </form>
     </BaseCard>
@@ -68,6 +68,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { schema } from '@/utils/schemas/resetPassword'
 
+import ButtonSave from '@/components/ui/ButtonSave.vue'
 import FloatLabel from 'primevue/floatlabel'
 import Password from 'primevue/password'
 import Divider from 'primevue/divider'

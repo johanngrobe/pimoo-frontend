@@ -71,7 +71,7 @@
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import apiClient from '@/services/axios'
+import { apiClient } from '@/services/axios'
 import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'
 import { useAuthStore } from '@/stores/auth'
 import MobilityForm from '@/components/form/MobilityForm.vue'

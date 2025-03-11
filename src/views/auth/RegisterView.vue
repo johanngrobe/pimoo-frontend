@@ -157,7 +157,7 @@ import InputText from 'primevue/inputtext'
 import FloatLabel from 'primevue/floatlabel'
 import Password from 'primevue/password'
 import Select from 'primevue/select'
-import apiClient from '@/services/axios'
+import { apiClient } from '@/services/axios'
 import { useToast } from 'primevue/usetoast'
 
 const isLoading = ref(false)
