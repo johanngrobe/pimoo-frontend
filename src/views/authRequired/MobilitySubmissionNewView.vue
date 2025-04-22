@@ -1,23 +1,17 @@
 <template>
   <div class="max-w-6xl">
-    <div class="flex">
-      <h1
-        class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
-      >
-        Neuer Mobilitätscheck
-      </h1>
-      <div class="text-right ms-auto mt-3">
-        <ButtonZuruecksetzen @click="refreshPage()" />
+    <div class="grid grid-cols-2 w-full items-center">
+      <BaseHeading>Neuer Mobilitäscheck</BaseHeading>
+      <div class="flex w-full justify-end">
+        <ButtonZuruecksetzen @click="refreshPage()">zurücksetzen</ButtonZuruecksetzen>
       </div>
     </div>
-    <Toast position="top-center" />
-    <MobilityForm />
+    <MobilitySubmissionForm :editMode="false" />
   </div>
 </template>
 
 <script setup>
-import MobilityForm from '@/components/form/MobilityForm.vue'
-import Toast from 'primevue/toast'
+import MobilitySubmissionForm from '@/components/form/MobilitySubmissionForm.vue'
 import ButtonZuruecksetzen from '@/components/ui/ButtonZuruecksetzen.vue'
 import { useRouter } from 'vue-router'
 import { useMobilitySubmissionStore } from '@/stores/mobilitySubmission'

@@ -44,6 +44,31 @@ export const createItem = async ({ model, values, detail }) => {
   }
 }
 
+export const createItemSilent = async ({ model, values }) => {
+  try {
+    const response = await apiClient.post(`/${model}`, values)
+    return response.data
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export const copyItem = async ({ model, modelId, detail }) => {
+  try {
+    const response = await apiClient.post(`/submission/${model}/copy/${modelId}`)
+    toastService.add({
+      severity: 'success',
+      detail: detail.success
+    })
+    return response.data
+  } catch (error) {
+    toastService.add({
+      severity: 'error',
+      detail: detail.error
+    })
+  }
+}
+
 export const updateItem = async ({ model, modelId, values, detail }) => {
   try {
     const response = await apiClient.patch(`/${model}/${modelId}`, values)
@@ -68,6 +93,40 @@ export const deleteItem = async ({ model, modelId, detail }) => {
       detail: detail.success
     })
     return response.data
+  } catch (error) {
+    toastService.add({
+      severity: 'error',
+      detail: detail.error
+    })
+  }
+}
+
+export const exportItem = async ({ model, modelId, detail }) => {
+  try {
+    const response = await apiClient.get(`/submission/${model}/export/${modelId}`, {
+      responseType: 'blob'
+    })
+    // Create a download link for the received Blob
+    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
+    const link = document.createElement('a')
+    link.href = url
+    let fileName
+    if (model === 'mobility') {
+      fileName = `mobilitätscheck_${modelId}.pdf`
+    } else if (model === 'climate') {
+      fileName = `klimacheck_${modelId}.pdf`
+    } else {
+      fileName = `export_${modelId}.pdf`
+    }
+    link.setAttribute('download', fileName) // The file name
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toastService.add({
+      severity: 'success',
+      detail: detail.success
+    })
   } catch (error) {
     toastService.add({
       severity: 'error',

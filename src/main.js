@@ -12,6 +12,7 @@ import BaseCard from './components/ui/BaseCard.vue'
 import BaseButton from './components/ui/BaseButton.vue'
 import BaseModal from './components/ui/BaseModal.vue'
 import BaseSpinner from './components/ui/BaseSpinner.vue'
+import BaseHeading from './components/ui/BaseHeading.vue'
 import BaseSubheading from './components/ui/BaseSubheading.vue'
 import ToastService from 'primevue/toastservice'
 import { setupToast } from '@/services/toast'
@@ -24,6 +25,7 @@ app.component('BaseCard', BaseCard)
 app.component('BaseButton', BaseButton)
 app.component('BaseModal', BaseModal)
 app.component('BaseSpinner', BaseSpinner)
+app.component('BaseHeading', BaseHeading)
 app.component('BaseSubheading', BaseSubheading)
 
 app.use(createPinia())

@@ -1,20 +1,20 @@
-import * as yup from 'yup'
+import { object, date, string, number } from 'yup'
+import { parseDate } from '@/utils/validation'
 
 // Define your enums
 const impactEnum = ['positive', 'negative', 'no_effect']
 const impactDurationEnum = ['short', 'medium', 'long']
 
 // Validation schema
-export const schema = yup.object({
+export const schema = object({
   // author: yup.string().required('Angabe ist erforderlich'),
-  administrationNo: yup.string().required('Angabe ist erforderlich'),
-  administrationDate: yup.date().required('Angabe ist erforderlich'),
-  label: yup.string().required('Angabe ist erforderlich'),
-  impact: yup
-    .string()
+  administrationNo: string().required('Angabe ist erforderlich'),
+  administrationDate: date().transform(parseDate).required('Angabe ist erforderlich'),
+  label: string().required('Angabe ist erforderlich'),
+  impact: string()
     .oneOf(impactEnum, 'Ungültiger Wert für Impact')
     .required('Angabe ist erforderlich'),
-  impactGhg: yup.number().when('impact', {
+  impactGhg: number().when('impact', {
     is: (impact) => impact !== 'no_effect',
     then: (schema) =>
       schema
@@ -25,7 +25,7 @@ export const schema = yup.object({
         .required('Bitte ausfüllen, wenn Impact nicht "no_effect" ist'),
     otherwise: (schema) => schema.optional().nullable(true).oneOf([null, ''])
   }),
-  impactAdaption: yup.number().when('impact', {
+  impactAdaption: number().when('impact', {
     is: (impact) => impact !== 'no_effect',
     then: (schema) =>
       schema
@@ -36,12 +36,12 @@ export const schema = yup.object({
         .required('Bitte ausfüllen, wenn Impact nicht "no_effect" ist'),
     otherwise: (schema) => schema.optional().nullable(true).oneOf([null, ''])
   }),
-  impactDesc: yup.string().when('impact', {
+  impactDesc: string().when('impact', {
     is: (impact) => impact !== 'no_effect',
     then: (schema) => schema.required('Bitte ausfüllen, wenn Impact nicht "no_effect" ist'),
     otherwise: (schema) => schema.optional().nullable(true).oneOf([null, ''])
   }),
-  impactDuration: yup.string().when('impact', {
+  impactDuration: string().when('impact', {
     is: (impact) => impact !== 'no_effect',
     then: (schema) =>
       schema
@@ -49,7 +49,7 @@ export const schema = yup.object({
         .required('Bitte ausfüllen, wenn Impact nicht "no_effect" ist'),
     otherwise: (schema) => schema.optional().nullable(true).oneOf([null, ''])
   }),
-  alternativeDesc: yup.string().when('impact', {
+  alternativeDesc: string().when('impact', {
     is: (impact) => impact !== 'no_effect',
     then: (schema) => schema.required('Bitte ausfüllen, wenn Impact nicht "no_effect" ist'),
     otherwise: (schema) => schema.optional().nullable(true).oneOf([null, ''])

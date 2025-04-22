@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div class="title mb-7">
-      <h2>Mobilitätscheck für Magistratsvorlagen</h2>
-    </div>
+    <BaseHeading>Mobilitätscheck für Magistratsvorlagen </BaseHeading>
     <section>
       <p>
         Herzlich willkommen bei dem Mobilitätscheck für Magistratsvorlagen für die Stadt Oberursel

@@ -1,15 +1,20 @@
 <template>
   <div>
-    <div class="flex">
-      <h1>Neuer Klimacheck</h1>
-      <div class="text-right ms-auto mt-3">
-        <ButtonZuruecksetzen @click="refreshPage()" />
+    <div class="grid grid-cols-2 w-full items-center">
+      <BaseHeading>Neuer Klimacheck</BaseHeading>
+      <div class="flex w-full justify-end">
+        <ButtonZuruecksetzen @click="refreshPage()">zurücksetzen</ButtonZuruecksetzen>
       </div>
     </div>
-    <BaseCard :collapsible="true" :isCollapsed="formInfoCollapsed">
-      <template #title>
-        <div @click="toggleFormInfo">
-          <h3>Informationen zum Formular</h3>
+    <BaseCard
+      :collapsible="true"
+      :isCollapsed="formInfoCollapsed"
+      :initiallyCollapsed="true"
+      class="hover:bg-gray-200"
+    >
+      <template #header>
+        <div v-tooltip.top="'Klicken zum Öffnen'" @click="toggleFormInfo">
+          <BaseSubheading>Informationen zum Formular</BaseSubheading>
         </div>
       </template>
       Das Kyoto-Protokoll nennt sechs Treibhausgase: Kohlendioxid (CO2), Methan (CH4), und Lachgas

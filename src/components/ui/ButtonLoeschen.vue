@@ -13,8 +13,12 @@
       </div>
     </template>
   </BaseModal>
-  <BaseButton v-tooltip.top="'löschen'" @click="toggleModal" color="red"
-    ><IconDelete class="h-4 w-4" />
+  <BaseButton
+    v-tooltip.top="'löschen'"
+    @click="toggleModal"
+    color="red"
+    class="flex items-center gap-2"
+    ><IconDelete class="h-4 w-4" /><slot></slot>
   </BaseButton>
 </template>
 

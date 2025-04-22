@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="mb-7">Über das Tool</h2>
+    <BaseHeading>Über das Tool</BaseHeading>
 
     <table class="table-auto border-separate border-spacing-3">
       <tbody>

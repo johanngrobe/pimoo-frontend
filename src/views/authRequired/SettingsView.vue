@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Einstellungen</h1>
+    <BaseHeading>Einstellungen</BaseHeading>
 
     <BaseTabs :tabs="tabs">
       <template #main-objective>

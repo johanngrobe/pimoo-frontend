@@ -1,23 +1,40 @@
 <template>
   <div>
-    <h1>Meine Datenbank</h1>
+    <BaseHeading>Meine Datenbank</BaseHeading>
 
     <BaseTabs :tabs="tabs">
       <template #mobility-check>
-        <MyMobilitySubmissionHistory />
+        <MobilitySubmissionList :filter="setFilter()" />
       </template>
 
       <template #climate-check>
-        <MyClimateSubmissionHistory />
+        <ClimateSubmissionList :filter="setFilter()" />
       </template>
     </BaseTabs>
   </div>
 </template>
 
 <script setup>
+import { useAuthStore } from '@/stores/auth'
 import BaseTabs from '@/components/ui/BaseTabs.vue'
-import MyMobilitySubmissionHistory from '@/components/history/MyMobilitySubmissionHistory.vue'
-import MyClimateSubmissionHistory from '@/components/history/MyClimateSubmissionHistory.vue'
+import MobilitySubmissionList from '@/components/history/MobilitySubmissionList.vue'
+import ClimateSubmissionList from '@/components/history/ClimateSubmissionList.vue'
+
+const authStore = useAuthStore()
+
+const setFilter = () => {
+  let filter = {}
+
+  switch (authStore.userRole) {
+    case 'administration':
+      filter.userRole = true
+      break
+    case 'politician':
+      filter.userId = true
+      break
+  }
+  return filter
+}
 
 const tabs = [
   { name: 'mobility-check', label: 'Mobilitätscheck', disabled: false },

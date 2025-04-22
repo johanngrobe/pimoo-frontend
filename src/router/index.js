@@ -54,12 +54,16 @@ const router = createRouter({
       component: () => import('@/views/auth/ResetPasswordView.vue')
     },
     {
-      path: '/new-mobility-check',
+      path: '/mobility-check/edit/:mobilitySubmissionId',
+      name: 'edit-mobility-check',
+      component: () => import('../views/authRequired/MobilitySubmissionEditView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/mobility-check/new',
       name: 'new-mobility-check',
-      component: () => import('@/views/authRequired/NewMobilityView.vue'),
-      meta: {
-        requiresAuth: true
-      }
+      component: () => import('../views/authRequired/MobilitySubmissionNewView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/new-climate-check',

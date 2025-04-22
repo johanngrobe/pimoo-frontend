@@ -147,7 +147,7 @@ const menuItems = ref([
 const authMenuItems = ref([
   {
     name: 'Neuer Mobilitätscheck',
-    link: '/new-mobility-check',
+    link: '/mobility-check/new',
     icon: 'MaterialSymbolsAdd.svg',
     requiresAuth: true,
     forRoles: ['administration', 'politician']

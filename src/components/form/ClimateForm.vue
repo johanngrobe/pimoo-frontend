@@ -131,7 +131,7 @@
                 v-model="impactGhg"
                 :value="option.value"
                 name="impactGhg"
-                :class="{ 'p-invalid': errors.impactGhg }"
+                :invalid="!!errors.impactGhg"
               />
             </div>
 
@@ -147,7 +147,7 @@
                 v-model="impactAdaption"
                 :value="option.value"
                 name="impactAdaption"
-                :class="{ 'p-invalid': errors.impactAdaption }"
+                :invalid="!!errors.impactAdaption"
               />
             </div>
           </div>
@@ -196,7 +196,7 @@
                 v-model="impactDuration"
                 :value="option.value"
                 name="impact-duration"
-                :class="{ 'p-invalid': errors.impactDuration }"
+                :invalid="!!errors.impactDuration"
               />
               <label :for="`impact-duration-${option.value}`" class="ml-2">
                 {{ option.label }}
@@ -232,34 +232,47 @@
       </div>
     </div>
     <div v-if="impact" class="flex w-full justify-end">
-      <ButtonSync v-if="editMode" @click="closeModal" type="submit" />
-      <ButtonSave v-else @click="closeModal" type="submit" />
-      <ButtonDownload
-        v-if="editMode"
-        @click="exportSubmission(currentSubmissionId.value)"
-      ></ButtonDownload>
+      <div v-if="editModeAfterSubmit" class="flex gap-2">
+        <ButtonSync @click="closeModal" type="submit">Aktualisieren</ButtonSync>
+        <ButtonDownload @click="onExport">PDF-Export</ButtonDownload>
+      </div>
+      <div v-else>
+        <ButtonSave @click="closeModal" type="submit">Speichern</ButtonSave>
+      </div>
     </div>
   </form>
 </template>
 
 <script setup>
-import { ref, computed, watchEffect, onMounted, defineModel } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useForm } from 'vee-validate'
 import { schema } from '@/utils/schemas/climateForm'
-import { useToast } from 'primevue/usetoast'
+import { toTypedSchema } from '@vee-validate/yup'
+import { createItem, fetchItems, updateItem, exportItem } from '@/composables/crud'
 import InputText from 'primevue/inputtext'
 import DatePicker from 'primevue/datepicker'
+import FloatLabel from 'primevue/floatlabel'
 import Textarea from 'primevue/textarea'
 import RadioButton from 'primevue/radiobutton'
 import HoverInfo from '@/components/ui/HoverInfo.vue'
-
-import { apiClient } from '@/services/axios'
 import ButtonDownload from '@/components/ui/ButtonDownload.vue'
 import ButtonSave from '@/components/ui/ButtonSave.vue'
 import ButtonSync from '@/components/ui/ButtonSync.vue'
-import FloatLabel from 'primevue/floatlabel'
 
+const props = defineProps({
+  editMode: {
+    type: Boolean,
+    default: false
+  },
+  item: {
+    type: Object,
+    default: null
+  }
+})
+
+const editModeAfterSubmit = ref(false)
+const modelIdAfterSubmit = ref(null)
 const impactOptions = ref({})
 const impactGhgOptions = ref({})
 const impactDurationOptions = ref({})
@@ -267,30 +280,14 @@ const user = ref({})
 
 const authStore = useAuthStore()
 
-onMounted(async () => {
-  await fetchImpactOptions()
-  await fetchImpactGhgOptions()
-  await fetchImpactDurationOptions()
-  user.value = await authStore.getUser()
-})
-
-const fetchImpactOptions = async () => {
-  const response = await apiClient.get('/option/climate/impact')
-  impactOptions.value = response.data
+const fetchOptions = async () => {
+  impactOptions.value = await fetchItems('option/climate/impact')
+  impactGhgOptions.value = await fetchItems('option/climate/impact-ghg')
+  impactDurationOptions.value = await fetchItems('option/climate/impact-duration')
 }
 
-const fetchImpactGhgOptions = async () => {
-  const response = await apiClient.get('/option/climate/impact-ghg')
-  impactGhgOptions.value = response.data
-}
-
-const fetchImpactDurationOptions = async () => {
-  const response = await apiClient.get('/option/climate/impact-duration')
-  impactDurationOptions.value = response.data
-}
-
-const { defineField, handleSubmit, errors, setFieldValue } = useForm({
-  validationSchema: schema
+const { defineField, handleSubmit, errors, setValues } = useForm({
+  validationSchema: toTypedSchema(schema)
 })
 
 // Define form state
@@ -309,7 +306,37 @@ const authorName = computed(() => {
   return `${user.value.firstName} ${user.value.lastName}`
 })
 
-// setFieldValue('author', fullName.value)
+onMounted(async () => {
+  await fetchOptions()
+  user.value = await authStore.getUser()
+
+  if (props.editMode) {
+    const {
+      author,
+      administrationNo,
+      administrationDate,
+      label,
+      impact,
+      impactGhg,
+      impactAdaption,
+      impactDesc,
+      impactDuration,
+      alternativeDesc
+    } = props.item
+    setValues({
+      author,
+      administrationNo,
+      administrationDate,
+      label,
+      impact,
+      impactGhg,
+      impactAdaption,
+      impactDesc,
+      impactDuration,
+      alternativeDesc
+    })
+  }
+})
 
 const continueForm = computed(() => {
   switch (impact.value) {
@@ -321,48 +348,14 @@ const continueForm = computed(() => {
   }
 })
 
-// Props to determine if the form is in edit mode
-const currentSubmissionId = defineModel({ default: null })
-
-const editMode = computed(() => currentSubmissionId.value !== null)
-
-// Fetch existing data if editing
-const fetchSubmissionData = async () => {
-  if (editMode.value) {
-    const response = await apiClient.get(`/submission/climate/${currentSubmissionId.value}`)
-    const submission = response.data
-
-    // Populate form fields with existing submission data
-    // setFieldValue('author', submission.author)
-    setFieldValue('administrationNo', submission.administrationNo)
-    setFieldValue('administrationDate', new Date(submission.administrationDate))
-    setFieldValue('label', submission.label)
-    setFieldValue('impact', submission.impact)
-    setFieldValue('impactGhg', submission.impactGhg)
-    setFieldValue('impactAdaption', submission.impactAdaption)
-    setFieldValue('impactDesc', submission.impactDesc)
-    setFieldValue('impactDuration', submission.impactDuration)
-    setFieldValue('alternativeDesc', submission.alternativeDesc)
-  }
-}
-
-// Watch for changes in submissionId and fetch data when necessary
-watchEffect(() => {
-  if (editMode.value) {
-    fetchSubmissionData()
-  }
-})
-
 // Emit event to close modal
-const emit = defineEmits(['close-modal'])
+const emit = defineEmits(['close-modal', 'update-item', 'add-item', 'export-item'])
 
 const closeModal = () => {
-  if (editMode.value) {
+  if (props.editMode) {
     emit('close-modal')
   }
 }
-
-const toast = useToast()
 
 // Handle form submission for both create (POST) and edit (PUT)
 const onSubmit = handleSubmit(async (values) => {
@@ -375,61 +368,45 @@ const onSubmit = handleSubmit(async (values) => {
       .toISOString()
       .split('T')[0]
   }
-
-  if (editMode.value) {
-    // PUT request to update existing submission
-    const response = await apiClient.patch(
-      `/submission/climate/${currentSubmissionId.value}`,
-      formattedValues
-    )
-    switch (response.status) {
-      case 200:
-        toast.add({ severity: 'success', summary: 'Klimacheck aktualisiert', life: 3000 })
-        break
-      default:
-        toast.add({
-          severity: 'error',
-          summary: 'Fehler beim Aktualisieren des Klimachecks',
-          message: 'Kontaktieren Sie den Support.',
-          life: 3000
-        })
-    }
+  if (props.editMode) {
+    emit('update-item', { modelId: props.item.id, values: formattedValues })
   } else {
-    // POST request to create a new submission
-    const response = await apiClient.post('/submission/climate', formattedValues)
-    switch (response.status) {
-      case 200:
-        toast.add({ severity: 'success', summary: 'Klimacheck gespeichert', life: 3000 })
-        currentSubmissionId.value = response.data.id
-        break
-      default:
-        toast.add({
-          severity: 'error',
-          summary: 'Fehler beim Speichern des Klimachecks',
-          message: 'Kontaktieren Sie den Support.',
-          life: 3000
-        })
+    if (editModeAfterSubmit.value) {
+      // PUT request to update existing submission
+      await updateItem({
+        model: 'submission/climate',
+        modelId: modelIdAfterSubmit.value,
+        values: formattedValues,
+        detail: {
+          success: 'Klimacheck aktualisiert',
+          error: 'Fehler beim Aktualisieren des Klimachecks'
+        }
+      })
+    } else {
+      // POST request to create a new submission
+      const response = await createItem({
+        model: 'submission/climate',
+        values: formattedValues,
+        detail: {
+          success: 'Klimacheck gespeichert',
+          error: 'Fehler beim Speichern des Klimachecks'
+        }
+      })
+      modelIdAfterSubmit.value = response.id
+      editModeAfterSubmit.value = true
     }
   }
 })
 
-const exportSubmission = async (id) => {
-  try {
-    const response = await apiClient.get(`/submission/climate/export/${id}`, {
-      responseType: 'blob'
-    })
-    // Create a download link for the received Blob
-    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
-    const link = document.createElement('a')
-    link.href = url
-    const fileName = `klimacheck_${id}.pdf`
-    link.setAttribute('download', fileName) // The file name
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  } catch (error) {
-    console.error('Error downloading the PDF:', error)
-  }
+const onExport = async () => {
+  await exportItem({
+    model: 'climate',
+    modelId: props.item.id,
+    detail: {
+      success: 'Klimacheck erfolgreich exportiert',
+      error: 'Fehler beim Exportieren des Klimachecks'
+    }
+  })
 }
 </script>
 
@@ -439,6 +416,6 @@ const exportSubmission = async (id) => {
 }
 
 .p-error {
-  @apply text-red-600 bg-red-100 border-2 rounded-sm m-2 px-1;
+  @apply text-red-600;
 }
 </style>

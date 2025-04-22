@@ -1,10 +1,10 @@
-import * as yup from 'yup'
+import { object, string, date } from 'yup'
+import { parseDate } from '@/utils/validation'
 
 // Validation schema
-export const schema = yup.object({
-  // author: yup.string().required('Angabe ist erforderlich'),
-  administrationNo: yup.string().required('Angabe ist erforderlich'),
-  administrationDate: yup.date().required('Angabe ist erforderlich'),
-  label: yup.string().required('Angabe ist erforderlich'),
-  desc: yup.string().required('Angabe ist erforderlich')
+export const schema = object({
+  administrationNo: string().required('Angabe ist erforderlich'),
+  administrationDate: date().transform(parseDate).required('Angabe ist erforderlich'),
+  label: string().required('Angabe ist erforderlich'),
+  desc: string().required('Angabe ist erforderlich')
 })

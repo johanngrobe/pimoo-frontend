@@ -33,6 +33,10 @@ const props = defineProps({
   defaultTab: {
     type: Object,
     required: false
+  },
+  disableUrlAltering: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -46,7 +50,7 @@ const selectedTab = computed({
     return props.tabs.find((tab) => tab.name === tabParam) || props.defaultTab || props.tabs[0]
   },
   set(newTab) {
-    if (newTab) {
+    if (newTab && !props.disableUrlAltering) {
       router.push({ query: { ...route.query, tab: newTab.name } })
     }
   }
@@ -61,9 +65,16 @@ const selectTab = (tab) => {
 
 // Sync the URL query parameter when `selectedTab` changes
 watchEffect(() => {
-  const currentTab = selectedTab.value
-  if (currentTab && route.query.tab !== currentTab.name) {
-    router.replace({ query: { ...route.query, tab: currentTab.name } })
+  if (!props.disableUrlAltering) {
+    const currentTab = selectedTab.value
+    if (currentTab && route.query.tab !== currentTab.name) {
+      router.replace({
+        query: {
+          ...route.query,
+          tab: currentTab.name
+        }
+      })
+    }
   }
 })
 </script>

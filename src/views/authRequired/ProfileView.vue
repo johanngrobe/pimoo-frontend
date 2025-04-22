@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="mb-7">Profil</h1>
+    <BaseHeading>Profil</BaseHeading>
 
     <UserData />
     <ResetPassword :changePassword="true" />

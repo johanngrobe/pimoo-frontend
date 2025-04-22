@@ -1,5 +1,5 @@
 <template>
-  <h1>Seite nicht gefunden</h1>
+  <BaseHeading>Seite nicht gefunden</BaseHeading>
 </template>
 
 <script>
