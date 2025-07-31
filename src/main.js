@@ -1,5 +1,5 @@
 import '@/assets/main.css'
-// import 'primeicons/primeicons.css'
+import 'primeicons/primeicons.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { localeDe } from './utils/translation'
@@ -7,18 +7,20 @@ import App from './App.vue'
 import router from './router'
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
-import BaseAlert from './components/ui/BaseAlert.vue'
-import BaseCard from './components/ui/BaseCard.vue'
-import BaseButton from './components/ui/BaseButton.vue'
-import BaseModal from './components/ui/BaseModal.vue'
-import BaseSpinner from './components/ui/BaseSpinner.vue'
-import BaseHeading from './components/ui/BaseHeading.vue'
-import BaseSubheading from './components/ui/BaseSubheading.vue'
+import BaseAlert from './components/BaseAlert.vue'
+import BaseCard from './components/BaseCard.vue'
+import BaseButton from './components/BaseButton.vue'
+import BaseModal from './components/BaseModal.vue'
+import BaseSpinner from './components/BaseSpinner.vue'
+import BaseHeading from './components/BaseHeading.vue'
+import BaseSubheading from './components/BaseSubheading.vue'
 import ToastService from 'primevue/toastservice'
 import { setupToast } from '@/services/toast'
 import Tooltip from 'primevue/tooltip'
 
 const app = createApp(App)
+
+app.directive('tooltip', Tooltip)
 
 app.component('BaseAlert', BaseAlert)
 app.component('BaseCard', BaseCard)
@@ -41,5 +43,5 @@ app.use(PrimeVue, {
   },
   locale: localeDe
 })
-app.directive('tooltip', Tooltip)
+
 app.mount('#app')

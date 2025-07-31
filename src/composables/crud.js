@@ -55,7 +55,7 @@ export const createItemSilent = async ({ model, values }) => {
 
 export const copyItem = async ({ model, modelId, detail }) => {
   try {
-    const response = await apiClient.post(`/submission/${model}/copy/${modelId}`)
+    const response = await apiClient.post(`/${model}/eingabe/duplizieren/${modelId}`)
     toastService.add({
       severity: 'success',
       detail: detail.success
@@ -85,6 +85,15 @@ export const updateItem = async ({ model, modelId, values, detail }) => {
   }
 }
 
+export const updateItemSilent = async ({ model, modelId, values }) => {
+  try {
+    const response = await apiClient.patch(`/${model}/${modelId}`, values)
+    return response.data
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 export const deleteItem = async ({ model, modelId, detail }) => {
   try {
     const response = await apiClient.delete(`/${model}/${modelId}`)
@@ -103,7 +112,7 @@ export const deleteItem = async ({ model, modelId, detail }) => {
 
 export const exportItem = async ({ model, modelId, detail }) => {
   try {
-    const response = await apiClient.get(`/submission/${model}/export/${modelId}`, {
+    const response = await apiClient.get(`/${model}/eingabe/export/${modelId}`, {
       responseType: 'blob'
     })
     // Create a download link for the received Blob
@@ -111,9 +120,9 @@ export const exportItem = async ({ model, modelId, detail }) => {
     const link = document.createElement('a')
     link.href = url
     let fileName
-    if (model === 'mobility') {
+    if (model === 'mobilitaetscheck') {
       fileName = `mobilitätscheck_${modelId}.pdf`
-    } else if (model === 'climate') {
+    } else if (model === 'klimacheck') {
       fileName = `klimacheck_${modelId}.pdf`
     } else {
       fileName = `export_${modelId}.pdf`

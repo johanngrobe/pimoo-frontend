@@ -21,6 +21,7 @@
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.447.0",
     "pinia": "^2.1.7",
+    "primeicons": "^7.0.0",
     "primevue": "^4.3.2",
     "radix-vue": "^1.9.6",
     "sass": "^1.77.8",
@@ -32,6 +33,7 @@
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3",
+    "vuedraggable": "^4.1.0",
     "yup": "^1.4.0",
     "yup-password": "^0.4.0"
   },

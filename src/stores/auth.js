@@ -11,7 +11,19 @@ export const useAuthStore = defineStore(
     const isLoggedIn = useStorage('isLoggedIn', false) // persist user in localStorage
     const loading = ref(false)
 
-    const userRole = useStorage('userRole', 'none') // persist user role in localStorage
+    const userRolleId = useStorage('userRolleId', null, undefined, {
+      serializer: {
+        read: (v) => (v === 'none' ? null : Number(v)),
+        write: (v) => String(v)
+      }
+    })
+
+    const gemeindeId = useStorage('gemeindeId', null, undefined, {
+      serializer: {
+        read: (v) => (v === 'none' ? null : Number(v)),
+        write: (v) => String(v)
+      }
+    })
 
     const router = useRouter()
 
@@ -38,8 +50,9 @@ export const useAuthStore = defineStore(
       if (response.status === 204) {
         isLoggedIn.value = true // Set logged-in status if successful
         const user = await getUser()
-        userRole.value = user.role
-        router.replace({ name: 'history', query: { tab: 'mobility-check' } })
+        userRolleId.value = user.rolleId
+        gemeindeId.value = user.gemeindeId
+        router.replace({ name: 'magistratsvorlage-liste' })
       } else {
         isLoggedIn.value = false
       }
@@ -52,8 +65,8 @@ export const useAuthStore = defineStore(
 
         await apiClient.post('/auth/logout')
         isLoggedIn.value = false
-        userRole.value = null
-        router.replace({ name: 'home' })
+        userRolleId.value = null
+        router.replace({ name: 'startseite' })
       } catch (error) {
         if (error instanceof Error) {
           alert(error.message)
@@ -79,9 +92,9 @@ export const useAuthStore = defineStore(
       (error) => {
         if (error.response && error.response.status === 401) {
           // Handle the 401 error: log out the user or redirect to login
-          router.replace({ name: 'login', query: { redirect: 'sessionExpired' } })
+          router.replace({ name: 'anmelden', query: { redirect: 'sessionExpired' } })
           isLoggedIn.value = false
-          userRole.value = null
+          userRolleId.value = null
         }
         // return Promise.reject(error) // Continue to reject the error to handle it locally if needed
       }
@@ -142,7 +155,8 @@ export const useAuthStore = defineStore(
     return {
       loading,
       isLoggedIn,
-      userRole,
+      gemeindeId,
+      userRolleId,
       register,
       login,
       logout,
