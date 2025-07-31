@@ -54,12 +54,6 @@ const router = createRouter({
       component: () => import('@/views/AuthPasswortZuruecksetzenView.vue')
     },
     {
-      path: '/mobilitaetscheck/bearbeiten/:mobilitaetscheckEingabeId',
-      name: 'mobilitaetscheck-bearbeiten',
-      component: () => import('../views/MobilitaetscheckBearbeitenView.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
       path: '/magistratsvorlage',
       name: 'magistratsvorlage-liste',
       component: () => import('@/views/MagistratsvorlagenView.vue'),
