@@ -96,7 +96,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { schema } from '@/utils/schemas/accountDaten'
+import { schema } from '@/utils/schemas/accountDaten.js'
 import { useForm } from 'vee-validate'
 import { useToast } from 'primevue/usetoast'
 import FloatLabel from 'primevue/floatlabel'

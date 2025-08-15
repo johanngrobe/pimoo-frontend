@@ -67,7 +67,7 @@ import { computed, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
-import { schema } from '@/utils/schemas/authPasswortZuruecksetzen'
+import { schema } from '@/utils/schemas/authPasswortZuruecksetzen.js'
 
 import ButtonSave from '@/components/ButtonSpeichern.vue'
 import FloatLabel from 'primevue/floatlabel'

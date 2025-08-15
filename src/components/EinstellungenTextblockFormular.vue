@@ -34,7 +34,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useForm } from 'vee-validate'
-import { schema } from '@/utils/schemas/textblock'
+import { schema } from '@/utils/schemas/textblock.js'
 import FloatLabel from 'primevue/floatlabel'
 import InputText from 'primevue/inputtext'
 import MultiSelect from 'primevue/multiselect'

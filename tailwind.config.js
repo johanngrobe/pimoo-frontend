@@ -8,42 +8,62 @@ export default {
     './src/**/**/*.{js,ts,vue}'
   ],
   theme: {
+    fontFamily: {
+      sans: ['Helvetica', 'Arial', 'sans-serif']
+    },
     extend: {
       colors: {
-        primary: 'rgb(var(--primary))',
-        'primary-inverse': 'rgb(var(--primary-inverse))',
-        'primary-hover': 'rgb(var(--primary-hover))',
-        'primary-active-color': 'rgb(var(--primary-active-color))',
-
-        'primary-highlight': 'rgb(var(--primary)/var(--primary-highlight-opacity))',
-        'primary-highlight-inverse': 'rgb(var(--primary-highlight-inverse))',
-        'primary-highlight-hover': 'rgb(var(--primary)/var(--primary-highlight-hover-opacity))',
-
-        'primary-50': 'rgb(var(--primary-50))',
-        'primary-100': 'rgb(var(--primary-100))',
-        'primary-200': 'rgb(var(--primary-200))',
-        'primary-300': 'rgb(var(--primary-300))',
-        'primary-400': 'rgb(var(--primary-400))',
-        'primary-500': 'rgb(var(--primary-500))',
-        'primary-600': 'rgb(var(--primary-600))',
-        'primary-700': 'rgb(var(--primary-700))',
-        'primary-800': 'rgb(var(--primary-800))',
-        'primary-900': 'rgb(var(--primary-900))',
-        'primary-950': 'rgb(var(--primary-950))',
-
-        'surface-0': 'rgb(var(--surface-0))',
-        'surface-50': 'rgb(var(--surface-50))',
-        'surface-100': 'rgb(var(--surface-100))',
-        'surface-200': 'rgb(var(--surface-200))',
-        'surface-300': 'rgb(var(--surface-300))',
-        'surface-400': 'rgb(var(--surface-400))',
-        'surface-500': 'rgb(var(--surface-500))',
-        'surface-600': 'rgb(var(--surface-600))',
-        'surface-700': 'rgb(var(--surface-700))',
-        'surface-800': 'rgb(var(--surface-800))',
-        'surface-900': 'rgb(var(--surface-900))',
-        'surface-950': 'rgb(var(--surface-950))'
-      }
+        blue: {
+          DEFAULT: '#193b4d',
+          100: '#eaf3f8',
+          200: '#bfdbea',
+          300: '#94c3dc',
+          400: '#69abce',
+          500: '#3f93c0',
+          600: '#317396',
+          700: '#23526b',
+          800: '#153140',
+          900: '#071015'
+        },
+        red: {
+          DEFAULT: '#E05A47',
+          100: '#fbe9e7',
+          200: '#f3beb6',
+          300: '#eb9286',
+          400: '#e26755',
+          500: '#da3b25',
+          600: '#aa2e1d',
+          700: '#792114',
+          800: '#49140c',
+          900: '#180704'
+        }
+      },
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            ul: {
+              listStyleType: 'disc',
+              paddingLeft: '1.25em',
+              marginTop: '0.5em',
+              marginBottom: '0.5em'
+            },
+            ol: {
+              listStyleType: 'decimal',
+              paddingLeft: '1.25em',
+              marginTop: '0.5em',
+              marginBottom: '0.5em'
+            },
+            li: {
+              marginTop: '0.25em',
+              marginBottom: '0.25em'
+            },
+            p: {
+              marginTop: '0.5em',
+              marginBottom: '0.5em'
+            }
+          }
+        }
+      })
     }
   },
   plugins: []

@@ -3,6 +3,7 @@ import 'primeicons/primeicons.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { localeDe } from './utils/translation'
+import { definePreset } from '@primeuix/themes'
 import App from './App.vue'
 import router from './router'
 import PrimeVue from 'primevue/config'
@@ -17,6 +18,40 @@ import BaseSubheading from './components/BaseSubheading.vue'
 import ToastService from 'primevue/toastservice'
 import { setupToast } from '@/services/toast'
 import Tooltip from 'primevue/tooltip'
+
+const MyPreset = definePreset(Aura, {
+  semantic: {
+    primary: {
+      50: '#E9F2F9', // Optional, or choose a calculated value
+      100: '#D1E5F4',
+      200: '#A0CCE9',
+      300: '#75B3D7',
+      400: '#6297B6',
+      500: '#507C96',
+      600: '#3F6378',
+      700: '#2E4A5B',
+      800: '#1F333F',
+      900: '#101D25',
+      950: '#081218' // Optional dark shade
+    },
+    colorScheme: {
+      light: {
+        primary: {
+          color: '{primary.600}',
+          inverseColor: '#ffffff',
+          hoverColor: '{primary.500}',
+          activeColor: '{primary.600}'
+        },
+        highlight: {
+          background: '{primary.500}',
+          focusBackground: '{primary.600}',
+          color: '#ffffff',
+          focusColor: '#ffffff'
+        }
+      }
+    }
+  }
+})
 
 const app = createApp(App)
 
@@ -36,7 +71,7 @@ setupToast(app, app.config.globalProperties.$toast)
 app.use(router)
 app.use(PrimeVue, {
   theme: {
-    preset: Aura,
+    preset: MyPreset,
     options: {
       darkModeSelector: false || 'none'
     }
