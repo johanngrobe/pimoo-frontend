@@ -14,6 +14,6 @@ npm run build
 # Step 4: Copy the build files to the deployment directory
 TARGET_DIR="/var/www/pimoo-1rz.fab.hs-rm.de/html/"
 echo "Copying files to $TARGET_DIR"
-sudo cp -rf dist/ "$TARGET_DIR"
+sudo cp -rf dist/* "$TARGET_DIR"
 
 echo "Deployment complete!"
