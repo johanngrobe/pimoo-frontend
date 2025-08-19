@@ -52,15 +52,6 @@ const items = ref([
     ]
   },
   {
-    label: 'Account',
-    items: [
-      {
-        label: 'Daten',
-        route: '/einstellungen/profil'
-      }
-    ]
-  },
-  {
     label: 'Administration',
     items: [
       {

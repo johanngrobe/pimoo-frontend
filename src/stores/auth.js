@@ -11,6 +11,8 @@ export const useAuthStore = defineStore(
     const isLoggedIn = useStorage('isLoggedIn', false) // persist user in localStorage
     const loading = ref(false)
 
+    const userInitialien = useStorage('userInitialien')
+
     const userRolleId = useStorage('userRolleId', null, undefined, {
       serializer: {
         read: (v) => (v === 'none' ? null : Number(v)),
@@ -50,6 +52,8 @@ export const useAuthStore = defineStore(
       if (response.status === 204) {
         isLoggedIn.value = true // Set logged-in status if successful
         const user = await getUser()
+        userInitialien.value =
+          user.vorname.charAt(0).toUpperCase() + user.nachname.charAt(0).toUpperCase()
         userRolleId.value = user.rolleId
         gemeindeId.value = user.gemeindeId
         router.replace({ name: 'magistratsvorlage-liste' })
@@ -155,6 +159,7 @@ export const useAuthStore = defineStore(
     return {
       loading,
       isLoggedIn,
+      userInitialien,
       gemeindeId,
       userRolleId,
       register,

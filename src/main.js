@@ -17,6 +17,7 @@ import BaseHeading from './components/BaseHeading.vue'
 import BaseSubheading from './components/BaseSubheading.vue'
 import ToastService from 'primevue/toastservice'
 import { setupToast } from '@/services/toast'
+import ConfirmationService from 'primevue/confirmationservice'
 import Tooltip from 'primevue/tooltip'
 
 const MyPreset = definePreset(Aura, {
@@ -33,6 +34,19 @@ const MyPreset = definePreset(Aura, {
       800: '#1F333F',
       900: '#101D25',
       950: '#081218' // Optional dark shade
+    },
+    secondary: {
+      50: '#FAFAFA',
+      100: '#F4F4F5',
+      200: '#E4E4E7',
+      300: '#D4D4D8',
+      400: '#A1A1AA',
+      500: '#71717A',
+      600: '#52525B',
+      700: '#3F3F46',
+      800: '#27272A',
+      900: '#18181B',
+      950: '#0B0B0E'
     },
     colorScheme: {
       light: {
@@ -67,6 +81,7 @@ app.component('BaseSubheading', BaseSubheading)
 
 app.use(createPinia())
 app.use(ToastService)
+app.use(ConfirmationService)
 setupToast(app, app.config.globalProperties.$toast)
 app.use(router)
 app.use(PrimeVue, {

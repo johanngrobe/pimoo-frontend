@@ -16,6 +16,7 @@
           @copy-item="onCopy"
           @delete-item="onDelete"
           @export-item="onExport"
+          @reload-item="refetchEingabe"
         />
       </div>
     </div>
@@ -40,6 +41,13 @@ const fetchEingaben = async () => {
   isLoading.value = true
   eingaben.value = await fetchItems(`mobilitaetscheck/eingabe/magistratsvorlage/${route.params.id}`)
   isLoading.value = false
+}
+
+const refetchEingabe = async (id) => {
+  const index = eingaben.value.findIndex((eingabe) => eingabe.id === id)
+  if (index !== -1) {
+    eingaben.value[index] = await fetchItems(`mobilitaetscheck/eingabe/${id}`)
+  }
 }
 
 onMounted(async () => {

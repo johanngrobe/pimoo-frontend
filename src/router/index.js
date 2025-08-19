@@ -87,6 +87,11 @@ const router = createRouter({
           component: () => import('@/views/MagistratsvorlageIdMobilitaetscheckView.vue')
         },
         {
+          path: 'klimarelevanzpruefung',
+          name: 'magistratsvorlage-id-klimarelevanzpruefung',
+          component: () => import('@/views/MagistratsvorlageIdKlimarelevanzpruefungView.vue')
+        },
+        {
           path: 'mobilitaetscheck/neu',
           name: 'magistratsvorlage-id-mobilitaetscheck-neu',
           component: () => import('@/views/MagistratsvorlageIdMobilitaetscheckNeuView.vue')
@@ -142,16 +147,16 @@ const router = createRouter({
           component: () => import('@/views/EinstellungenTagView.vue')
         },
         {
-          path: 'profil',
-          name: 'profil',
-          component: () => import('@/views/EinstellungenProfilView.vue')
-        },
-        {
           path: 'accountverwaltung',
           name: 'accountverwaltung',
           component: () => import('@/views/EinstellungenAccountverwaltungView.vue')
         }
       ]
+    },
+    {
+      path: '/einstellungen/profil',
+      name: 'profil',
+      component: () => import('@/views/EinstellungenProfilView.vue')
     },
 
     {
@@ -159,7 +164,14 @@ const router = createRouter({
       name: 'keine-zugangsberechtigung',
       component: () => import('@/views/KeineZugangsberechtigungView.vue')
     }
-  ]
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  }
 })
 
 router.beforeEach((to, from, next) => {

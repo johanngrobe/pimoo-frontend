@@ -18,6 +18,7 @@
           @copy-item="onCopy"
           @delete-item="onDelete"
           @export-item="onExport"
+          @reload-item="refetchEingabe"
         />
       </div>
     </div>
@@ -48,15 +49,22 @@ const fetchEingaben = async () => {
   isLoading.value = false
 }
 
+const refetchEingabe = async (id) => {
+  const index = eingaben.value.findIndex((eingabe) => eingabe.id === id)
+  if (index !== -1) {
+    eingaben.value[index] = await fetchItems(`klimacheck/eingabe/${id}`)
+  }
+}
+
 // Computed property to filter submissions by multiple fields
 const filteredEingaben = computed(() => {
   return eingaben.value.filter((eingabe) => {
     const query = searchQuery.value.toLowerCase()
     isLoading.value = true
     let results =
-      eingabe.name.toLowerCase().includes(query) ||
-      eingabe.autor.toLowerCase().includes(query) ||
-      eingabe.erstelltAm.includes(query) // Date format remains the same, no need to lowercase
+      (typeof eingabe.name === 'string' && eingabe.name.toLowerCase().includes(query)) ||
+      (typeof eingabe.autor === 'string' && eingabe.autor.toLowerCase().includes(query)) ||
+      (typeof eingabe.erstelltAm === 'string' && eingabe.erstelltAm.includes(query)) // Date format remains the same, no need to lowercase
     isLoading.value = false
     return results
   })

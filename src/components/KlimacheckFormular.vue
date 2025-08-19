@@ -261,7 +261,7 @@ const fortsetzungFormular = computed(() => {
 })
 
 // Emit event to close modal
-const emit = defineEmits(['close-modal', 'update-item', 'add-item', 'export-item'])
+const emit = defineEmits(['close-modal', 'update-item', 'add-item', 'export-item', 'reload-item'])
 
 const closeModal = () => {
   if (props.editMode) {
@@ -282,6 +282,7 @@ const onSubmit = handleSubmit(async (values) => {
   }
   if (props.editMode) {
     emit('update-item', { modelId: props.item.id, values: formattedValues })
+    emit('reload-item')
   } else {
     // POST request to create a new submission
     await createItem({

@@ -53,9 +53,14 @@
           <Button label="Anmelden" type="submit" class="w-full" />
         </div>
       </form>
-      <RouterLink class="hover:underline" to="/auth/passwort-vergessen"
-        >Passwort vergessen?</RouterLink
-      >
+      <div class="grid grid-cols-1 gap-y-2 mt-4">
+        <RouterLink class="hover:underline" :to="{ name: 'passwort-vergessen' }"
+          >Passwort vergessen?</RouterLink
+        >
+        <RouterLink class="hover:underline" :to="{ name: 'registrieren' }"
+          >Noch keinen Account? Hier registrieren</RouterLink
+        >
+      </div>
     </BaseCard>
   </div>
 </template>

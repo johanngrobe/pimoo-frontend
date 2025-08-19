@@ -1,23 +1,16 @@
 <template>
-  <!-- <div class="flex min-h-screen"> -->
-  <!-- Sidebar -->
-  <!-- <NavigationsmenuSidebar class="sm:w-64 rounded" /> -->
-
-  <!-- Main Content Area -->
   <div>
     <div class="max-w-6xl mx-auto p-1">
-      <TheNavigationsmenuTopbar class="w-full" />
+      <TheNavigationsmenuTopbar class="w-full mb-2" />
       <Toast position="bottom-right" />
       <RouterView />
     </div>
     <TheFooter />
   </div>
-  <!-- </div> -->
 </template>
 
 <script setup>
 import { RouterView } from 'vue-router'
-// import NavigationsmenuSidebar from './components/NavigationsmenuSidebar.vue'
 import { useTitle } from '@vueuse/core'
 import Toast from 'primevue/toast'
 import TheNavigationsmenuTopbar from './components/TheNavigationsmenuTopbar.vue'

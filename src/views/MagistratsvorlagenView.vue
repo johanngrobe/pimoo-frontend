@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto p-6">
+  <div class="mx-auto p-6">
     <div class="flex items-center gap-5">
       <BaseHeading>Magistratsvorlagen</BaseHeading>
       <RouterLink :to="{ name: 'magistratsvorlage-neu' }">

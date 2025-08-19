@@ -4,7 +4,12 @@
       <template #header>
         <h2>{{ props.item.name }} bearbeiten</h2>
       </template>
-      <KlimacheckFormular :editMode="true" :item="props.item" @update-item="onUpdate" />
+      <KlimacheckFormular
+        :editMode="true"
+        :item="props.item"
+        @update-item="onUpdate"
+        @reload-item="emit('reload-item', props.item.id)"
+      />
     </BaseModal>
     <BaseCard>
       <div class="col-span-10 grid grid-cols-1 gap-x-4 gap-y-1">
@@ -21,35 +26,33 @@
         </div>
       </div>
       <div class="col-span-2 grid grid-cols-1 items-center justify-center gap-y-1">
-        <div v-if="userRolleZugang" class="flex items-center gap-1">
-          <ToggleButton
-            v-model="veroeffentlicht"
-            onLabel="veröffentlicht"
-            offLabel="verwaltungsintern"
-            @change="onPublish"
-            size="small"
-          />
-          <Button
-            icon="pi pi-download"
-            @click="onExport"
-            label="PDF-Export"
-            size="small"
-            severity="info"
-            disabled
-          />
-          <Button
-            icon="pi pi-pen-to-square"
-            v-if="userRolleZugang"
-            @click="toggleEditMode"
-            label="Bearbeiten"
-            size="small"
-            severity="info"
-          />
-          <ButtonLoeschen v-if="userRolleZugang" @delete-confirmed="onDelete" />
-
-          <ButtonBearbeiten v-if="userRolleZugang([2])" @click="onCopy" color="green"
-            >In meine Datenbank kopieren</ButtonBearbeiten
-          >
+        <div v-if="userRolleZugang" class="grid grid-cols-5 items-center gap-1">
+          <div class="col-span-4 flex gap-2">
+            <ToggleButton
+              v-model="veroeffentlicht"
+              onLabel="veröffentlicht"
+              offLabel="verwaltungsintern"
+              onIcon="pi pi-lock-open"
+              offIcon="pi pi-lock"
+              @change="onPublish"
+              size="small"
+              style="width: 10rem"
+            />
+            <Button
+              icon="pi pi-pen-to-square"
+              v-if="userRolleZugang"
+              @click="toggleEditMode"
+              label="Bearbeiten"
+              size="small"
+            />
+            <ButtonBearbeiten v-if="userRolleZugang(['politik'])" @click="onCopy" color="green"
+              >In meine Datenbank kopieren</ButtonBearbeiten
+            >
+            <Button icon="pi pi-download" @click="onExport" label="PDF-Export" size="small" />
+          </div>
+          <div class="flex justify-end">
+            <ButtonLoeschen v-if="userRolleZugang" @delete-confirmed="onDelete" />
+          </div>
         </div>
       </div>
     </BaseCard>
@@ -85,7 +88,14 @@ const userRolleZugang = (fuerUserRollen = [1]) => {
   return fuerUserRollen.includes(authStore.userRolle)
 }
 
-const emit = defineEmits(['update-item', 'delete-item', 'copy-item', 'publish-item', 'export-item'])
+const emit = defineEmits([
+  'update-item',
+  'delete-item',
+  'copy-item',
+  'publish-item',
+  'export-item',
+  'reload-item'
+])
 
 const onPublish = () => {
   emit('publish-item', {

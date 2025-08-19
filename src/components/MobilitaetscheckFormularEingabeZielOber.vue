@@ -20,7 +20,13 @@
         </BaseCard>
       </div>
       <div class="flex justify-end items-center mt-4">
-        <Button icon="pi pi-save" @click="handleSubmit" type="submit" label="Speichern" />
+        <Button
+          icon="pi pi-save"
+          @click="handleSubmit"
+          type="submit"
+          label="Speichern"
+          :loading="isLoading"
+        />
       </div>
     </form>
   </div>
@@ -39,6 +45,8 @@ import { toastService } from '@/services/toast'
 import MobilitaetscheckFormularEingabeZielOberItem from '@/components/MobilitaetscheckFormularEingabeZielOberItem.vue'
 
 const mobilitaetscheckFormularEingabeZielOberRefs = ref([])
+
+const isLoading = ref(false)
 
 const props = defineProps({
   editMode: {
@@ -69,9 +77,10 @@ onMounted(async () => {
   })
 })
 
-const emit = defineEmits(['close-modal'])
+const emit = defineEmits(['close-modal', 'reload-item'])
 
 const onSubmit = handleSubmit(async (values) => {
+  isLoading.value = true
   const refs = mobilitaetscheckFormularEingabeZielOberRefs.value.filter((ref) => ref)
 
   // Step 1: Call onSubmit() for each EingabeZielOberItem
@@ -86,6 +95,7 @@ const onSubmit = handleSubmit(async (values) => {
       summary: 'Fehler',
       detail: 'Bitte überprüfen Sie die Eingaben in den Zielen.'
     })
+    isLoading.value = false
     return
   }
   await updateItem({
@@ -99,12 +109,14 @@ const onSubmit = handleSubmit(async (values) => {
   })
   if (props.editMode) {
     emit('close-modal')
+    emit('reload-item')
   } else {
     router.push({
       name: 'magistratsvorlage-id-mobilitaetscheck',
       params: { id: route.params.id }
     })
   }
+  isLoading.value = false
 })
 </script>
 
