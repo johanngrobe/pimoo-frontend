@@ -5,15 +5,16 @@
     <div v-else>
       <form v-if="!submit" @submit.prevent="onSubmit">
         <div class="field">
-          <label for="email">E-Mail</label>
-          <InputText
-            id="email"
-            v-model="email"
-            placeholder="vergessen@email.de"
-            class="w-full"
-            :invalid="!!errors.email"
-            aria-describedby="email-help"
-          />
+          <FloatLabel variant="on">
+            <InputText
+              id="email"
+              v-model="email"
+              class="w-full"
+              :invalid="!!errors.email"
+              aria-describedby="email-help"
+            />
+            <label for="email">E-Mail</label>
+          </FloatLabel>
           <small v-if="errors.email" class="p-error">{{ errors.email }}</small>
         </div>
         <div class="flex justify-end mt-2">
@@ -35,6 +36,7 @@ import * as yup from 'yup'
 import { useForm } from 'vee-validate'
 import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
+import FloatLabel from 'primevue/floatlabel'
 
 const isLoading = ref(false)
 const submit = ref(false)
