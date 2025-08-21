@@ -150,6 +150,11 @@ const router = createRouter({
           path: 'accountverwaltung',
           name: 'accountverwaltung',
           component: () => import('@/views/EinstellungenAccountverwaltungView.vue')
+        },
+        {
+          path: 'gemeinde-gebiet',
+          name: 'gemeinde-gebiet',
+          component: () => import('@/views/EinstellungenGemeindeGebietView.vue')
         }
       ]
     },

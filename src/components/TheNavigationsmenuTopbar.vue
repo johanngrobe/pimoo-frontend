@@ -22,10 +22,15 @@
     <template #end>
       <div v-if="authStore.isLoggedIn" class="flex items-center gap-2">
         <router-link v-if="[1].includes(authStore.userRolleId)" :to="{ name: 'leitziel' }">
-          <Button icon="pi pi-cog" />
+          <Button v-tooltip.left="'Einstellungen'" icon="pi pi-cog" />
         </router-link>
 
-        <Avatar :label="authStore.userInitialien" shape="circle" @click="toggle" />
+        <Avatar
+          v-tooltip.right="'Profil und Abmelden'"
+          :label="authStore.userInitialien"
+          shape="circle"
+          @click="toggle"
+        />
 
         <Popover ref="op">
           <div class="flex flex-col gap-4 w-[8rem]">

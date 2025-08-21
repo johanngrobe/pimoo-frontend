@@ -31,6 +31,15 @@ import Menu from 'primevue/menu'
 
 const items = ref([
   {
+    label: 'Gemeinde',
+    items: [
+      {
+        label: 'Gebiete',
+        route: '/einstellungen/gemeinde-gebiet'
+      }
+    ]
+  },
+  {
     label: 'Mobilitätscheck',
     items: [
       {

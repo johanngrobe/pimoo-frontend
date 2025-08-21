@@ -31,6 +31,11 @@
                       <div>{{ item.verwaltungsvorgangNr }}</div>
                       <div>{{ datumFormatieren(item.verwaltungsvorgangDatum) }}</div>
                     </div>
+                    <div class="flex items-center gap-2">
+                      <span v-for="gebiet in item.gemeindeGebiete" :key="gebiet.id">
+                        <Tag :value="gebiet.name" severity="secondary" />
+                      </span>
+                    </div>
                   </div>
                   <div class="col-span-3 font-bold">
                     <div class="flex items-center gap-2">
@@ -118,6 +123,7 @@ import { useConfirm } from 'primevue/useconfirm'
 import Button from 'primevue/button'
 import DataView from 'primevue/dataview'
 import ConfirmDialog from 'primevue/confirmdialog'
+import Tag from 'primevue/tag'
 
 const magistratsvorlageListe = ref([])
 

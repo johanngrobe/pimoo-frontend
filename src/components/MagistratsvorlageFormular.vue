@@ -56,7 +56,25 @@
         </FloatLabel>
         <small v-if="errors.name" id="name-help" class="p-error block">{{ errors.name }}</small>
       </div>
-
+      <div>
+        <FloatLabel variant="on">
+          <MultiSelect
+            id="gemeindeGebietIds"
+            v-model="gemeindeGebietIds"
+            :options="gebiete"
+            optionLabel="name"
+            optionValue="id"
+            display="chip"
+            class="w-full"
+            filter
+            :invalid="!!errors.gemeindeGebietIds"
+          />
+          <label for="gemeindeGebietIds">Gebiete auswählen</label>
+        </FloatLabel>
+        <small v-if="errors.gemeindeGebietIds" id="gemeindeGebietIds-help" class="p-error block">{{
+          errors.gemeindeGebietIds
+        }}</small>
+      </div>
       <div class="form-group field">
         <FloatLabel variant="on">
           <Textarea
@@ -75,7 +93,7 @@
         }}</small>
       </div>
       <div class="flex justify-end w-full">
-        <ButtonSave type="submit">speichern</ButtonSave>
+        <Button icon="pi pi-save" type="submit" label="Speichern" :loading="isLoading" />
       </div>
     </form>
   </div>
@@ -88,11 +106,12 @@ import { useForm } from 'vee-validate'
 import { schema } from '@/utils/schemas/magistratsvorlage'
 import { toTypedSchema } from '@vee-validate/yup'
 import { createItem, fetchItems, updateItem } from '@/composables/crud'
+import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import DatePicker from 'primevue/datepicker'
 import Textarea from 'primevue/textarea'
 import FloatLabel from 'primevue/floatlabel'
-import ButtonSave from '@/components/ButtonSpeichern.vue'
+import MultiSelect from 'primevue/multiselect'
 
 const props = defineProps({
   editMode: {
@@ -104,6 +123,7 @@ const props = defineProps({
 const router = useRouter()
 const route = useRoute()
 const isLoading = ref(false)
+const gebiete = ref([])
 
 const { defineField, handleSubmit, errors, setValues } = useForm({
   validationSchema: toTypedSchema(schema)
@@ -113,12 +133,20 @@ const [verwaltungsvorgangNr] = defineField('verwaltungsvorgangNr')
 const [verwaltungsvorgangDatum] = defineField('verwaltungsvorgangDatum')
 const [name] = defineField('name')
 const [beschreibung] = defineField('beschreibung')
+const [gemeindeGebietIds] = defineField('gemeindeGebietIds')
 
 onMounted(async () => {
   if (props.editMode) {
     await fetchMagistratsvorlage()
   }
+  await fetchGebiete()
 })
+
+const fetchGebiete = async () => {
+  isLoading.value = true
+  gebiete.value = await fetchItems('einstellungen/gebiet')
+  isLoading.value = false
+}
 
 const fetchMagistratsvorlage = async () => {
   isLoading.value = true
@@ -128,7 +156,8 @@ const fetchMagistratsvorlage = async () => {
     verwaltungsvorgangDatum: new Date(response.verwaltungsvorgangDatum),
     name: response.name,
     beschreibung: response.beschreibung,
-    gemeindeId: response.gemeindeId
+    gemeindeId: response.gemeindeId,
+    gemeindeGebietIds: response.gemeindeGebietIds
   })
   isLoading.value = false
 }

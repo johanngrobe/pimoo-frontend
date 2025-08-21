@@ -1,12 +1,12 @@
 <template>
   <div>
     <BaseHeading>Neue Magistratsvorlage</BaseHeading>
-    <MagistratsvorlageForumlar :edit-mode="false" />
+    <MagistratsvorlageFormular :edit-mode="false" />
   </div>
 </template>
 
 <script setup>
-import MagistratsvorlageForumlar from '@/components/MagistratsvorlageForumlar.vue'
+import MagistratsvorlageFormular from '@/components/MagistratsvorlageFormular.vue'
 </script>
 
 <style></style>
