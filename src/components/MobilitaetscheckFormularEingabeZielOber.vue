@@ -24,7 +24,7 @@
           icon="pi pi-save"
           @click="handleSubmit"
           type="submit"
-          label="Speichern"
+          label="speichern"
           :loading="isLoading"
         />
       </div>

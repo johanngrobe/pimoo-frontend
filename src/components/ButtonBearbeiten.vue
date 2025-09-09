@@ -1,7 +1,7 @@
 <template>
   <Button
     icon="pi pi-pen-to-square"
-    v-tooltip.top="'Bearbeiten'"
+    v-tooltip.top="'bearbeiten'"
     :label="label"
     size="small"
     :disabled="props.disabled"
@@ -24,7 +24,7 @@ const props = defineProps({
 })
 
 const label = computed(() => {
-  return props.noLabel ? '' : 'Bearbeiten'
+  return props.noLabel ? '' : 'bearbeiten'
 })
 </script>
 

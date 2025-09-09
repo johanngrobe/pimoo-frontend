@@ -175,7 +175,7 @@
       </div>
     </div>
     <div v-if="klimarelevanzId" class="flex w-full justify-end">
-      <Button icon="pi pi-save" @click="closeModal" type="submit" label="Speichern"></Button>
+      <Button icon="pi pi-save" @click="closeModal" type="submit" label="speichern"></Button>
     </div>
   </form>
 </template>

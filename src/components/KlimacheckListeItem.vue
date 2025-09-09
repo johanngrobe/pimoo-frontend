@@ -42,7 +42,7 @@
               icon="pi pi-pen-to-square"
               v-if="userRolleZugang"
               @click="toggleEditMode"
-              label="Bearbeiten"
+              label="bearbeiten"
               size="small"
             />
             <ButtonBearbeiten v-if="userRolleZugang(['politik'])" @click="onCopy" color="green"

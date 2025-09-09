@@ -4,7 +4,7 @@
       <div class="flex items-center gap-2 text-white">
         <router-link
           :to="{ name: 'startseite' }"
-          class="grid grid-cols-1 items-center justify-center justify-items-center"
+          class="grid grid-cols-1 items-center justify-center justify-items-center menuItem-active-link"
         >
           <div class="font-bold text-lg flex items-center">Mobilitätscheck</div>
           <div class="font-bold text-xs">für Magistratsvorlagen</div>
@@ -73,6 +73,9 @@ const toggle = (event) => {
 </script>
 
 <style scoped>
+.router-link-exact-active.menuItem-active-link {
+  @apply text-white;
+}
 .router-link-active,
 .router-link-exact-active {
   @apply block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500;

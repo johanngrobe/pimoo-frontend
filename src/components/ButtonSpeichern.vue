@@ -1,5 +1,5 @@
 <template>
-  <Button icon="pi pi-save" v-tooltip.top="'Speichern'" :label="label" />
+  <Button icon="pi pi-save" v-tooltip.top="'speichern'" :label="label" />
 </template>
 
 <script setup>
@@ -14,7 +14,7 @@ const props = defineProps({
 })
 
 const label = computed(() => {
-  return props.noLabel ? '' : 'Speichern'
+  return props.noLabel ? '' : 'speichern'
 })
 </script>
 

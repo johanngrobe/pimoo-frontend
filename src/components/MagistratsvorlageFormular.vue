@@ -31,7 +31,7 @@
             iconDisplay="input"
             :invalid="!!errors.verwaltungsvorgangDatum"
           />
-          <label for="verwaltungsvorgangDatum"> Datum Magistratssitzung </label>
+          <label for="verwaltungsvorgangDatum"> Datum der Magistratssitzung </label>
         </FloatLabel>
         <small
           v-if="errors.verwaltungsvorgangDatum"
@@ -52,7 +52,7 @@
             class="w-full"
             inputClass="w-full"
           />
-          <label for="name">Titel der Maßnahme</label>
+          <label for="name">Titel der Magistratsvorlage</label>
         </FloatLabel>
         <small v-if="errors.name" id="name-help" class="p-error block">{{ errors.name }}</small>
       </div>
@@ -93,7 +93,7 @@
         }}</small>
       </div>
       <div class="flex justify-end w-full">
-        <Button icon="pi pi-save" type="submit" label="Speichern" :loading="isLoading" />
+        <Button icon="pi pi-save" type="submit" label="speichern" :loading="isLoading" />
       </div>
     </form>
   </div>

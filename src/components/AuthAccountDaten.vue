@@ -87,7 +87,7 @@
         <small v-if="errors.email" id="email-help" class="p-error block">{{ errors.email }}</small>
       </div>
       <div class="flex gap-4">
-        <ButtonSave type="submit" class="w-full">Speichern</ButtonSave>
+        <ButtonSave type="submit" class="w-full">speichern</ButtonSave>
       </div>
     </form>
   </BaseCard>

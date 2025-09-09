@@ -8,7 +8,7 @@
       <small v-if="errors.name" id="name-help" class="p-error block">{{ errors.name }}</small>
     </div>
     <div class="flex justify-end gap-2">
-      <Button type="submit" label="Speichern"></Button>
+      <Button type="submit" label="speichern"></Button>
     </div>
   </form>
 </template>

@@ -10,7 +10,7 @@
           icon="pi pi-trash"
           class="p-button-danger"
           @click="handleDelete"
-          label="Löschen"
+          label="löschen"
           size="small"
           severity="danger"
         />
@@ -52,7 +52,7 @@ const props = defineProps({
 })
 
 const label = computed(() => {
-  return props.noLabel ? '' : 'Löschen'
+  return props.noLabel ? '' : 'löschen'
 })
 
 const isModalOpen = ref(false)
