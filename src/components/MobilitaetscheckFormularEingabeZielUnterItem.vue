@@ -18,7 +18,7 @@
       <div v-if="tangiert">
         <div class="grid grid-cols-2 gap-4">
           <div class="w-full my-auto max-w-md">
-            <label for="auswirkung">Wirkungsrichtung und -Stärke</label>
+            <label for="auswirkung">Wirkungsrichtung und -stärke</label>
             <Slider
               id="auswirkung"
               v-model.number="auswirkung"

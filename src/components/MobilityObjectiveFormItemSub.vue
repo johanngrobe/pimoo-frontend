@@ -22,7 +22,7 @@
       <div v-if="target">
         <div class="grid grid-cols-2 gap-4">
           <div class="w-full my-auto max-w-md">
-            <label for="impact">Wirkungsrichtung und -Stärke</label>
+            <label for="impact">Wirkungsrichtung und -stärke</label>
             <Slider
               id="impact"
               v-model.number="impact"
