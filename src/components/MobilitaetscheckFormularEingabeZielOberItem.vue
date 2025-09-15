@@ -24,6 +24,7 @@
             <MobilitaetscheckFormularEingabeZielUnterItem
               :editMode="props.editMode"
               :item="eingabeZielUnter"
+              :zielOberNr="props.item.zielOber.nr"
               :ref="(el) => registerUnterRef(el, index)"
             />
           </div>

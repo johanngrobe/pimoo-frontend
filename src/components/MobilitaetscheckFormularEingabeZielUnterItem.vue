@@ -11,7 +11,7 @@
           @click="toggleTangiert"
         />
         <label for="sub-checkbox" class="text-lg font-bold flex justify-center gap-2">
-          <span>{{ item.zielUnter.zielOberId }}.{{ item.zielUnter.nr }}</span>
+          <span>{{ props.zielOberNr }}.{{ item.zielUnter.nr }}</span>
           <span>{{ item.zielUnter.name }}</span>
         </label>
       </div>
@@ -126,6 +126,9 @@ const props = defineProps({
   item: {
     type: Object,
     default: null
+  },
+  zielOberNr: {
+    type: Number
   }
 })
 
