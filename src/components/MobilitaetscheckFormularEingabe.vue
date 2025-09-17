@@ -29,7 +29,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { schema } from '@/utils/schemas/mobilitaetscheckEingabe'
 import { toTypedSchema } from '@vee-validate/yup'
-import { createItem, createItemSilent, fetchItems } from '@/composables/crud'
+import { createItem } from '@/composables/crud'
 import InputText from 'primevue/inputtext'
 import FloatLabel from 'primevue/floatlabel'
 import ButtonSpeichern from '@/components/ButtonSpeichern.vue'
@@ -48,34 +48,6 @@ setFieldValue('magistratsvorlageId', route.params.id)
 
 onMounted(async () => {})
 
-const createEingabeZielOber = async (eingabeId) => {
-  const zielOberListe = await fetchItems('/einstellungen/mobilitaetscheck/ziel/ober')
-
-  for (const zielOber of zielOberListe) {
-    const eingabeZielOberResponse = await createItemSilent({
-      model: 'mobilitaetscheck/eingabe/ziel/ober',
-      values: {
-        eingabeId,
-        zielOberId: zielOber.id
-      }
-    })
-
-    // Wait for all unter goals to be created
-    const unterRequests = zielOber.zielUnter.map((zielUnter) =>
-      createItemSilent({
-        model: 'mobilitaetscheck/eingabe/ziel/unter',
-        values: {
-          eingabeZielOberId: eingabeZielOberResponse.id,
-          zielUnterId: zielUnter.id,
-          auswirkung: 0
-        }
-      })
-    )
-
-    await Promise.all(unterRequests)
-  }
-}
-
 const onSubmit = handleSubmit(async (values) => {
   isLoading.value = true
   const response = await createItem({
@@ -86,8 +58,6 @@ const onSubmit = handleSubmit(async (values) => {
       error: 'Fehler beim Erstellen des Mobilitätschecks'
     }
   })
-
-  await createEingabeZielOber(response.id)
 
   router.replace({
     name: 'mobilitaetscheck-ziele-neu',
