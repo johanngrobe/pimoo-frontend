@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-6xl">
     <div class="grid grid-cols-2 w-full items-center">
-      <BaseHeading>Neuer Mobilitäscheck</BaseHeading>
+      <BaseHeading>Neuer Mobilitätscheck</BaseHeading>
     </div>
     <MobilitaetscheckFormularEingabe />
   </div>

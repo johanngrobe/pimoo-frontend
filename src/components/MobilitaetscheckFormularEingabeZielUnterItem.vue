@@ -44,7 +44,7 @@
                 <span class="w-0.5 h-2 bg-gray-800"></span>
                 <!-- Invisible but clickable -->
                 <span class="absolute top-2 left-1/2 transform -translate-x-1/2 text-xs">
-                  {{ tickmarkLabels[tick - 4] }}
+                  {{ tickmarkLabels[tick] }}
                 </span>
               </span>
             </div>
@@ -76,7 +76,10 @@
             <label for="anmerkung">Erläuterung</label>
           </FloatLabel>
         </div>
-        <TextblockHinzufuegen class="mt-3 w-full" @add-textblock="appendTextblock($event)" />
+        <ButtonTextblockHinzufuegen
+          class="mt-3 w-full"
+          @textblock-hinzufuegen="textblockHinzufuegen($event)"
+        />
         <div class="mt-7 max-w-5xl">
           <FloatLabel variant="on">
             <MultiSelect
@@ -105,9 +108,9 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useStorage } from '@vueuse/core'
-import { fetchItems, updateItemSilent } from '@/composables/crud'
+import { fetchItem, fetchItems, updateItemSilent } from '@/composables/crud'
 import { useForm } from 'vee-validate'
 import { schema } from '@/utils/schemas/mobilitaetscheckEingabeZielUnter'
 import Checkbox from 'primevue/checkbox'
@@ -116,7 +119,7 @@ import Select from 'primevue/select'
 import MultiSelect from 'primevue/multiselect'
 import Textarea from 'primevue/textarea'
 import Slider from 'primevue/slider'
-import TextblockHinzufuegen from '@/components/TextblockHinzufuegen.vue'
+import ButtonTextblockHinzufuegen from '@/components/ButtonTextblockHinzufuegen.vue'
 
 const props = defineProps({
   editMode: {
@@ -132,20 +135,21 @@ const props = defineProps({
   }
 })
 
-const optionsIndikatoren = useStorage('cachedIndikatoren', [])
+const optionsIndikatoren = ref([])
 const tickmarkLabels = useStorage('cachedTickmarkLabels', {})
 const optionsAuswirkungRaeumlich = useStorage('cachedAuswirkungRaeumlich', [])
 
 const fetchOptions = async () => {
-  optionsAuswirkungRaeumlich.value = await fetchItems(
-    '/option/mobilitaetscheck/auswirkung-raeumlich'
-  )
+  if (
+    !Array.isArray(optionsAuswirkungRaeumlich.value) ||
+    optionsAuswirkungRaeumlich.value.length === 0
+  ) {
+    optionsAuswirkungRaeumlich.value = await fetchItems(
+      '/option/mobilitaetscheck/auswirkung-raeumlich'
+    )
+  }
   if (Object.keys(tickmarkLabels.value).length === 0) {
-    const response = await fetchItems('/option/mobilitaetscheck/auswirkung-tickmarks')
-    tickmarkLabels.value = response.data.reduce((acc, { label, value }) => {
-      acc[value] = label
-      return acc
-    }, {})
+    tickmarkLabels.value = await fetchItem('/option/mobilitaetscheck/auswirkung-tickmarks')
   }
   optionsIndikatoren.value = await fetchItems('/einstellungen/indikator')
 }
@@ -162,25 +166,34 @@ const [indikatorIds] = defineField('indikatorIds')
 
 onMounted(async () => {
   await fetchOptions()
-  const {
-    tangiert,
-    auswirkung,
-    auswirkungRaeumlichId,
-    anmerkung,
-    indikatorIds,
-    eingabeZielOberId,
-    zielUnterId
-  } = props.item
-  setValues({
-    tangiert,
-    auswirkung,
-    auswirkungRaeumlichId,
-    anmerkung,
-    indikatorIds,
-    eingabeZielOberId,
-    zielUnterId
-  })
 })
+
+watch(
+  () => props.item,
+  (newItem) => {
+    if (!newItem) return
+    const {
+      tangiert,
+      auswirkung,
+      auswirkungRaeumlichId,
+      anmerkung,
+      indikatorIds,
+      eingabeZielOberId,
+      zielUnterId
+    } = newItem
+
+    setValues({
+      tangiert,
+      auswirkung,
+      auswirkungRaeumlichId,
+      anmerkung,
+      indikatorIds,
+      eingabeZielOberId,
+      zielUnterId
+    })
+  },
+  { immediate: true } // sofort beim ersten gesetzten Wert ausführen
+)
 
 const toggleTangiert = () => {
   setFieldValue('tangiert', !tangiert.value)
@@ -190,10 +203,14 @@ const moveSlider = (tickValue) => {
   setFieldValue('auswirkung', tickValue)
 }
 
-const appendTextblock = (event) => {
-  if (anmerkung) {
+const textblockHinzufuegen = (event) => {
+  const current = anmerkung?.value?.trim()
+
+  if (current && current.length > 0) {
+    // hat schon Inhalt → neuen Absatz anhängen
     setFieldValue('anmerkung', `${anmerkung.value}\n${event}`)
   } else {
+    // noch leer → direkt Text einsetzen
     setFieldValue('anmerkung', event)
   }
 }

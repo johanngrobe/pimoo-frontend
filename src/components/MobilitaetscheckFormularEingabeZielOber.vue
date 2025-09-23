@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { updateItem } from '@/composables/crud'
@@ -71,11 +71,19 @@ const { defineField, handleSubmit, errors, setValues } = useForm({
 })
 const [name] = defineField('name')
 
-onMounted(async () => {
-  setValues({
-    name: props.item.name
-  })
-})
+onMounted(async () => {})
+
+watch(
+  () => props.item,
+  (newItem) => {
+    if (newItem) {
+      setValues({
+        name: props.item.name
+      })
+    }
+  },
+  { immediate: true }
+)
 
 const emit = defineEmits(['close-modal', 'reload-item'])
 

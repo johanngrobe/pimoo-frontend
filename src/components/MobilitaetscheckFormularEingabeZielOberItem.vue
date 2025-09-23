@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { updateItemSilent } from '@/composables/crud'
 import { schema } from '@/utils/schemas/mobilitaetscheckEingabeZielOber'
@@ -65,14 +65,21 @@ const { defineField, handleSubmit, validate, errors, setFieldValue, setValues } 
 
 const [tangiert] = defineField('tangiert')
 
-onMounted(() => {
-  const { tangiert, eingabeId, zielOberId } = props.item
-  setValues({
-    tangiert,
-    eingabeId,
-    zielOberId
-  })
-})
+onMounted(() => {})
+
+watch(
+  () => props.item,
+  (newItem) => {
+    if (!newItem) return
+    const { tangiert, eingabeId, zielOberId } = props.item
+    setValues({
+      tangiert,
+      eingabeId,
+      zielOberId
+    })
+  },
+  { immediate: true } // sofort beim ersten gesetzten Wert ausführen
+)
 
 const toggleTangiert = () => {
   setFieldValue('tangiert', !tangiert.value)

@@ -29,12 +29,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import InputText from 'primevue/inputtext'
-import { apiClient } from '@/services/axios'
+import { fetchItems } from '@/composables/crud'
 
 const textblocks = ref([])
 
 onMounted(async () => {
-  textblocks.value = await fetchTextblocks()
+  await fetchTextblocks()
 })
 
 const showList = ref(false)
@@ -44,20 +44,15 @@ const toggleList = () => {
   showList.value = !showList.value
 }
 
-const emit = defineEmits(['add-textblock'])
+const emit = defineEmits(['textblock-hinzufuegen'])
 
 const addTextblock = (block) => {
-  emit('add-textblock', block.name)
+  emit('textblock-hinzufuegen', block.name)
   toggleList()
 }
 
 const fetchTextblocks = async () => {
-  try {
-    const response = await apiClient.get('/einstellungen/textblock')
-    return response.data
-  } catch (error) {
-    console.error(error)
-  }
+  textblocks.value = await fetchItems('/einstellungen/textblock')
 }
 
 const filteredTextblocks = computed(() => {
@@ -68,7 +63,7 @@ const filteredTextblocks = computed(() => {
     filteredTextblocks = filteredTextblocks.filter(
       (block) =>
         block.name.toLowerCase().includes(query) ||
-        block.tags.some((tag) => tag.toLowerCase().includes(query))
+        block.tags.some((tag) => tag.name?.toLowerCase().includes(query.toLowerCase()))
     )
   }
 

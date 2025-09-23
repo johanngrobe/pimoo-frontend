@@ -92,6 +92,11 @@ const router = createRouter({
           component: () => import('@/views/MagistratsvorlageIdKlimarelevanzpruefungView.vue')
         },
         {
+          path: 'klimarelevanzpruefung/neu',
+          name: 'magistratsvorlage-id-klimarelevanzpruefung-neu',
+          component: () => import('@/views/MagistratsvorlageIdKlimarelevanzpruefungNeuView.vue')
+        },
+        {
           path: 'mobilitaetscheck/neu',
           name: 'magistratsvorlage-id-mobilitaetscheck-neu',
           component: () => import('@/views/MagistratsvorlageIdMobilitaetscheckNeuView.vue')
@@ -179,24 +184,16 @@ const router = createRouter({
   }
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _) => {
   const authStore = useAuthStore()
-  // Check if the route requires authentication
+
   if (to.meta.requiresAuth) {
     if (!authStore.isLoggedIn) {
-      // Redirect to login if the user is not authenticated
-      next({ name: 'anmelden' })
+      return { name: 'anmelden' }
     }
     if (to.meta.requiredUserRolle && !to.meta.requiredUserRolleId.includes(authStore.userRolleId)) {
-      // Check if user has the required rolle(s) for this route
-      next({ name: 'keine-zugangsberechtigung' }) // or redirect to a 403 page
-    } else {
-      // Allow access if authenticated and has required rolle(s)
-      next()
+      return { name: 'keine-zugangsberechtigung' }
     }
-  } else {
-    // Allow access if no authentication is required
-    next()
   }
 })
 

@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-6xl">
     <div class="grid grid-cols-2 w-full items-center">
-      <BaseHeading>Neuer Mobilitäscheck</BaseHeading>
+      <BaseHeading>Neuer Mobilitätscheck</BaseHeading>
       <div class="flex w-full justify-end">
         <ButtonZuruecksetzen @click="refreshPage()">zurücksetzen</ButtonZuruecksetzen>
       </div>

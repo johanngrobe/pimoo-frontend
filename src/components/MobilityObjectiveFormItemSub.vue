@@ -119,7 +119,7 @@ import Select from 'primevue/select'
 import MultiSelect from 'primevue/multiselect'
 import Textarea from 'primevue/textarea'
 import Slider from 'primevue/slider'
-import AddTextBlock from '@/components/TextblockHinzufuegen.vue'
+import AddTextBlock from '@/components/ButtonTextblockHinzufuegen.vue'
 
 const props = defineProps({
   editMode: {

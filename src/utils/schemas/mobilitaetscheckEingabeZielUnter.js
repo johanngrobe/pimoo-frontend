@@ -14,11 +14,12 @@ export const schema = yup.object({
       then: (schema) => schema.required('Angabe ist erforderlich'),
       otherwise: (schema) => schema.nullable(true)
     }),
-  auswirkungRaeumlichId: yup.number().when('tangiert', {
-    is: true,
-    then: (schema) => schema.required('Angabe ist erforderlich'),
-    otherwise: (schema) => schema.nullable(true)
-  }),
+  auswirkungRaeumlichId: yup.number().nullable(true),
+  // .when('tangiert', {
+  //   is: true,
+  //   then: (schema) => schema.required('Angabe ist erforderlich'),
+  //   otherwise: (schema) => schema.nullable(true)
+  // }),
   anmerkung: yup.string().nullable(true),
   indikatorIds: yup.array().of(yup.number()).nullable(true)
 })
