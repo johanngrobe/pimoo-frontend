@@ -27,6 +27,8 @@ export const useAuthStore = defineStore(
       }
     })
 
+    const userId = useStorage('userId')
+
     const router = useRouter()
 
     async function register(data) {
@@ -56,6 +58,7 @@ export const useAuthStore = defineStore(
           user.vorname.charAt(0).toUpperCase() + user.nachname.charAt(0).toUpperCase()
         userRolleId.value = user.rolleId
         gemeindeId.value = user.gemeindeId
+        userId.value = user.id
         router.replace({ name: 'magistratsvorlage-liste' })
       } else {
         isLoggedIn.value = false

@@ -1,10 +1,10 @@
 <template>
   <BaseHeading>Neue Klimarelevanzprüfung</BaseHeading>
-  <KlimarelevanzpruefungFormularFbFilter />
+  <KlimarelevanzpruefungFormular />
 </template>
 
 <script setup>
-import KlimarelevanzpruefungFormularFbFilter from '@/components/KlimarelevanzpruefungFormularFbFilter.vue'
+import KlimarelevanzpruefungFormular from '@/components/KlimarelevanzpruefungFormular.vue'
 </script>
 
 <style></style>

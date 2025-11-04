@@ -7,5 +7,6 @@ export const schema = object({
   verwaltungsvorgangDatum: date().transform(parseDate).required('Angabe ist erforderlich'),
   name: string().required('Angabe ist erforderlich'),
   beschreibung: string().required('Angabe ist erforderlich'),
-  gemeindeGebietIds: array().of(number()).nullable(true)
+  gemeindeGebietIds: array().of(number()).nullable(true),
+  tagIds: array().of(number()).nullable(true)
 })

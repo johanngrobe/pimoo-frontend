@@ -50,7 +50,7 @@
           }}</small>
         </div>
         <div class="flex gap-4">
-          <Button label="Anmelden" type="submit" class="w-full" />
+          <Button label="Anmelden" type="submit" class="w-full" :loading="isLoading" />
         </div>
       </form>
       <div class="grid grid-cols-1 gap-y-2 mt-4">

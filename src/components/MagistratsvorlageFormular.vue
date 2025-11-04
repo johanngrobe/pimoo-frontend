@@ -1,5 +1,6 @@
 <template>
   <div>
+    <ConfirmDialog></ConfirmDialog>
     <BaseSpinner v-if="isLoading" />
     <form v-else class="grid grid-cols-1 gap-y-4 my-7" @submit.prevent="onSubmit">
       <div class="form-group field">
@@ -75,6 +76,25 @@
           errors.gemeindeGebietIds
         }}</small>
       </div>
+      <div>
+        <FloatLabel variant="on">
+          <MultiSelect
+            id="tagIds"
+            v-model="tagIds"
+            :options="tagOptions"
+            optionLabel="name"
+            optionValue="id"
+            display="chip"
+            class="w-full"
+            filter
+            :invalid="!!errors.tagIds"
+          />
+          <label for="tagIds">Tags auswählen</label>
+        </FloatLabel>
+        <small v-if="errors.gemeindeGebietIds" id="tagIds-help" class="p-error block">{{
+          errors.tagIds
+        }}</small>
+      </div>
       <div class="form-group field">
         <FloatLabel variant="on">
           <Textarea
@@ -95,6 +115,18 @@
       <div class="flex justify-end w-full">
         <Button icon="pi pi-save" type="submit" label="speichern" :loading="isLoading" />
       </div>
+      <div v-if="editMode">
+        <Divider />
+        <BaseSubheading>Danger Zone</BaseSubheading>
+        <div class="mt-4">
+          <Button
+            @click="confirmDelete()"
+            icon="pi pi-trash"
+            label="Magistratsvorlage löschen"
+            severity="danger"
+          />
+        </div>
+      </div>
     </form>
   </div>
 </template>
@@ -105,13 +137,18 @@ import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { schema } from '@/utils/schemas/magistratsvorlage'
 import { toTypedSchema } from '@vee-validate/yup'
-import { createItem, fetchItems, updateItem } from '@/composables/crud'
+import { createItem, deleteItem, fetchItems, updateItem } from '@/composables/crud'
+import { useConfirm } from 'primevue/useconfirm'
 import Button from 'primevue/button'
+import ConfirmDialog from 'primevue/confirmdialog'
+import Divider from 'primevue/divider'
 import InputText from 'primevue/inputtext'
 import DatePicker from 'primevue/datepicker'
 import Textarea from 'primevue/textarea'
 import FloatLabel from 'primevue/floatlabel'
 import MultiSelect from 'primevue/multiselect'
+
+const confirm = useConfirm()
 
 const props = defineProps({
   editMode: {
@@ -124,6 +161,7 @@ const router = useRouter()
 const route = useRoute()
 const isLoading = ref(false)
 const gebiete = ref([])
+const tagOptions = ref([])
 
 const { defineField, handleSubmit, errors, setValues } = useForm({
   validationSchema: toTypedSchema(schema)
@@ -134,17 +172,19 @@ const [verwaltungsvorgangDatum] = defineField('verwaltungsvorgangDatum')
 const [name] = defineField('name')
 const [beschreibung] = defineField('beschreibung')
 const [gemeindeGebietIds] = defineField('gemeindeGebietIds')
+const [tagIds] = defineField('tagIds')
 
 onMounted(async () => {
   if (props.editMode) {
     await fetchMagistratsvorlage()
   }
-  await fetchGebiete()
+  await fetchOptions()
 })
 
-const fetchGebiete = async () => {
+const fetchOptions = async () => {
   isLoading.value = true
   gebiete.value = await fetchItems('einstellungen/gebiet')
+  tagOptions.value = await fetchItems('/einstellungen/tag')
   isLoading.value = false
 }
 
@@ -157,7 +197,8 @@ const fetchMagistratsvorlage = async () => {
     name: response.name,
     beschreibung: response.beschreibung,
     gemeindeId: response.gemeindeId,
-    gemeindeGebietIds: response.gemeindeGebietIds
+    gemeindeGebietIds: response.gemeindeGebietIds,
+    tagIds: response.tagIds
   })
   isLoading.value = false
 }
@@ -191,6 +232,34 @@ const onSubmit = handleSubmit(async (values) => {
     isLoading.value = false
   }
 })
+
+const confirmDelete = () => {
+  confirm.require({
+    message: 'Möchten Sie diese Magistratsvorlage löschen?',
+    header: 'Löschen bestätigen',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Abbrechen',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'löschen',
+      severity: 'danger'
+    },
+    accept: async () => {
+      await deleteItem({
+        model: 'magistratsvorlage',
+        modelId: route.params.id,
+        detail: {
+          success: 'Magistratsvorlage erfolgreich gelöscht.',
+          error: 'Fehler beim Löschen der Magistratsvorlage.'
+        }
+      })
+      router.push({ name: 'magistratsvorlage-liste' })
+    }
+  })
+}
 </script>
 
 <style scoped>

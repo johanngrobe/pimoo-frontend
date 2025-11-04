@@ -1,6 +1,7 @@
 import * as yup from 'yup'
 import YupPassword from 'yup-password'
 YupPassword(yup) // extend yup
+import { fetchItem } from '@/composables/crud'
 
 export const schema = yup.object({
   vorname: yup.string().required('Vorname ist erforderlich').label('Vorname'),
@@ -11,7 +12,13 @@ export const schema = yup.object({
     .string()
     .required('E-Mail ist erforderlich')
     .email('Ungültige E-Mail-Adresse')
-    .label('E-Mail'),
+    .label('E-Mail')
+    .test('unique-email', 'Diese E-Mail-Adresse ist bereits vergeben.', async function (value) {
+      if (!value) return true
+      // Replace with your async check, e.g. API call
+      const response = await fetchItem('public/unique-email', { email: value })
+      return response.emailGueltig
+    }),
   password: yup
     .string()
     .min(8, 'Passwort muss mindestens 8 Zeichen lang sein')
