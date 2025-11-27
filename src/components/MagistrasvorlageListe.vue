@@ -162,18 +162,18 @@
                       <div class="col-span-1 font-bold grid grid-cols-1 gap-y-1.5">
                         <div>Nr.</div>
                         <div>Datum</div>
-                        <div>Gebiete</div>
-                        <div>Tags</div>
+                        <div v-if="item.gemeindeGebiete.length > 0">Gebiete</div>
+                        <div v-if="item.tags.length > 0">Tags</div>
                       </div>
                       <div class="col-span-4 grid grid-cols-1 gap-y-1.5">
                         <div>{{ item.verwaltungsvorgangNr }}</div>
                         <div>{{ datumFormatieren(item.verwaltungsvorgangDatum) }}</div>
-                        <div class="flex items-center gap-2">
+                        <div v-if="item.gemeindeGebiete.length > 0" class="flex items-center gap-2">
                           <span v-for="gebiet in item.gemeindeGebiete" :key="gebiet.id">
                             <Tag :value="gebiet.name" severity="secondary" />
                           </span>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div v-if="item.tags.length > 0" class="flex items-center gap-2">
                           <span v-for="tag in item.tags" :key="tag.id">
                             <Tag :value="'#' + tag.name" severity="info" />
                           </span>

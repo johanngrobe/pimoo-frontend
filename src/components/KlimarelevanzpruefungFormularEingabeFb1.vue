@@ -1,6 +1,5 @@
 <template>
   <div>
-    <BaseSubheading>Fragebogen 1</BaseSubheading>
     <form @submit.prevent="onSubmit" class="mt-4">
       <Stepper value="1">
         <StepList>
@@ -143,7 +142,7 @@
                     <p>Welcher Energiestandard wird erreicht?</p>
                     <Select
                       v-model="a2q4"
-                      :options="optionEnergiestandardUmbauSanierung"
+                      :options="optionVorhaben.find((x) => x.id === 3)?.energiestandards || []"
                       optionLabel="name"
                       optionValue="id"
                       class="w-full"
@@ -172,7 +171,7 @@
                   <p>Welcher Energiestandard wird erreicht?</p>
                   <Select
                     v-model="a2q6"
-                    :options="optionEnergiestandardNeubauAnbau"
+                    :options="optionVorhaben.find((x) => x.id === 1)?.energiestandards || []"
                     optionLabel="name"
                     optionValue="id"
                     class="w-full"
@@ -180,7 +179,7 @@
                     aria-describedby="a2q6-help"
                   />
                 </div>
-                <div v-fi="typeof a2q6 === 'number'">
+                <div v-if="typeof a2q6 === 'number'">
                   <p>Warum wurde sich für den genannten Energiestandard entschieden?</p>
                   <FloatLabel variant="on">
                     <InputText
@@ -758,9 +757,10 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useForm } from 'vee-validate'
-import { schema } from '@/utils/schemas/klimarelevanzpruefungFb1.js'
+import { schema } from '@/utils/schemas/klimarelevanzpruefungEingabeFb1'
+import { fetchItems } from '@/composables/crud'
 // import ToggleSwitch from 'primevue/toggleswitch'
 import Button from 'primevue/button'
 import Divider from 'primevue/divider'
@@ -774,6 +774,21 @@ import StepList from 'primevue/steplist'
 import StepPanels from 'primevue/steppanels'
 import Step from 'primevue/step'
 import StepPanel from 'primevue/steppanel'
+
+const isLoading = ref(false)
+const optionBoolean = ref()
+const optionVorhaben = ref()
+
+onMounted(async () => {
+  isLoading.value = true
+  await fetchData()
+  isLoading.value = false
+})
+
+const fetchData = async () => {
+  optionBoolean.value = await fetchItems('/einstellungen/bool-erweitert')
+  optionVorhaben.value = await fetchItems('/klimarelevanzpruefung/vorhaben')
+}
 
 const { defineField, handleSubmit, errors } = useForm({
   validationSchema: schema
@@ -822,37 +837,6 @@ const [a7q1] = defineField('a7q1')
 const [a7q2] = defineField('a7q2')
 const [a8q1] = defineField('a8q1')
 const [a8q2] = defineField('a8q2')
-
-const optionBoolean = [
-  { label: 'Ja', value: 1 },
-  { label: 'Nein', value: 2 },
-  { label: 'Weiß nicht', value: 3 }
-]
-
-const optionVorhaben = [
-  { label: 'Neubau', value: '1' },
-  { label: 'Anbau', value: '2' },
-  { label: 'Umbau', value: '3' },
-  { label: 'Sanierung', value: '4' },
-  { label: 'Abriss', value: '5' }
-]
-
-const optionEnergiestandardUmbauSanierung = [
-  { label: 'kein Standard', value: '1' },
-  { label: 'KfW-Effizienzhaus 155', value: '2' },
-  { label: 'KfW-Effizienzhaus 100', value: '3' },
-  { label: 'KfW-Effizienzhaus 85', value: '4' },
-  { label: 'KfW-Effizienzhaus 70', value: '5' },
-  { label: 'KfW-Effizienzhaus 55', value: '6' },
-  { label: 'KfW-Effizienzhaus 40 (Plus)', value: '7' },
-  { label: 'Passivhaus (PHPP)', value: '8' }
-]
-
-const optionEnergiestandardNeubauAnbau = [
-  { label: 'KfW-Effizienzhaus 55', value: '6' },
-  { label: 'KfW-Effizienzhaus 40 (Plus)', value: '7' },
-  { label: 'Passivhaus (PHPP)', value: '8' }
-]
 
 const a1WeiterButtonDisabled = computed(() => {
   if (

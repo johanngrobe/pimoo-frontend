@@ -1,6 +1,5 @@
 <template>
   <div>
-    <BaseSubheading>Fragebogen 4</BaseSubheading>
     <form @submit.prevent="onSubmit" class="mt-4">
       <Stepper value="1">
         <StepList>
@@ -72,7 +71,7 @@
 
 <script setup>
 import { useForm } from 'vee-validate'
-import { schema } from '@/utils/schemas/klimarelevanzpruefungFb1.js'
+import { schema } from '@/utils/schemas/klimarelevanzpruefungEingabeFb4'
 // import ToggleSwitch from 'primevue/toggleswitch'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'

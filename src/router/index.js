@@ -97,6 +97,11 @@ const router = createRouter({
           component: () => import('@/views/MagistratsvorlageIdKlimarelevanzpruefungNeuView.vue')
         },
         {
+          path: 'klimarelevanzpruefung/:klimarelevanzpruefungId',
+          name: 'magistratsvorlage-id-klimarelevanzpruefung-id',
+          component: () => import('@/views/MagistratsvorlageIdKlimarelevanzpruefungIdView.vue')
+        },
+        {
           path: 'mobilitaetscheck/neu',
           name: 'magistratsvorlage-id-mobilitaetscheck-neu',
           component: () => import('@/views/MagistratsvorlageIdMobilitaetscheckNeuView.vue')

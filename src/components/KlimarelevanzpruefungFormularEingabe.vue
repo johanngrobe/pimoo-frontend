@@ -1,8 +1,7 @@
 <template>
   <div>
-    <BaseSubheading>Auswahlfragen</BaseSubheading>
     <form @submit.prevent="onSubmit" class="mt-4">
-      <div class="mb-4">
+      <div class="mb-8">
         <FloatLabel variant="on">
           <InputText
             id="name"
@@ -16,8 +15,8 @@
         </FloatLabel>
         <small v-if="errors.name" id="name-help" class="p-error block">{{ errors.name }}</small>
       </div>
-      <ol class="grid grid-cols-[11fr_1fr] gap-2 items-center list-outside list-decimal">
-        <li @click="fb1 = !fb1">
+      <ol class="grid grid-cols-[11fr_1fr] gap-2 items-center list-outside list-decimal ms-6">
+        <li @click="f1 = !f1">
           Es handelt sich um eine <strong>physische Maßnahme oder eine Beschaffung </strong> oder um
           die <strong>konkrete Planung/Konzept derer</strong>.<br />
           <small
@@ -25,17 +24,17 @@
             Fällungen, Flächennutzungsänderungen, Baumaßnahmen etc.)</small
           >
         </li>
-        <ToggleSwitch v-model="fb1" :disbaled="disableFb1to4" :invalied="!!errors.fb1" />
+        <ToggleSwitch v-model="f1" :disbaled="disableF1to4" :invalied="!!errors.f1" />
         <Divider class="col-span-2" />
-        <li @click="fb2 = !fb2">
+        <li @click="f2 = !f2">
           Es handelt sich um eine Planung / ein Konzept , das<strong>
             indirekt physische Maßnahmen nach sich zieht.</strong
           ><br /><small> (z.B. Bebauungsplan)</small>
         </li>
-        <ToggleSwitch v-model="fb2" :disbaled="disableFb1to4" :invalied="!!errors.fb2" />
+        <ToggleSwitch v-model="f2" :disbaled="disableF1to4" :invalied="!!errors.f2" />
 
         <Divider class="col-span-2" />
-        <li @click="fb3 = !fb3">
+        <li @click="f3 = !f3">
           Es handelt sich um eine Planung, ein Konzept, oder ein Vorhaben, die
           <strong
             >das Verhalten der Bevölkerung oder der kommunalen Mitarbeitenden in Bezug auf
@@ -43,19 +42,19 @@
           ><br />
           <small> (z.B. Klima-Bildungskampagne, Mobilitätsverhalten)</small>
         </li>
-        <ToggleSwitch v-model="fb3" :disbaled="disableFb1to4" :invalied="!!errors.fb3" />
+        <ToggleSwitch v-model="f3" :disbaled="disableF1to4" :invalied="!!errors.f3" />
 
         <Divider class="col-span-2" />
-        <li @click="fb4 = !fb4">
+        <li @click="f4 = !f4">
           Es handelt sich um ein Vorhaben, das
           <strong>nicht in eine der bisherigen Kategorien passt</strong>, aber dennoch klimawirksam
           ist.<br />
           <small>(z.B. Reisen)</small>
         </li>
-        <ToggleSwitch v-model="fb4" :disbaled="disableFb1to4" :invalied="!!errors.fb4" />
+        <ToggleSwitch v-model="f4" :disbaled="disableF1to4" :invalied="!!errors.f4" />
 
         <Divider class="col-span-2" />
-        <li @click="fb5 = !fb5">
+        <li @click="f5 = !f5">
           Es handelt sich um eine Maßnahme, die <strong>in keiner Weise klimawirksam</strong> ist.
           <br />
           <small>
@@ -63,8 +62,8 @@
             Beantwortung von Anfragen, Wahlen etc.)</small
           >
         </li>
-        <ToggleSwitch v-model="fb5" :disabled="disableFb5" :invalied="!!errors.fb5" />
-        <small v-if="errors.fb5" id="fb5-help" class="p-error col-span-2">{{ errors.fb5 }}</small>
+        <ToggleSwitch v-model="f5" :disabled="disableF5" :invalied="!!errors.f5" />
+        <small v-if="errors.f5" id="f5-help" class="p-error col-span-2">{{ errors.f5 }}</small>
       </ol>
       <div class="flex justify-end items-center mt-8">
         <Button icon="pi pi-angle-right" label="weiter" type="submit" />
@@ -76,61 +75,74 @@
 <script setup>
 import { computed, watch } from 'vue'
 import { useForm } from 'vee-validate'
-import { schema } from '@/utils/schemas/klimarelevanzpruefungFbFilter'
+import { schema } from '@/utils/schemas/klimarelevanzpruefungEingabe'
+import { createItem } from '@/composables/crud'
+import { useRoute, useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import FloatLabel from 'primevue/floatlabel'
 import ToggleSwitch from 'primevue/toggleswitch'
 import Divider from 'primevue/divider'
 
+const route = useRoute()
+const router = useRouter()
+
 const { defineField, handleSubmit, setValues, errors } = useForm({
   validationSchema: schema
 })
 
 const [name] = defineField('name')
-const [fb1] = defineField('fb1')
-const [fb2] = defineField('fb2')
-const [fb3] = defineField('fb3')
-const [fb4] = defineField('fb4')
-const [fb5] = defineField('fb5')
+const [f1] = defineField('f1')
+const [f2] = defineField('f2')
+const [f3] = defineField('f3')
+const [f4] = defineField('f4')
+const [f5] = defineField('f5')
 
 setValues({
-  fb1: false,
-  fb2: false,
-  fb3: false,
-  fb4: false,
-  fb5: false
+  f1: false,
+  f2: false,
+  f3: false,
+  f4: false,
+  f5: false
 })
 
-const disableFb1to4 = computed(() => fb5.value === true)
+const disableF1to4 = computed(() => f5.value === true)
 
-watch(fb5, (newVal) => {
+watch(f5, (newVal) => {
   if (newVal === true) {
     setValues({
-      fb1: false,
-      fb2: false,
-      fb3: false,
-      fb4: false
+      f1: false,
+      f2: false,
+      f3: false,
+      f4: false
     })
   }
 })
-const disableFb5 = computed(
-  () => fb1.value === true || fb2.value === true || fb3.value === true || fb4.value === true
+const disableF5 = computed(
+  () => f1.value === true || f2.value === true || f3.value === true || f4.value === true
 )
 
-watch([fb1, fb2, fb3, fb4], ([val1, val2, val3, val4]) => {
+watch([f1, f2, f3, f4], ([val1, val2, val3, val4]) => {
   if (val1 || val2 || val3 || val4) {
     setValues({
-      fb5: false
+      f5: false
     })
   }
 })
 
-const emit = defineEmits(['submit'])
-
-const onSubmit = handleSubmit((values) => {
-  console.log('Form Values:', values)
-  emit('submit', values)
+const onSubmit = handleSubmit(async (values) => {
+  const response = await createItem({
+    model: 'klimarelevanzpruefung/eingabe',
+    values,
+    detail: {
+      success: 'Klimarelevanzprüfung erfolgreich hinzugefügt',
+      error: 'Fehler beim Hinzufügen der Klimarelevanzprüfung'
+    }
+  })
+  router.push({
+    name: 'magistratsvorlage-id-klimarelevanzpruefung-id',
+    params: { id: route.params.id, klimarelevanzpruefungId: response.id }
+  })
 })
 </script>
 

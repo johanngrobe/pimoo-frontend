@@ -1,6 +1,5 @@
 <template>
   <div>
-    <BaseSubheading>Fragebogen 1</BaseSubheading>
     <form @submit.prevent="onSubmit" class="mt-4">
       <Stepper value="1">
         <StepList>
@@ -411,8 +410,10 @@
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue'
 import { useForm } from 'vee-validate'
-import { schema } from '@/utils/schemas/klimarelevanzpruefungFb1.js'
+import { schema } from '@/utils/schemas/klimarelevanzpruefungEingabeFb2'
+import { fetchItems } from '@/composables/crud'
 // import ToggleSwitch from 'primevue/toggleswitch'
 import Button from 'primevue/button'
 import Divider from 'primevue/divider'
@@ -424,6 +425,19 @@ import StepList from 'primevue/steplist'
 import StepPanels from 'primevue/steppanels'
 import Step from 'primevue/step'
 import StepPanel from 'primevue/steppanel'
+
+const isLoading = ref(false)
+const optionBoolean = ref()
+
+onMounted(async () => {
+  isLoading.value = true
+  await fetchData()
+  isLoading.value = false
+})
+
+const fetchData = async () => {
+  optionBoolean.value = await fetchItems('/einstellungen/bool-erweitert')
+}
 
 const { defineField, handleSubmit, errors } = useForm({
   validationSchema: schema
@@ -454,12 +468,6 @@ const [b2q2] = defineField('b2q2')
 const [b2q3] = defineField('b2q3')
 const [b2q4] = defineField('b2q4')
 const [b2q5] = defineField('b2q5')
-
-const optionBoolean = [
-  { label: 'Ja', value: true },
-  { label: 'Nein', value: false },
-  { label: 'Weiß nicht', value: null }
-]
 
 const onSubmit = handleSubmit((values) => {
   console.log('Form Values:', values)
